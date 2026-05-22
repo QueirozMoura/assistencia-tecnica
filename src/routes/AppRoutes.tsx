@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { HomePage } from '../pages/HomePage';
 import { ProductsPage } from '../pages/ProductsPage';
@@ -11,6 +11,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { AccountPage } from '../pages/AccountPage';
 
+
 function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center text-center px-4">
@@ -18,7 +19,7 @@ function NotFoundPage() {
         <div className="text-8xl font-black text-gray-100 mb-4">404</div>
         <h2 className="text-2xl font-black text-gray-900 mb-2">Página não encontrada</h2>
         <p className="text-gray-500 mb-6">A página que você procura não existe.</p>
-        <a href="/" className="text-blue-600 font-semibold hover:underline">Voltar ao início</a>
+        <Link to="/" className="text-blue-600 font-semibold hover:underline">Voltar ao início</Link>
       </div>
     </div>
   );
