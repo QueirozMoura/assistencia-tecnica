@@ -5,7 +5,7 @@ import './styles/globals.css';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/assistencia-tecnica">
       <AppRoutes />
     </BrowserRouter>
   );
