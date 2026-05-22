@@ -1,0 +1,23 @@
+# dependencies
+node_modules
+
+# build
+dist
+
+# logs
+*.log
+
+# environment variables
+.env
+
+# cache
+.cache
+.vite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/*
+!.vscode/extensions.json
