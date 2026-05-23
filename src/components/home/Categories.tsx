@@ -2,8 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import geladeiraImage from '../../assets/images/WhatsApp Image 2026-05-22 at 23.16.16.jpeg';
 import maquinaLavarImage from '../../assets/images/WhatsApp Image 2026-05-22 at 22.24.03 (1).jpeg';
 import lavaSecaImage from '../../assets/images/WhatsApp Image 2026-05-22 at 22.24.03 (2).jpeg';
+import secadoraImage from '../../assets/images/WhatsApp Image 2026-05-22 at 23.20.26.jpeg';
 import microondasImage from '../../assets/images/WhatsApp Image 2026-05-22 at 23.12.15.jpeg';
 
 const categories = [
@@ -14,7 +16,7 @@ const categories = [
     gradient: 'from-blue-500 to-cyan-400',
     bgGradient: 'from-blue-50 to-cyan-50',
     borderColor: 'border-blue-100',
-    image: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=400&q=80',
+    image: geladeiraImage,
     count: 4,
   },
   {
@@ -25,7 +27,7 @@ const categories = [
     bgGradient: 'from-indigo-50 to-blue-50',
     borderColor: 'border-indigo-100',
     image: maquinaLavarImage,
-    count: 3,
+    count: 7,
   },
   {
     slug: 'lava-e-seca',
@@ -35,7 +37,7 @@ const categories = [
     bgGradient: 'from-purple-50 to-indigo-50',
     borderColor: 'border-purple-100',
     image: lavaSecaImage,
-    count: 2,
+    count: 3,
   },
   {
     slug: 'secadora',
@@ -44,7 +46,7 @@ const categories = [
     gradient: 'from-orange-500 to-yellow-400',
     bgGradient: 'from-orange-50 to-yellow-50',
     borderColor: 'border-orange-100',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+    image: secadoraImage,
     count: 2,
   },
   {
@@ -112,13 +114,13 @@ export function Categories() {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
         >
           {categories.map((cat) => (
-            <motion.div key={cat.slug} variants={item}>
+            <motion.div key={cat.slug} variants={item} className="h-full">
               <Link
                 to={`/produtos?categoria=${cat.slug}`}
-                className={`group block bg-gradient-to-br ${cat.bgGradient} border ${cat.borderColor} rounded-3xl overflow-hidden hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1`}
+                className={`group flex h-full flex-col bg-gradient-to-br ${cat.bgGradient} border ${cat.borderColor} rounded-3xl overflow-hidden hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1`}
               >
                 {/* Image */}
-                <div className="relative h-36 overflow-hidden">
+                <div className="relative h-36 shrink-0 overflow-hidden">
                   <img
                     src={cat.image}
                     alt={cat.label}
@@ -131,11 +133,11 @@ export function Categories() {
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
+                <div className="flex flex-1 flex-col p-4">
                   <h3 className="font-bold text-gray-900 text-sm leading-tight">{cat.label}</h3>
                   <p className="text-gray-500 text-xs mt-1 leading-relaxed">{cat.description}</p>
 
-                  <div className={`flex items-center gap-1 mt-3 text-xs font-semibold bg-gradient-to-r ${cat.gradient} bg-clip-text text-transparent group-hover:gap-2 transition-all`}>
+                  <div className={`flex items-center gap-1 mt-auto pt-3 text-xs font-semibold bg-gradient-to-r ${cat.gradient} bg-clip-text text-transparent group-hover:gap-2 transition-all`}>
                     Ver produtos
                     <ArrowRight size={12} className={`bg-gradient-to-r ${cat.gradient} bg-clip-text`} />
                   </div>
