@@ -6,7 +6,6 @@ const brands = [
   { name: 'LG', bg: 'from-red-600 to-red-800' },
   { name: 'Electrolux', bg: 'from-teal-600 to-teal-800' },
   { name: 'Brastemp', bg: 'from-blue-700 to-indigo-900' },
-  { name: 'Whirlpool', bg: 'from-indigo-600 to-indigo-800' },
   { name: 'Consul', bg: 'from-slate-600 to-slate-800' },
 ];
 

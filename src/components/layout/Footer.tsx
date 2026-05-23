@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Instagram, Facebook, Youtube, Twitter, MapPin, Phone, Mail, Shield, Truck, CreditCard, RefreshCw } from 'lucide-react';
+import { Zap, Instagram, MessageCircle, MapPin, Phone, Mail, Shield, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { categoryLabels } from '../../data/products';
 
 const footerLinks = {
@@ -29,6 +29,23 @@ const benefits = [
   { icon: Shield, title: 'Compra Segura', description: 'Criptografia SSL' },
   { icon: CreditCard, title: '12x Sem Juros', description: 'Em todos os cartões' },
   { icon: RefreshCw, title: '30 Dias', description: 'Para troca ou devolução' },
+];
+
+const socialLinks = [
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/josue_f_queiroz',
+    icon: Instagram,
+  },
+  {
+    label: 'WhatsApp',
+    href: 'https://wa.me/5511965602135',
+    icon: MessageCircle,
+  },
+  {
+    label: 'OLX',
+    href: 'https://www.olx.com.br/',
+  },
 ];
 
 export function Footer() {
@@ -74,28 +91,38 @@ export function Footer() {
             </p>
 
             <div className="space-y-2 mb-6">
-              <a href="tel:08000000000" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+              <a href="tel:11965602135" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
                 <Phone size={14} className="text-blue-400" />
-                0800 JFQ HELP
+                11 96560-2135
               </a>
-              <a href="mailto:contato@jfqassistencia.com.br" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+              <a href="mailto:jqueiroz555@gmail.com" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
                 <Mail size={14} className="text-blue-400" />
-                contato@jfqassistencia.com.br
+                jqueiroz555@gmail.com
               </a>
               <span className="flex items-center gap-2 text-sm text-gray-400">
                 <MapPin size={14} className="text-blue-400" />
-                Atendemos todo o Brasil
+                Atendemos SP e região 
               </span>
             </div>
 
             <div className="flex gap-3">
-              {[Instagram, Facebook, Youtube, Twitter].map((Icon, i) => (
-                <button
-                  key={i}
+              {socialLinks.map(({ label, href, icon: Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
                   className="w-9 h-9 rounded-xl bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-colors group"
                 >
-                  <Icon size={16} className="text-gray-400 group-hover:text-white transition-colors" />
-                </button>
+                  {Icon ? (
+                    <Icon size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+                  ) : (
+                    <span className="text-[10px] font-black text-gray-400 group-hover:text-white transition-colors">
+                      {label}
+                    </span>
+                  )}
+                </a>
               ))}
             </div>
           </div>
