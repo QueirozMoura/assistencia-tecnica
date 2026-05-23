@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import maquinaLavarImage from '../../assets/images/WhatsApp Image 2026-05-22 at 22.24.03 (1).jpeg';
+import lavaSecaImage from '../../assets/images/WhatsApp Image 2026-05-22 at 22.24.03 (2).jpeg';
+import microondasImage from '../../assets/images/WhatsApp Image 2026-05-22 at 23.12.15.jpeg';
 
 const categories = [
   {
@@ -21,7 +24,7 @@ const categories = [
     gradient: 'from-indigo-500 to-blue-400',
     bgGradient: 'from-indigo-50 to-blue-50',
     borderColor: 'border-indigo-100',
-    image: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=400&q=80',
+    image: maquinaLavarImage,
     count: 3,
   },
   {
@@ -31,7 +34,7 @@ const categories = [
     gradient: 'from-purple-500 to-indigo-400',
     bgGradient: 'from-purple-50 to-indigo-50',
     borderColor: 'border-purple-100',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+    image: lavaSecaImage,
     count: 2,
   },
   {
@@ -51,7 +54,7 @@ const categories = [
     gradient: 'from-teal-500 to-green-400',
     bgGradient: 'from-teal-50 to-green-50',
     borderColor: 'border-teal-100',
-    image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80',
+    image: microondasImage,
     count: 3,
   },
 ];

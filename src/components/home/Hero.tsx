@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, Shield, Truck, Zap, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/Button';
+import heroImage from '../../assets/images/WhatsApp Image 2026-05-22 at 22.24.02.jpeg';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -123,7 +124,7 @@ export function Hero() {
               {/* Main image card */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
                 <img
-                  src="https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=600&q=80"
+                  src={heroImage}
                   alt="Geladeira Premium"
                   className="w-full h-[500px] object-cover"
                 />
