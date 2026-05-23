@@ -155,7 +155,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
-            © 2024 JFQ Assistência. Todos os direitos reservados.
+            © 2026 JFQ Assistência. Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <Link to="/privacidade" className="hover:text-gray-300 transition-colors">Privacidade</Link>

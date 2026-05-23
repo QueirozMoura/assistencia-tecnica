@@ -494,7 +494,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 198,
     images: [
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+      lavaSecaProduct1,
     ],
     badge: '20% OFF',
     badgeColor: 'red',
@@ -543,7 +543,7 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 142,
     images: [
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+      lavaSecaProduct2,
     ],
     inStock: true,
     description: 'A Samsung Perfect Care 9kg cuida das suas roupas enquanto seca com precisão. Tecnologia OptimalDry garante que cada peça seja seca no ponto certo.',
