@@ -10,6 +10,7 @@ import { SuccessPage } from '../pages/SuccessPage';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { AccountPage } from '../pages/AccountPage';
+import { TesteBackend } from '../pages/TesteBackend';
 
 
 function NotFoundPage() {
@@ -32,6 +33,7 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/cadastro" element={<RegisterPage />} />
       <Route path="/sucesso" element={<SuccessPage />} />
+      <Route path="/teste-backend" element={<TesteBackend />} />
 
       {/* Main layout */}
       <Route element={<Layout />}>
