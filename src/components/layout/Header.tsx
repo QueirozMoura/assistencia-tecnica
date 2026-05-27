@@ -5,7 +5,8 @@ import {
   Search, ShoppingCart, User, Menu, X, Zap, ChevronDown,
   Bell, Heart, MapPin
 } from 'lucide-react';
-import { useCartStore, useAuthStore, useUIStore } from '../../store/useStore';
+import { useCartStore, useUIStore } from '../../store/useStore';
+import { useAuth } from '../../contexts/AuthContext';
 import { useSearchProducts } from '../../hooks/useProducts';
 import { categoryLabels } from '../../data/products';
 import { formatCurrency } from '../../utils/formatters';
@@ -20,7 +21,7 @@ export function Header() {
   const navigate = useNavigate();
 
   const { getTotalItems, toggleCart } = useCartStore();
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuth();
   const { isMenuOpen, toggleMenu } = useUIStore();
 
   const searchResults = useSearchProducts(localSearch);

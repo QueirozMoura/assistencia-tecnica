@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { User, Mail, Lock, Eye, EyeOff, Zap, CheckCircle } from 'lucide-react';
-import { useAuthStore } from '../store/useStore';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 
 const benefits = [
@@ -15,7 +15,7 @@ const benefits = [
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register } = useAuthStore();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '', email: '', password: '', confirmPassword: '', phone: '',
   });
@@ -42,15 +42,18 @@ export function RegisterPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    const success = register(formData.name, formData.email, formData.password);
-    if (success) {
+    try {
+      await register({ name: formData.name, email: formData.email, password: formData.password });
       toast.success('Conta criada com sucesso! Bem-vindo(a)!');
       navigate('/');
-    } else {
-      toast.error('Erro ao criar conta. Tente novamente.');
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        'Erro ao criar conta. Tente novamente.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const passwordStrength = () => {

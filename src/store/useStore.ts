@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem, Product, User, FilterState } from '../types';
+import { CartItem, Product, FilterState } from '../types';
 
 interface CartStore {
   items: CartItem[];
@@ -25,14 +25,6 @@ interface UIStore {
   setSearchQuery: (query: string) => void;
   isMenuOpen: boolean;
   toggleMenu: () => void;
-}
-
-interface AuthStore {
-  isAuthenticated: boolean;
-  user: User | null;
-  login: (email: string, _password: string) => boolean;
-  logout: () => void;
-  register: (name: string, email: string, _password: string) => boolean;
 }
 
 interface FilterStore {
@@ -144,45 +136,6 @@ export const useUIStore = create<UIStore>((set) => ({
   isMenuOpen: false,
   toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen })),
 }));
-
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => ({
-      isAuthenticated: false,
-      user: null,
-
-      login: (email: string, _password: string) => {
-        // Fake authentication - always succeeds with any valid email format
-        if (email && email.includes('@')) {
-          set({
-            isAuthenticated: true,
-            user: {
-              id: 'user-001',
-              name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-              email,
-            },
-          });
-          return true;
-        }
-        return false;
-      },
-
-      logout: () => set({ isAuthenticated: false, user: null }),
-
-      register: (name: string, email: string, _password: string) => {
-        if (name && email && email.includes('@')) {
-          set({
-            isAuthenticated: true,
-            user: { id: 'user-new', name, email },
-          });
-          return true;
-        }
-        return false;
-      },
-    }),
-    { name: 'jfq-auth' }
-  )
-);
 
 export const useFilterStore = create<FilterStore>((set) => ({
   filters: defaultFilters,

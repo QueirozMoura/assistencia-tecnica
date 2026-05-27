@@ -11,6 +11,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { AccountPage } from '../pages/AccountPage';
 import { TesteBackend } from '../pages/TesteBackend';
+import { ProtectedRoute } from './ProtectedRoute';
 
 
 function NotFoundPage() {
@@ -42,9 +43,9 @@ export function AppRoutes() {
         <Route path="/produto/:id" element={<ProductDetailPage />} />
         <Route path="/carrinho" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/conta" element={<AccountPage />} />
-        <Route path="/conta/pedidos" element={<AccountPage />} />
-        <Route path="/conta/enderecos" element={<AccountPage />} />
+        <Route path="/conta" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+        <Route path="/conta/pedidos" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+        <Route path="/conta/enderecos" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

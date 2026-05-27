@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, Zap, ArrowRight } from 'lucide-react';
-import { useAuthStore } from '../store/useStore';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -29,15 +32,18 @@ export function LoginPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    const success = login(email, password);
-    if (success) {
+    try {
+      await login({ email, password });
       toast.success('Login realizado com sucesso!');
-      navigate('/');
-    } else {
-      toast.error('E-mail ou senha inválidos');
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        'E-mail ou senha inválidos';
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

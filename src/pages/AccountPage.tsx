@@ -5,7 +5,7 @@ import {
   User, Package, MapPin, Settings, LogOut, ChevronRight,
   Edit3, Check, Truck, Clock, CheckCircle
 } from 'lucide-react';
-import { useAuthStore } from '../store/useStore';
+import { useAuth } from '../contexts/AuthContext';
 import { mockOrders, mockAddresses } from '../data/orders';
 import { formatCurrency, formatDate, getStatusLabel, getStatusColor } from '../utils/formatters';
 import { Button } from '../components/ui/Button';
@@ -22,7 +22,7 @@ const statusIcons: Record<string, React.ReactNode> = {
 
 export function AccountPage() {
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>(
     location.pathname.includes('pedidos') ? 'orders' :
     location.pathname.includes('enderecos') ? 'addresses' : 'profile'

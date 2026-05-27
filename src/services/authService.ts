@@ -1,37 +1,17 @@
 import { api } from './api';
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: AuthUser;
-}
+import { storage } from '../utils/storage';
+import type { AuthUser, AuthResponse, LoginPayload, RegisterPayload } from '../types/auth';
 
 export const authService = {
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
+  async login(credentials: LoginPayload): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/login', credentials);
-    localStorage.setItem('auth_token', data.token);
+    storage.setToken(data.token);
     return data;
   },
 
-  async register(payload: RegisterRequest): Promise<AuthResponse> {
+  async register(payload: RegisterPayload): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/register', payload);
-    localStorage.setItem('auth_token', data.token);
+    storage.setToken(data.token);
     return data;
   },
 
@@ -41,6 +21,6 @@ export const authService = {
   },
 
   logout(): void {
-    localStorage.removeItem('auth_token');
+    storage.clear();
   },
 };
