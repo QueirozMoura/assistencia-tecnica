@@ -1,0 +1,349 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import {
+  CheckCircle, Clock, Shield, Phone, MessageSquare,
+  User, Mail, MapPin, Wrench, Calendar, ChevronRight,
+} from 'lucide-react'
+
+const equipmentTypes = [
+  'Máquina de Lavar',
+  'Lava e Seca',
+  'Centrífuga',
+  'Geladeira',
+  'Microondas',
+  'Outro',
+]
+
+const brandsList = [
+  'Brastemp', 'Consul', 'Electrolux', 'LG', 'Samsung',
+  'Panasonic', 'Midea', 'Philco', 'Whirlpool', 'Outra',
+]
+
+const timeSlots = [
+  'Manhã (8h às 12h)',
+  'Tarde (12h às 18h)',
+  'Qualquer horário',
+]
+
+const initialForm = {
+  name: '', phone: '', whatsapp: '', email: '',
+  address: '', city: '', cep: '',
+  equipment: '', brand: '', model: '',
+  problem: '', timeSlot: '', notes: '',
+}
+
+export default function Scheduling() {
+  const [form, setForm] = useState(initialForm)
+  const [submitted, setSubmitted] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  const validate = () => {
+    const e = {}
+    if (!form.name.trim()) e.name = 'Nome obrigatório'
+    if (!form.phone.trim()) e.phone = 'Telefone obrigatório'
+    if (!form.email.trim()) e.email = 'E-mail obrigatório'
+    if (!form.address.trim()) e.address = 'Endereço obrigatório'
+    if (!form.city.trim()) e.city = 'Cidade obrigatória'
+    if (!form.equipment) e.equipment = 'Selecione o equipamento'
+    if (!form.problem.trim()) e.problem = 'Descreva o problema'
+    return e
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm((f) => ({ ...f, [name]: value }))
+    if (errors[name]) setErrors((er) => ({ ...er, [name]: '' }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const e2 = validate()
+    if (Object.keys(e2).length > 0) { setErrors(e2); return }
+    setSubmitted(true)
+  }
+
+  const inputClass = (field) =>
+    `w-full bg-white border rounded-xl px-4 py-3 text-sm text-[#181c20] placeholder-[#737780] outline-none transition-colors ${
+      errors[field]
+        ? 'border-[#ba1a1a] focus:border-[#ba1a1a]'
+        : 'border-[#c3c6d1] focus:border-[#0070ea]'
+    }`
+
+  if (submitted) {
+    return (
+      <div className="bg-[#f7f9ff] min-h-screen flex items-center justify-center py-20">
+        <div className="bg-white rounded-2xl p-10 shadow-xl text-center max-w-md mx-4">
+          <div className="w-16 h-16 bg-[#d4f5e2] rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle size={32} className="text-[#1a6b3c]" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#003366] mb-3">Solicitação Enviada!</h2>
+          <p className="text-[#43474f] mb-2">
+            Recebemos sua solicitação de atendimento. Nossa equipe entrará em contato em até <strong>2 horas</strong> para confirmar o agendamento.
+          </p>
+          <p className="text-sm text-[#737780] mb-8">
+            Você também pode nos contatar pelo WhatsApp para agilizar o atendimento.
+          </p>
+          <div className="flex flex-col gap-3">
+            <a
+              href="https://wa.me/5511999999999"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#1ebe5d] transition-colors"
+            >
+              <MessageSquare size={16} />
+              Falar no WhatsApp
+            </a>
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 border border-[#e5e8ee] text-[#43474f] px-6 py-3 rounded-xl font-medium hover:bg-[#f7f9ff] transition-colors text-sm"
+            >
+              Voltar ao Início
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-[#f7f9ff] min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-12">
+        <div className="container-max">
+          <nav className="text-xs text-[#8fa8c8] mb-3 flex items-center gap-1">
+            <Link to="/" className="hover:text-white transition-colors">Início</Link>
+            <ChevronRight size={12} />
+            <span className="text-white">Agendamento</span>
+          </nav>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Agendar Visita Técnica</h1>
+          <p className="text-[#8fa8c8]">Preencha o formulário e nossa equipe entrará em contato em até 2 horas.</p>
+        </div>
+      </section>
+
+      <div className="container-max py-10">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Form */}
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#e5e8ee] space-y-6">
+
+              {/* Dados Pessoais */}
+              <div>
+                <h2 className="font-bold text-[#003366] text-lg mb-4 flex items-center gap-2">
+                  <User size={18} className="text-[#0070ea]" />
+                  Dados Pessoais
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Nome completo *</label>
+                    <input name="name" value={form.name} onChange={handleChange} placeholder="Seu nome" className={inputClass('name')} />
+                    {errors.name && <p className="text-xs text-[#ba1a1a] mt-1">{errors.name}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Telefone *</label>
+                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="(11) 9999-9999" className={inputClass('phone')} />
+                    {errors.phone && <p className="text-xs text-[#ba1a1a] mt-1">{errors.phone}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">WhatsApp</label>
+                    <input name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="(11) 9999-9999" className={inputClass('whatsapp')} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">E-mail *</label>
+                    <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="seu@email.com" className={inputClass('email')} />
+                    {errors.email && <p className="text-xs text-[#ba1a1a] mt-1">{errors.email}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Endereço */}
+              <div>
+                <h2 className="font-bold text-[#003366] text-lg mb-4 flex items-center gap-2">
+                  <MapPin size={18} className="text-[#0070ea]" />
+                  Endereço para Atendimento
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Endereço completo *</label>
+                    <input name="address" value={form.address} onChange={handleChange} placeholder="Rua, número, complemento" className={inputClass('address')} />
+                    {errors.address && <p className="text-xs text-[#ba1a1a] mt-1">{errors.address}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">CEP</label>
+                    <input name="cep" value={form.cep} onChange={handleChange} placeholder="00000-000" className={inputClass('cep')} />
+                  </div>
+                  <div className="md:col-span-3">
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Cidade *</label>
+                    <input name="city" value={form.city} onChange={handleChange} placeholder="Sua cidade" className={inputClass('city')} />
+                    {errors.city && <p className="text-xs text-[#ba1a1a] mt-1">{errors.city}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Equipamento */}
+              <div>
+                <h2 className="font-bold text-[#003366] text-lg mb-4 flex items-center gap-2">
+                  <Wrench size={18} className="text-[#0070ea]" />
+                  Dados do Equipamento
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Tipo de equipamento *</label>
+                    <select name="equipment" value={form.equipment} onChange={handleChange} className={inputClass('equipment')}>
+                      <option value="">Selecione...</option>
+                      {equipmentTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    {errors.equipment && <p className="text-xs text-[#ba1a1a] mt-1">{errors.equipment}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Marca</label>
+                    <select name="brand" value={form.brand} onChange={handleChange} className={inputClass('brand')}>
+                      <option value="">Selecione...</option>
+                      {brandsList.map((b) => <option key={b} value={b}>{b}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Modelo</label>
+                    <input name="model" value={form.model} onChange={handleChange} placeholder="Ex: BWK12AB" className={inputClass('model')} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Problema */}
+              <div>
+                <h2 className="font-bold text-[#003366] text-lg mb-4 flex items-center gap-2">
+                  <Calendar size={18} className="text-[#0070ea]" />
+                  Descrição do Problema
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Descreva o problema *</label>
+                    <textarea
+                      name="problem"
+                      value={form.problem}
+                      onChange={handleChange}
+                      rows={4}
+                      placeholder="Descreva o problema com o máximo de detalhes possível..."
+                      className={`${inputClass('problem')} resize-none`}
+                    />
+                    {errors.problem && <p className="text-xs text-[#ba1a1a] mt-1">{errors.problem}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-2">Melhor horário para atendimento</label>
+                    <div className="flex flex-wrap gap-2">
+                      {timeSlots.map((slot) => (
+                        <button
+                          key={slot}
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, timeSlot: slot }))}
+                          className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                            form.timeSlot === slot
+                              ? 'bg-[#0070ea] text-white border-[#0070ea]'
+                              : 'bg-white text-[#43474f] border-[#c3c6d1] hover:border-[#0070ea]'
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Observações adicionais</label>
+                    <textarea
+                      name="notes"
+                      value={form.notes}
+                      onChange={handleChange}
+                      rows={2}
+                      placeholder="Informações adicionais que possam ajudar o técnico..."
+                      className={`${inputClass('notes')} resize-none`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-[#0070ea] text-white py-4 rounded-xl font-bold text-base hover:bg-[#0059bb] transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <CheckCircle size={18} />
+                Solicitar Atendimento
+              </button>
+              <p className="text-xs text-[#737780] text-center">
+                Ao enviar, você concorda com nossa política de privacidade. Retornaremos em até 2 horas.
+              </p>
+            </form>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-5">
+            {/* Info card */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#e5e8ee]">
+              <h3 className="font-bold text-[#003366] mb-4">Informações de Contato</h3>
+              <div className="space-y-3">
+                <a href="tel:+5511999999999" className="flex items-center gap-3 text-sm text-[#43474f] hover:text-[#0070ea] transition-colors">
+                  <div className="w-9 h-9 bg-[#cce0ff] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Phone size={15} className="text-[#003366]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#181c20]">(11) 9999-9999</p>
+                    <p className="text-xs text-[#737780]">Seg–Sáb: 8h às 18h</p>
+                  </div>
+                </a>
+                <a
+                  href="https://wa.me/5511999999999"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-sm text-[#43474f] hover:text-[#25D366] transition-colors"
+                >
+                  <div className="w-9 h-9 bg-[#d4f5e2] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <MessageSquare size={15} className="text-[#1a6b3c]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#181c20]">WhatsApp</p>
+                    <p className="text-xs text-[#737780]">Resposta rápida</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            {/* Guarantees */}
+            <div className="bg-[#003366] rounded-2xl p-5 text-white">
+              <h3 className="font-bold mb-4">Nossas Garantias</h3>
+              <div className="space-y-3">
+                {[
+                  { icon: Clock, text: 'Técnico em até 24h úteis' },
+                  { icon: Shield, text: '90 dias de garantia no serviço' },
+                  { icon: CheckCircle, text: 'Diagnóstico 100% gratuito' },
+                  { icon: Wrench, text: 'Peças originais certificadas' },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-2.5 text-sm text-[#a7c8ff]">
+                    <Icon size={15} className="text-[#0070ea] flex-shrink-0" />
+                    {text}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Area */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#e5e8ee]">
+              <h3 className="font-bold text-[#003366] mb-3">Área de Atendimento</h3>
+              <div className="space-y-1.5">
+                {[
+                  'São Paulo (Capital)',
+                  'ABC Paulista',
+                  'Guarulhos',
+                  'Osasco',
+                  'Mauá e região',
+                ].map((city) => (
+                  <div key={city} className="flex items-center gap-2 text-sm text-[#43474f]">
+                    <CheckCircle size={13} className="text-[#0070ea]" />
+                    {city}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

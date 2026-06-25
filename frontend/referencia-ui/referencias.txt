@@ -1,0 +1,2867 @@
+<!-- ElectroService - Home -->
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroService | Professional Appliance Sales &amp; Support</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3135",
+                    "primary": "#001e40",
+                    "on-secondary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#191c1d",
+                    "surface-container-highest": "#e0e3e8",
+                    "outline": "#737780",
+                    "inverse-primary": "#a7c8ff",
+                    "tertiary": "#1c1f20",
+                    "secondary-fixed-dim": "#adc7ff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-container": "#ebeef3",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#313435",
+                    "surface-container-low": "#f1f4f9",
+                    "surface-tint": "#3a5f94",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-secondary-fixed-variant": "#004493",
+                    "surface-bright": "#f7f9ff",
+                    "background": "#f7f9ff",
+                    "on-primary-container": "#799dd6",
+                    "surface-dim": "#d7dadf",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "surface-container-high": "#e5e8ee",
+                    "inverse-on-surface": "#eef1f6",
+                    "on-surface": "#181c20",
+                    "secondary": "#0059bb",
+                    "on-tertiary-container": "#9a9c9d",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#003366",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "on-secondary-container": "#fefcff",
+                    "primary-fixed": "#d5e3ff",
+                    "on-primary-fixed": "#001b3c",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#0070ea",
+                    "tertiary-fixed": "#e1e3e4",
+                    "on-surface-variant": "#43474f",
+                    "surface": "#f7f9ff",
+                    "on-background": "#181c20",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c3c6d1",
+                    "surface-variant": "#e0e3e8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "xl": "80px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-shadow {
+            box-shadow: 0px 4px 20px rgba(0, 51, 102, 0.08);
+        }
+        .premium-shadow:hover {
+            box-shadow: 0px 12px 30px rgba(0, 51, 102, 0.12);
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter py-4 bg-surface-container-lowest dark:bg-surface-container-high shadow-sm max-w-container-max mx-auto left-0 right-0">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">ElectroService</div>
+<nav class="hidden md:flex gap-md items-center">
+<a class="text-secondary dark:text-secondary-fixed-dim border-b-2 border-secondary dark:border-secondary-fixed-dim pb-1 font-label-md text-label-md" href="#">Laundry</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200 font-label-md text-label-md" href="#">Refrigerators</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200 font-label-md text-label-md" href="#">Microwaves</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200 font-label-md text-label-md" href="#">Parts</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200 font-label-md text-label-md" href="#">Services</a>
+</nav>
+<div class="flex items-center gap-base">
+<div class="relative hidden sm:block">
+<input class="rounded-full bg-surface-container-low border-none px-4 py-2 text-label-md focus:ring-2 focus:ring-secondary-container w-48 lg:w-64" placeholder="Search appliances..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-on-surface-variant" style="font-size: 20px;">search</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="shopping_cart">shopping_cart</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="pt-24 lg:pt-32 pb-xl bg-surface-container-low overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter grid lg:grid-cols-2 gap-xl items-center">
+<div class="space-y-md">
+<span class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider">Premium Performance</span>
+<h1 class="font-display-lg text-display-lg-mobile lg:text-display-lg text-primary leading-tight">Elite Care for Your Home Appliances</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">Experience the next generation of washing technology. Professional installation, specialized technical support, and the world's most advanced appliances delivered to your door.</p>
+<div class="flex flex-wrap gap-sm pt-4">
+<button class="bg-secondary text-on-secondary px-8 py-4 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all premium-shadow">Shop Now</button>
+<button class="border-2 border-primary text-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-all">Request Repair</button>
+<button class="text-primary font-label-md text-label-md flex items-center gap-xs px-4 py-4 hover:underline">
+                        Contact Us <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="relative">
+<div class="w-full h-[400px] lg:h-[550px] rounded-2xl overflow-hidden premium-shadow transform rotate-1">
+<img class="w-full h-full object-cover" data-alt="A professional studio photograph of a modern, sleek silver front-loading washing machine and matching dryer stacked together in a high-end, minimalist laundry room. The lighting is soft and corporate, highlighting the metallic finish and digital interfaces of the appliances. The background features clean white tiles and subtle blue lighting accents, evoking a sense of technological advancement and clinical precision. The overall mood is premium, trustworthy, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtBRMxEcQG107mNCaKsDiXUzc9rQXasV3JbT0md-vUyBuB87Fel_nNVQf5CFSh75FYtAHgnFsZQvLqF1aEz6D0yuW6zA87yWSynQEKHqWH32cwV2SY9B2ZlSKGI7KwmyNCY4beCsmtq_A0uMjWZeDtwH4nWqeQ0XF1gMirRw5P-E1QevOz8r5u69utAJgcr073SE6ZvbCNdEaVjT7Bx2ELSltcYZi2MYZwz1-nTkj6Aj0reu6S7GDiUL-9fu_OVggvAcdJF_W8DbU"/>
+</div>
+<div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl hidden md:block">
+<div class="flex items-center gap-4">
+<div class="bg-primary-container p-3 rounded-full">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-primary">Certified Expert</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Official technical support</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Benefits Bar -->
+<div class="bg-primary py-md">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="flex items-center gap-sm justify-center md:justify-start">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-size: 32px;">speed</span>
+<span class="text-on-primary font-label-md text-label-md">Fast Service &amp; Logistics</span>
+</div>
+<div class="flex items-center gap-sm justify-center">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-size: 32px;">shield_lock</span>
+<span class="text-on-primary font-label-md text-label-md">Full Manufacturer Warranty</span>
+</div>
+<div class="flex items-center gap-sm justify-center md:justify-end">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-size: 32px;">lock</span>
+<span class="text-on-primary font-label-md text-label-md">100% Secure Payments</span>
+</div>
+</div>
+</div>
+<!-- Category Bento Grid -->
+<section class="py-xl max-w-container-max mx-auto px-gutter">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Browse Categories</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Everything your home needs, in one place.</p>
+</div>
+<a class="text-secondary font-label-md text-label-md hover:underline" href="#">View All Categories</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md h-auto md:h-[600px]">
+<!-- Large Card -->
+<div class="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl premium-shadow bg-surface-container">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A detailed, high-resolution product shot of a collection of modern front-loading washing machines and dryers in a bright, airy showroom. The environment is minimalist with polished concrete floors and soft blue spotlighting. The machines feature glass doors and touch-screen interfaces. The lighting is high-key and professional, reinforcing a sense of premium quality and corporate reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Ax74IxPmHd4aQwyMH_uLTLe4A_QfDfMCR2m03YoOXjDPL9Egda4FwHLkvJRkydAhzz40kprfAcVCAGz2pkk_j8zrG_kBzCQGARcRWMlPUWwK3hEKK-whSmPgwBcCgzmToxTMIE7caUJ6w2yZPcnq0v5UruL3iCDF6jCvEEpNHiRcHl19JcN3oIVjkyMbPi2XBK788SXFQ6I3BWPhi0hnVSJglt8wEdwJAyqh833Da16AZwkl_vJncUU1oqjOBZcy6_eTa3Abr9I"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-lg w-full">
+<h3 class="font-headline-md text-headline-md text-white">Laundry Solutions</h3>
+<p class="text-white/80 font-body-md text-body-md mt-2">Washing Machines &amp; Washer-Dryers</p>
+<button class="mt-4 bg-white text-primary px-6 py-2 rounded-lg font-label-md text-label-md transition-transform active:scale-95">Explore Collection</button>
+</div>
+</div>
+<!-- Medium Cards -->
+<div class="group relative overflow-hidden rounded-2xl premium-shadow bg-surface-container">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A clean, minimalist close-up of a high-end stainless steel refrigerator with French doors. The background is a soft light grey kitchen setting. The image highlights the sleek texture of the steel and the premium craftsmanship. Lighting is cool and balanced, focusing on the vertical lines and handle details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCJT7pNmMRsuULzqEnAWHrSVHlbtyiyglJBb-veWOK9UN03G4XpDzxJ9W2_uY5wHhxvx3kvqpvWg2H-BCI8CmWFfK4QQMCEyZ1PLa2FrGIoykywgypSR3Wy8Gb4EPjkTaDyzu4CXeo2a_S37CRWMtZgISAK-I_XqLiPIzgsxIRCUaOSVOq5L0WfkZ60yGELMx2xi52qb882nAEltVjDB7joBYD06GUh47jJcufhoQoWqfAyLg7fTPAXYhlIgtovWUgsdbY5lwIa7s"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-md">
+<h3 class="font-headline-sm text-headline-sm text-white">Refrigerators</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl premium-shadow bg-surface-container">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="An artistic, professional product shot of a built-in modern microwave oven with a black glass finish. The kitchen setting is dark and sophisticated, with subtle golden warm accents from under-cabinet lighting. The focus is on the digital display and the sleek minimalist design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrEvszjuDo3z6YoGnHLBPcvF0k0YzVxXhszZ1izvP0sdbNaCpg9QsnJEGiVC_oUb92IeenSbX_YWdh0KSW_Nmq8DmNVK_f1TIvT1wCBif2ZMvRBwSWzySF7VtHEQx-DJWaKrwnFQpHI8Ii39OC9635FsvjOzCAKs6QccjrROL95TqAuCz5G8zFEQdtoYV2WqKajOCZwrcLwQkVL2PrBZLkpU__tSDJIqRAaRw3_-pkqYqaiTqJYc5zOBrUi26mHjaX7SMzHmfo2wk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-md">
+<h3 class="font-headline-sm text-headline-sm text-white">Microwaves</h3>
+</div>
+</div>
+<!-- Wide Bottom Card -->
+<div class="md:col-span-2 group relative overflow-hidden rounded-2xl premium-shadow bg-surface-container">
+<div class="absolute inset-0 bg-primary-container"></div>
+<div class="absolute inset-0 opacity-20">
+<img class="w-full h-full object-cover grayscale" data-alt="A professional flat-lay arrangement of various mechanical and electronic appliance spare parts, including water pumps, control boards, and heating elements. The parts are laid out on a clean white surface with technical blueprints faintly visible in the background. The aesthetic is organized, technical, and precise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP3dYnjNbupB9NHbyhXIJsWlReNgyzSY8clKqW0e9sa_yULhzRwEy9PwDeEoQ_XPQmN8ZJOHOOJxSzHVo3-gavUme_JrI0CECGYdN5Y36zLW0EqUm0pSQxfBCuZ2jxvfPVQYNEFDGb3V9Q3cms9vpqdTG3SaTFb5NVraXC8qau0U3SBIU_VMrzgUjLuKaiNT8JcW1M8u6tqgX1-3QxRVdrxUMi-1Gk4apJODmKQyDsi4VpHDtx6XeDUrYCxdIOCuq7radfk7eH1fw"/>
+</div>
+<div class="relative h-full p-lg flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-white">Genuine Spare Parts</h3>
+<p class="text-white/70 font-body-md text-body-md mt-2">Extend the life of your appliances with original components.</p>
+<div class="mt-4">
+<button class="bg-secondary text-white px-6 py-2 rounded-lg font-label-md text-label-md">Shop Parts</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Assistance Section -->
+<section class="bg-surface-container-low py-xl">
+<div class="max-w-container-max mx-auto px-gutter text-center mb-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-4">Technical Assistance Excellence</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">We don't just sell; we care for your investment with Brazil's most trusted technician network.</p>
+</div>
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-white p-8 rounded-2xl premium-shadow text-center">
+<div class="w-16 h-16 bg-secondary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-secondary" style="font-size: 32px;">home_repair_service</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2">On-site Repair</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Request a visit and get your appliance fixed in the comfort of your home within 24 hours.</p>
+</div>
+<div class="bg-white p-8 rounded-2xl premium-shadow text-center">
+<div class="w-16 h-16 bg-secondary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-secondary" style="font-size: 32px;">badge</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2">Certified Technicians</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Our team undergoes rigorous factory training for all major brands we carry.</p>
+</div>
+<div class="bg-white p-8 rounded-2xl premium-shadow text-center">
+<div class="w-16 h-16 bg-secondary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-secondary" style="font-size: 32px;">inventory_2</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2">Original Parts</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">We only use genuine manufacturer parts to ensure the longevity and safety of your machine.</p>
+</div>
+</div>
+</section>
+<!-- Featured Products -->
+<section class="py-xl max-w-container-max mx-auto px-gutter">
+<div class="flex justify-between items-center mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary">Hot Deals This Week</h2>
+<div class="flex gap-2">
+<button class="p-2 border border-outline-variant rounded-full hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-2 border border-outline-variant rounded-full hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Product Card 1 -->
+<div class="bg-white rounded-2xl overflow-hidden premium-shadow flex flex-col group">
+<div class="relative h-64 bg-surface-container-low p-6 overflow-hidden">
+<div class="absolute top-3 left-3 bg-error text-white font-label-sm text-label-sm px-3 py-1 rounded-full z-10">15% OFF</div>
+<img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="A clean product shot of a premium white 12kg front-load washing machine with a chrome-trimmed glass door, isolated on a light grey background. The image is bright, professional, and captures the appliance's modern interface and high-quality build." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7vhc_ILUFz0U9SCejrtRcGG2l5XSC-fbId6AR6OJHkZ7UV-PASAPj7_fQKiglFUdZBN3vHzpi79nz73StmQP8CgVCAujOazQ7O6EiBpPxwrCxRfOMGD_NQ9vA1j6WNzwFmBOhXt_dyOB7nVmTz71QDtQnR3t08aXGUK3cvkWnpDvAqJlqLrejHRaM9qrK1wXlo6TUsgVWFCeqCUuuhLRFnKhzneUkYfqkpbjnFFr-QnVFmjzSH80ClLhSflVJzV8tWmbRg6rV4uI"/>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="font-label-sm text-label-sm text-secondary mb-1">Samsung Elite Series</div>
+<h3 class="font-headline-sm text-headline-sm text-primary line-clamp-1">ProClean 12kg Front Load</h3>
+<div class="flex items-center gap-1 my-2">
+<span class="material-symbols-outlined text-yellow-500" style="font-variation-settings: 'FILL' 1; font-size: 16px;">star</span>
+<span class="font-label-md text-label-md">4.9</span>
+<span class="text-on-surface-variant text-label-sm">(124 reviews)</span>
+</div>
+<div class="mt-auto">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-primary">$899.00</span>
+<span class="text-on-surface-variant text-label-sm line-through">$1,059.00</span>
+</div>
+<button class="w-full mt-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white py-2 rounded-lg font-label-md text-label-md transition-all">Add to Cart</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-white rounded-2xl overflow-hidden premium-shadow flex flex-col group">
+<div class="relative h-64 bg-surface-container-low p-6 overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="A professional product photograph of a modern black matte microwave oven with a digital LED display and touch controls. The lighting is moody and elegant, emphasizing the sophisticated finish and the minimalist aesthetic. Isolated on a light neutral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF5iu_DcnfEwh0zQdb1eS-6yWQjzzhJxFmPwdXLOKC2NABU4opCA1tc-H7b-QHdEE0MbiWSEnnuVhKQL5WSdwwWq3gK7PsWnZqjp-qVFomNy6Sb4nqyGO5OpMGU5nlR4BtGcHVpI3tjuG-_x9WV1FylQw94X7a1hqnkGQLZnY7KDkOK28pFFsVTJhB_vYljTpbsstIuvYS-4vOKlws5r1Ut3qm92WjLbiTqGCBZd5xolcEEdxqTFsWFOUSgndIOY3fX_sabER2Kzo"/>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="font-label-sm text-label-sm text-secondary mb-1">LG NeoChef</div>
+<h3 class="font-headline-sm text-headline-sm text-primary line-clamp-1">Smart Inverter Microwave</h3>
+<div class="flex items-center gap-1 my-2">
+<span class="material-symbols-outlined text-yellow-500" style="font-variation-settings: 'FILL' 1; font-size: 16px;">star</span>
+<span class="font-label-md text-label-md">4.7</span>
+<span class="text-on-surface-variant text-label-sm">(86 reviews)</span>
+</div>
+<div class="mt-auto">
+<div class="font-headline-sm text-headline-sm text-primary">$349.00</div>
+<button class="w-full mt-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white py-2 rounded-lg font-label-md text-label-md transition-all">Add to Cart</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-white rounded-2xl overflow-hidden premium-shadow flex flex-col group">
+<div class="relative h-64 bg-surface-container-low p-6 overflow-hidden">
+<div class="absolute top-3 left-3 bg-error text-white font-label-sm text-label-sm px-3 py-1 rounded-full z-10">10% OFF</div>
+<img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="A clean studio photo of a large French-door refrigerator in brushed stainless steel. The background is a minimalist modern kitchen with soft lighting. The focus is on the water dispenser and the sleek vertical handles. High-end and corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR5emPr7bNgjn6ceoPmp1ix29RYFslGYn7c64gUBcc1WbPI6omcv6ZIhr9_M-gOr0Hkwd3R1ZXWxWaECCc9UEK6OJplKn7UGrWowEJRRsexJzztUmOnLmgvAh_1NA4twymZ6-yiT7whCCWCePBVvneFKbXvXtLU3D20JckhwHthNNMr6hiv74LUF_CWum2Sg7asMCRqsmL-U9SSo5DNSSLSGb4J5HGEWQ6cxhnMWs9v5MDG5jhr97b2UvcObUYNYu-dnuf17tLKwQ"/>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="font-label-sm text-label-sm text-secondary mb-1">Whirlpool Master</div>
+<h3 class="font-headline-sm text-headline-sm text-primary line-clamp-1">Family Hub Refrigerator</h3>
+<div class="flex items-center gap-1 my-2">
+<span class="material-symbols-outlined text-yellow-500" style="font-variation-settings: 'FILL' 1; font-size: 16px;">star</span>
+<span class="font-label-md text-label-md">5.0</span>
+<span class="text-on-surface-variant text-label-sm">(42 reviews)</span>
+</div>
+<div class="mt-auto">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-primary">$2,499.00</span>
+<span class="text-on-surface-variant text-label-sm line-through">$2,799.00</span>
+</div>
+<button class="w-full mt-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white py-2 rounded-lg font-label-md text-label-md transition-all">Add to Cart</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-white rounded-2xl overflow-hidden premium-shadow flex flex-col group">
+<div class="relative h-64 bg-surface-container-low p-6 overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" data-alt="A professional product shot of a silver washer-dryer combo appliance with a black door, isolated on a light grey studio background. The lighting is balanced and crisp, highlighting the high-quality plastic and metal components of the modern household machine." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp7NYBQ6i1WS2Vpt3BtcdfqTb3dHFT_XDwYh_q3fqKuo0EHXxxx2j9ApTgmmk1wOTv5LyNQhiJCAuXvBEDsu7bitIWIJewyiRQkg8tBLNUyU_ZZLzcBMkqLahnz917wDvazXwIMGVvwmfE01IYppF_SPfXK5bgXmlDhNg_zkuzJDIUOuqJ6YjcdFx-SKosOwhYCOJ6yPzlo-s3K2NDCOXPEr5veYIfBBPS4MTaB1qsug5tcG8miu1ugm71vp2S4zwPN3d1hJFZOnw"/>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="font-label-sm text-label-sm text-secondary mb-1">Bosch Series 6</div>
+<h3 class="font-headline-sm text-headline-sm text-primary line-clamp-1">EcoSilence Washer Dryer</h3>
+<div class="flex items-center gap-1 my-2">
+<span class="material-symbols-outlined text-yellow-500" style="font-variation-settings: 'FILL' 1; font-size: 16px;">star</span>
+<span class="font-label-md text-label-md">4.8</span>
+<span class="text-on-surface-variant text-label-sm">(210 reviews)</span>
+</div>
+<div class="mt-auto">
+<div class="font-headline-sm text-headline-sm text-primary">$1,150.00</div>
+<button class="w-full mt-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white py-2 rounded-lg font-label-md text-label-md transition-all">Add to Cart</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials Section -->
+<section class="py-xl bg-primary">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-xl">
+<h2 class="font-headline-md text-headline-md text-white">Trust from Our Clients</h2>
+<p class="font-body-lg text-body-lg text-white/70">Join thousands of satisfied homeowners.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="bg-primary-container p-8 rounded-2xl border border-white/10">
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-white font-body-md text-body-md italic mb-6">"Excellent service! My washer was fixed on the same day I called. The technician was professional and knowledgeable."</p>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-white">RM</div>
+<div>
+<div class="text-white font-label-md text-label-md">Ricardo M.</div>
+<div class="text-white/60 font-label-sm text-label-sm">São Paulo, SP</div>
+</div>
+</div>
+</div>
+<div class="bg-primary-container p-8 rounded-2xl border border-white/10">
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-white font-body-md text-body-md italic mb-6">"Buying a new refrigerator was a breeze. They delivered and installed it within 48 hours. Five stars!"</p>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-white">AS</div>
+<div>
+<div class="text-white font-label-md text-label-md">Ana Silva</div>
+<div class="text-white/60 font-label-sm text-label-sm">Rio de Janeiro, RJ</div>
+</div>
+</div>
+</div>
+<div class="bg-primary-container p-8 rounded-2xl border border-white/10">
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-white font-body-md text-body-md italic mb-6">"Authentic parts make a huge difference. My 10-year-old microwave works like new again. Highly recommend ElectroService."</p>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-white">JL</div>
+<div>
+<div class="text-white font-label-md text-label-md">João L.</div>
+<div class="text-white/60 font-label-sm text-label-sm">Curitiba, PR</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container">
+<div class="w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-4 gap-md max-w-container-max mx-auto">
+<div class="md:col-span-1">
+<div class="font-headline-sm text-headline-sm text-white font-bold mb-4">ElectroService</div>
+<p class="font-body-md text-body-md text-on-primary/80 mb-6">Your premier partner for professional household appliance sales and specialized maintenance services.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" href="#">
+<span class="material-symbols-outlined">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" href="#">
+<span class="material-symbols-outlined">mail</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" href="#">
+<span class="material-symbols-outlined">phone_in_talk</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white font-bold mb-4">Solutions</h4>
+<ul class="space-y-2 font-body-md text-body-md text-on-primary/80">
+<li><a class="hover:text-on-primary transition-opacity" href="#">Washing Machines</a></li>
+<li><a class="hover:text-on-primary transition-opacity" href="#">Refrigerators</a></li>
+<li><a class="hover:text-on-primary transition-opacity" href="#">Microwaves</a></li>
+<li><a class="hover:text-on-primary transition-opacity" href="#">Dishwashers</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white font-bold mb-4">Support</h4>
+<ul class="space-y-2 font-body-md text-body-md text-on-primary/80">
+<li><a class="hover:text-on-primary font-bold underline" href="#">Service Policy</a></li>
+<li><a class="hover:text-on-primary/80 transition-opacity" href="#">Maintenance Plans</a></li>
+<li><a class="hover:text-on-primary/80 transition-opacity" href="#">Warranty Info</a></li>
+<li><a class="hover:text-on-primary/80 transition-opacity" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white font-bold mb-4">Join Newsletter</h4>
+<p class="font-body-md text-body-md text-on-primary/80 mb-4">Get the latest technical tips and offers.</p>
+<div class="flex">
+<input class="bg-white/10 border-none rounded-l-lg px-4 py-2 text-white placeholder:text-white/40 focus:ring-1 focus:ring-white w-full" placeholder="Email address" type="email"/>
+<button class="bg-secondary text-white px-4 py-2 rounded-r-lg font-label-md text-label-md transition-transform active:scale-95">Join</button>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter py-md border-t border-white/10 text-center text-on-primary/60 font-body-md text-body-md">
+            © 2024 ElectroService. Specialized Technical Support.
+        </div>
+</footer>
+<!-- FAB for Support (Contextual) -->
+<div class="fixed bottom-8 right-8 z-40">
+<button class="w-16 h-16 bg-secondary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform group">
+<span class="material-symbols-outlined text-white" style="font-size: 32px; font-variation-settings: 'FILL' 1;">chat</span>
+<span class="absolute right-full mr-4 bg-white text-primary px-4 py-2 rounded-lg text-label-md font-bold shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Need Assistance?</span>
+</button>
+</div>
+</body></html>
+
+<!-- ElectroService - All Appliances -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroService | Professional Appliances</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3135",
+                    "primary": "#001e40",
+                    "on-secondary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#191c1d",
+                    "surface-container-highest": "#e0e3e8",
+                    "outline": "#737780",
+                    "inverse-primary": "#a7c8ff",
+                    "tertiary": "#1c1f20",
+                    "secondary-fixed-dim": "#adc7ff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-container": "#ebeef3",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#313435",
+                    "surface-container-low": "#f1f4f9",
+                    "surface-tint": "#3a5f94",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-secondary-fixed-variant": "#004493",
+                    "surface-bright": "#f7f9ff",
+                    "background": "#f7f9ff",
+                    "on-primary-container": "#799dd6",
+                    "surface-dim": "#d7dadf",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "surface-container-high": "#e5e8ee",
+                    "inverse-on-surface": "#eef1f6",
+                    "on-surface": "#181c20",
+                    "secondary": "#0059bb",
+                    "on-tertiary-container": "#9a9c9d",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#003366",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "on-secondary-container": "#fefcff",
+                    "primary-fixed": "#d5e3ff",
+                    "on-primary-fixed": "#001b3c",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#0070ea",
+                    "tertiary-fixed": "#e1e3e4",
+                    "on-surface-variant": "#43474f",
+                    "surface": "#f7f9ff",
+                    "on-background": "#181c20",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c3c6d1",
+                    "surface-variant": "#e0e3e8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "xl": "80px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .product-card-shadow { box-shadow: 0px 4px 20px rgba(0, 51, 102, 0.08); }
+        .product-card:hover { transform: translateY(-4px); transition: all 0.3s ease; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter max-w-container-max mx-auto shadow-sm bg-surface-container-lowest dark:bg-surface-container-high h-16">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">ElectroService</span>
+<nav class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim border-b-2 border-secondary dark:border-secondary-fixed-dim pb-1 hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Laundry</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Refrigerators</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Microwaves</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Parts</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors duration-200" href="#">Services</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 w-64 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-full ml-2" placeholder="Search components..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container transition-colors rounded-full">shopping_cart</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container transition-colors rounded-full">account_circle</button>
+</div>
+</header>
+<main class="mt-16 pt-lg pb-xl max-w-container-max mx-auto px-gutter">
+<!-- Promotional Banner -->
+<section class="mb-lg rounded-xl overflow-hidden relative h-64 md:h-80 flex items-center bg-primary">
+
+<div class="relative z-10 px-md md:px-xl text-white max-w-2xl">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full mb-4 inline-block">WINTER SALE</span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4">Precision Engineering for Your Home.</h1>
+<p class="font-body-md text-body-md opacity-90 mb-6">Upgrade your lifestyle with our professional maintenance plans and premium appliance lineup. Up to 30% off selected refrigerators and washing machines.</p>
+<button class="bg-secondary text-white font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-secondary-container transition-colors">Shop the Collection</button>
+</div>
+<div class="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full border-2 border-white/10 flex items-center justify-center">
+<div class="w-64 h-64 rounded-full border border-white/20 animate-pulse"></div>
+</div>
+</section>
+<div class="flex flex-col md:flex-row gap-lg">
+<!-- Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 space-y-md">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-headline-sm text-headline-sm text-primary">Filters</h2>
+<button class="text-secondary font-label-sm text-label-sm underline">Clear All</button>
+</div>
+<!-- Category -->
+<div class="border-b border-outline-variant pb-md">
+<h3 class="font-label-md text-label-md text-on-surface mb-3">Product Category</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Washing Machines</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Refrigerators</span>
+</label>
+</div>
+</div>
+<!-- Brand -->
+<div class="border-b border-outline-variant pb-md">
+<h3 class="font-label-md text-label-md text-on-surface mb-3">Brand</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">LG Premium</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Samsung Elite</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Brastemp Pro</span>
+</label>
+</div>
+</div>
+<!-- Energy Efficiency -->
+<div class="border-b border-outline-variant pb-md">
+<h3 class="font-label-md text-label-md text-on-surface mb-3">Energy Rating</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1 rounded-full border border-outline-variant text-label-sm font-label-sm hover:border-secondary hover:text-secondary transition-colors">Class A+++</button>
+<button class="px-3 py-1 rounded-full border border-secondary text-secondary bg-secondary/5 text-label-sm font-label-sm">Class A</button>
+<button class="px-3 py-1 rounded-full border border-outline-variant text-label-sm font-label-sm hover:border-secondary hover:text-secondary transition-colors">Class B</button>
+</div>
+</div>
+<!-- Price Range Slider -->
+<div class="pb-md">
+<h3 class="font-label-md text-label-md text-on-surface mb-3">Price Range (R$)</h3>
+<input class="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-secondary" type="range"/>
+<div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant">
+<span>R$ 1.500</span>
+<span>R$ 12.000+</span>
+</div>
+</div>
+</aside>
+<!-- Product Grid -->
+<div class="flex-1">
+<!-- Grid Controls -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-md gap-4">
+<p class="font-body-md text-body-md text-on-surface-variant">Showing <span class="font-bold text-on-surface">24</span> Premium Appliances</p>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Sort by:</span>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-lg font-label-md text-label-md px-4 py-2 focus:ring-secondary focus:border-secondary">
+<option>Recommended</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Highest Rated</option>
+</select>
+</div>
+</div>
+<!-- Products -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Product Card 1 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="A professional studio photograph of a sleek, brushed stainless steel double-door refrigerator. The lighting is crisp and cool, highlighting the metallic texture and modern digital display on the front door. The setting is a minimalist, ultra-modern kitchen with white marble countertops and soft ambient light, creating an atmosphere of high-end luxury and technical precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk9woKsojPyDraKjppa6aYW6S4WWKXYAYoHv61nYggEALzPp-rz-uSTD0TEZ3qwEjFF_Qymjc1O8vZXlr18I794AjVjBQjYfCJlP-dcPV5ttmviq_OB1_iONl4jmXGl4QhOQCjcpXElHJjmjFYWA3sIdjtIMQDiVkeenWnF6P73a96QhkPNUdFA3yCa2garpCloXYG03mSHWmQwu5CcGaBsB9bjMtk4lCbvW4vzmBpGDLOfshy3PVANtqPuc0IoTF6MvsG-EtZXD0"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-error text-on-error font-label-sm text-label-sm px-2 py-1 rounded">-15%</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> ENERGY A
+                                </span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Refrigerator</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">Inverter Twin Cooling Pro</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.9</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(124 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant line-through font-body-md text-body-md">R$ 5.499</span>
+<span class="font-headline-md text-headline-md text-primary">R$ 4.674,15</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 2 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="A front-view studio shot of a high-tech matte black front-loading washing machine. The large tempered glass door reflects a soft studio lighting setup. The machine features a sophisticated digital touch control panel that is illuminated with a soft blue glow. The aesthetic is professional, modern, and high-performance, set against a neutral gray gradient background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdj8Z__JjC4uGkkHwM1Y9sqlSVb_OuQCY6f0W9K_HCQVhg7sYpnUMOQ6r8QlqY6TMaQGbBAvw4LzguhfpF4CfOcbyBsGu3ufoOz7SuDeKbweakodoBMEFrPatSe8Ch_Gzhye_M0JaqZylPxun9HHyUxtP5YJBnTAWGSikpPHgbb2r1J6WHyjD4n5PKv5FZn3LUZlNLgG-A1tINg-BcEMDmZ0jgtXSRXqOc-eTKeYuAE8DAudP3ZKA-AGZz4CFEov6TV4d7qybx-1k"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-secondary text-white font-label-sm text-label-sm px-2 py-1 rounded">NEW ARRIVAL</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Laundry</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">SteamPro Smart Load 12kg</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.8</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(89 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary">R$ 3.899,00</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 3 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="A premium French-door refrigerator featuring a large integrated smart touch screen on the right panel. The unit is finished in a luxurious champagne gold metallic texture. The background is a high-concept, spacious interior with architectural lighting and dark walnut accents, emphasizing the appliance's role as a centerpiece of a modern home." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9xCtvXq8gdqSiSJwvQ8Dc1GwVfVYaXRjkTKEdkThILAJaqtxe6_tY1aJBB_B8jTZFXgagiEZJ9COo0vu5lnkB1QZBbVr1SqBAo5BQCE_eA1MXkasKUHyKDKmsqg9mzSM59gZ9Je4Bch_XCzWlSpNHFo4BA3YIY9s7Dn-us8RekmLIdxS2138W3CWd9UeifaK9J116VJR0so1f3VoZYz_4GkNfwV1qUSnj9oL4pa1tajMtZ8xJRvZSnVrd3a58yspaPDG7HIlIml4"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-1 rounded">BEST SELLER</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Refrigerator</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">Smart Hub Family View</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">5.0</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(215 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary">R$ 12.490,00</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 4 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="Detailed close-up of an industrial-style front-load washing machine featuring professional-grade chrome controls and a reinforced glass door. The lighting highlights the precision engineering and high-quality build materials. The scene conveys reliability and durability, styled with a slightly desaturated, high-contrast editorial look common in technical hardware magazines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Qm3b3iaLbcI1yZp4OUQdHZbJno4yqvweeoyMIJA_2dK6XNiHwO1MG5ds3ilgcFoGUGnACquutZY7UbXxdRdiZxPWdM6F8fRFcxslxJJrlo-wNjA_mmXz90gJrXkeIcjyD9vP4dgNTVTWTpjU6rAgDK-jy0L44vlcH0P5FT-aASPT3qq7mCmcfCa-Nf3TtwcDZXEsyA2ODJ51TuiwAuhRKvgux-ssetZ3k38kvMsyWe45A8XExOc-FWPTvWYv2xvt2DJ0OpDyCQU"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-error text-on-error font-label-sm text-label-sm px-2 py-1 rounded">-R$ 800</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Laundry</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">SilentDrive Pro Inverter</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.7</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(56 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant line-through font-body-md text-body-md">R$ 4.299</span>
+<span class="font-headline-md text-headline-md text-primary">R$ 3.499,00</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 5 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="A compact, stylish single-door refrigerator designed for modern urban apartments. The finish is a deep, charcoal gray with a subtle matte texture. The unit is placed in a bright, sunlit kitchen nook with clean lines and natural wood elements, emphasizing its space-saving yet elegant design and professional performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVG8xu1OfIuQ5uLZrQ9IsRViVDpml43CnMYgZL-G4v9BxDWk14MXqX8yKKip_B14t8KhSrLWjnidOVREKym6PWCaQPNrhICWTElJs5N9wj5_oVDyqUF3vMzUq35hdkZJTCiEJzt2-qICq_1MpUzD-efy9A0XhYpdEFAg87NG0r6BSj5rOshKkXD1cqgAnmE4dafKUJHybIcqNI0JHyNjVR5DIOIh_weFAVknKkDd4xDz9x07CaRaNLMO41Sp1IYLT9uJG66i8w2Us"/>
+<div class="absolute top-4 left-4 flex flex-col gap-2">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded">COMPACT TECH</span>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Refrigerator</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">Urban Series FlexiFlow</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.5</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(42 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary">R$ 2.599,00</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card 6 -->
+<article class="product-card group relative bg-surface-container-lowest rounded-xl overflow-hidden product-card-shadow border border-transparent hover:border-secondary/20 flex flex-col">
+<div class="relative h-64 bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" data-alt="An advanced washer-dryer combo unit shown in a sleek, minimalist laundry room. The appliance features a large futuristic black glass interface and polished chrome accents. Warm, high-end interior lighting emphasizes the machine's premium quality and technical superiority, highlighting the seamless integration of washing and drying technologies." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8vV79Nv_hKaK38bJqURMeIXCgr12QVeGy2An11yeXJgugY3Szo2-yv879GL7lzzVVBQC0RGmTaFCv5Qya4wkU3tAQq7XW9fC7cogqlHJn2N7b4neXGVY6-GXZZTLYrzoYdpMcyksfJ2qCjsee9mNz1_gPBOIpnY8gtTDmqm7kEAqbbKAQYBFSZJBmCQ4LqtBgVhi3zKoP5-zueNC-M1itkT8QpFve_WPETKqGnAD0Q4qb_iReyJ0WJKJwQsf8X-m3AcUJHlDwQ0s"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="bg-white text-primary p-3 rounded-full shadow-lg hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+</div>
+<div class="p-md flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Laundry</p>
+<h3 class="font-headline-sm text-headline-sm text-primary">UltraWash &amp; Dry All-in-One</h3>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.9</span>
+<span class="text-on-surface-variant font-body-md text-body-md">(167 reviews)</span>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary">R$ 6.199,00</span>
+</div>
+<button class="bg-secondary text-white p-3 rounded-lg hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="mt-xl flex justify-center items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-secondary text-white font-label-md text-label-md">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-label-md text-label-md">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-label-md text-label-md">3</button>
+<span class="px-2">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-label-md text-label-md">12</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-4 gap-md max-w-container-max mx-auto bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container">
+<div class="space-y-md">
+<span class="font-headline-sm text-headline-sm font-bold text-on-primary dark:text-on-primary-container">ElectroService</span>
+<p class="font-body-md text-body-md opacity-80">Leading technical provider for premium household appliances in Brazil. Reliability, precision, and expertise since 1998.</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-4">Support</h4>
+<ul class="space-y-2">
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Service Policy</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Maintenance Plans</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Warranty Info</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-4">Categories</h4>
+<ul class="space-y-2">
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Washing Machines</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Refrigerators</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Microwaves</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-on-primary dark:hover:text-white transition-opacity" href="#">Spare Parts</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-4">Newsletter</h4>
+<p class="font-body-md text-body-md opacity-80 mb-4">Get maintenance tips and exclusive offers.</p>
+<div class="flex gap-2">
+<input class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 w-full text-white placeholder:text-white/40 focus:ring-secondary focus:border-secondary" placeholder="Email address" type="email"/>
+<button class="bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary-container transition-colors">Join</button>
+</div>
+</div>
+<div class="col-span-1 md:col-span-4 pt-xl mt-xl border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-body-md text-body-md opacity-60">© 2024 ElectroService. Specialized Technical Support.</span>
+<div class="flex gap-6 opacity-60">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="material-symbols-outlined">lock</span>
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+</div>
+</footer>
+<!-- Quick View Modal (Hidden by default) -->
+<div class="fixed inset-0 z-[60] hidden flex items-center justify-center p-md" id="quick-view-modal">
+<div class="absolute inset-0 bg-primary/40 backdrop-blur-sm" onclick="closeModal()"></div>
+<div class="relative bg-surface-container-lowest rounded-2xl w-full max-w-4xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-300">
+<button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary p-2" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="grid grid-cols-1 md:grid-cols-2">
+<div class="bg-surface-container-low p-md flex items-center justify-center h-80 md:h-auto">
+<img class="w-full h-full object-contain" data-alt="High-resolution, detailed image of the professional-grade smart refrigerator with illuminated interior showing organized glass shelves and transparent crisper drawers. The lighting is warm and natural, making the food inside look fresh and appealing. This shot emphasizes the practical utility combined with sophisticated engineering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyW1Gtev2SCBHgAwwnTw0KPoxSArwi9AJgcT4FPnqgxhi1dkWvNGjmX4AT_jHyyiVSrSCnU1eYbwUlqQ-iuC4PUK8hNG9alJUfVKB9ap6gGnKVe668vH0D5StcvXVOH5lN3-e9RINuvxr3Aj7oW1qjLS-jmKskJMxr_O6g-UMXIn0jBFAPILP6RGUPLb6Iz1ooUsrqDFBYHmE4RaP8aUUDsbsffFdyb5_qktUvFBhJOXoNY8Xljwa3p01sAAuVy_CZXOP1vJqUCe0"/>
+</div>
+<div class="p-lg space-y-md">
+<p class="font-label-sm text-label-sm text-secondary uppercase">Brand: Samsung Elite</p>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-primary">Inverter Twin Cooling Pro</h2>
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md text-primary">R$ 4.674,15</span>
+<span class="bg-error text-on-error font-label-sm text-label-sm px-2 py-1 rounded">Save 15%</span>
+</div>
+<div class="space-y-sm">
+<p class="font-label-md text-label-md font-bold">Key Specifications:</p>
+<ul class="grid grid-cols-2 gap-2 text-body-md font-body-md text-on-surface-variant">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">bolt</span> Inverter Tech</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">humidity_mid</span> Twin Cooling</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">nest_eco_leaf</span> Energy Class A</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">database</span> 450L Capacity</li>
+</ul>
+</div>
+<div class="pt-4 flex flex-col gap-3">
+<button class="bg-secondary text-white font-label-md text-label-md w-full py-4 rounded-xl hover:bg-secondary-container transition-all">Add to Shopping Cart</button>
+<button class="border-2 border-primary text-primary font-label-md text-label-md w-full py-4 rounded-xl hover:bg-primary hover:text-white transition-all">Book Installation Service</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+        // Modal functionality
+        function openModal() {
+            document.getElementById('quick-view-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('quick-view-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Apply quick view trigger to all card visibility buttons
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if(icon.textContent === 'visibility') {
+                icon.parentElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal();
+                });
+            }
+        });
+    </script>
+</body></html>
+
+<!-- ElectroService - Product Details -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroService - Premium Front-Load Washing Machine</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2d3135",
+                        "primary": "#001e40",
+                        "on-secondary-fixed": "#001a41",
+                        "on-tertiary-fixed": "#191c1d",
+                        "surface-container-highest": "#e0e3e8",
+                        "outline": "#737780",
+                        "inverse-primary": "#a7c8ff",
+                        "tertiary": "#1c1f20",
+                        "secondary-fixed-dim": "#adc7ff",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-container": "#ebeef3",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#313435",
+                        "surface-container-low": "#f1f4f9",
+                        "surface-tint": "#3a5f94",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "on-secondary-fixed-variant": "#004493",
+                        "surface-bright": "#f7f9ff",
+                        "background": "#f7f9ff",
+                        "on-primary-container": "#799dd6",
+                        "surface-dim": "#d7dadf",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "surface-container-high": "#e5e8ee",
+                        "inverse-on-surface": "#eef1f6",
+                        "on-surface": "#181c20",
+                        "secondary": "#0059bb",
+                        "on-tertiary-container": "#9a9c9d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#003366",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-secondary-container": "#fefcff",
+                        "primary-fixed": "#d5e3ff",
+                        "on-primary-fixed": "#001b3c",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#0070ea",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-surface-variant": "#43474f",
+                        "surface": "#f7f9ff",
+                        "on-background": "#181c20",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c3c6d1",
+                        "surface-variant": "#e0e3e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "xl": "80px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-thumb {
+            outline: 2px solid #0059bb;
+            outline-offset: 2px;
+        }
+        .zoom-container:hover img {
+            transform: scale(1.15);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter max-w-container-max mx-auto h-20 bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">ElectroService</span>
+<div class="hidden md:flex items-center gap-md ml-lg">
+<a class="text-secondary border-b-2 border-secondary pb-1 font-label-md text-label-md" href="#">Laundry</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-md text-label-md" href="#">Refrigerators</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-md text-label-md" href="#">Microwaves</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-md text-label-md" href="#">Parts</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-label-md text-label-md" href="#">Services</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="hidden lg:flex items-center bg-surface-container rounded-full px-sm py-xs border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-xs">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Search appliances..." type="text"/>
+</div>
+<button class="p-xs hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-primary">shopping_cart</span>
+</button>
+<button class="p-xs hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</button>
+</div>
+</nav>
+<main class="mt-20 max-w-container-max mx-auto px-gutter py-lg">
+<!-- Breadcrumbs -->
+<nav class="flex gap-xs text-label-sm font-label-sm text-on-surface-variant mb-md">
+<a href="#">Home</a> <span>/</span>
+<a href="#">Laundry</a> <span>/</span>
+<a class="text-on-surface" href="#">Washing Machines</a>
+</nav>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Left Side: Image Gallery -->
+<div class="lg:col-span-7 flex flex-col md:flex-row gap-md">
+<!-- Thumbnails -->
+<div class="flex md:flex-col gap-sm order-2 md:order-1 no-scrollbar overflow-x-auto">
+<button class="w-20 h-20 flex-shrink-0 bg-white rounded-lg border border-outline-variant active-thumb overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A front-view studio photograph of a premium stainless steel washing machine with a sleek glass door and digital interface, set against a clean white background with soft editorial lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_DNXpCsCHgd6sX1VOQ7LAldrR6iqaLH-0J3xRqfCZ6Qcj7Pm_9GI5tSPqh0eRlR4E41dLQTLgB2RWJYLAvGsKHgOCHNVpK_UnxdMGEzF26U9W5T6BK8tws0QjcPCyWmhYn6mZuPggvMpPq769v3HOs_lMVcbdoi2tehBWTScjfpsD9SG6RfvqTpksKfMf4kWZ6SLQfWWq4b0g_YCBXoErtgY9DuGzAlsH08sqrl38CHxPcx57Cy2LfaYpQZGoymUKRFmT0IxZ4Lo"/>
+</button>
+<button class="w-20 h-20 flex-shrink-0 bg-white rounded-lg border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A detailed close-up shot of the digital control panel of a high-end washing machine, showing vibrant blue LED displays and brushed metal knobs in a modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSWRg6LeEs5xIDmAMSo4YggJPUq4GHw7Y4W82RntkPs1iYINpR4llIDKe-a33wf31I6y9wqo18MVSNkZgRCzbdpEl2-GHAoRpYeiizMjoRGaxHFf_pVxg5fg88jB5SzeQpmp4Usi3IbXb5Gq72yeBUN80lrbsgmc_svB5A3deItEYMVvIgsNKmiVgIYST82F5hvEhNF_0nn89RJJsW6sKJCLUnASMTM278yh14ISQXOJzlRinLmkQTeUz7iFpzpMxbJtoaO7GLdLA"/>
+</button>
+<button class="w-20 h-20 flex-shrink-0 bg-white rounded-lg border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="An interior view of a washing machine drum featuring hexagonal stainless steel patterns and textured lifters, captured with sharp focus and professional industrial lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBheQjfHf2PZWqGFcTcEpVdbajECEwNeJF1RA7i3vrzWPguHmhlDHf0hdVyp3nDZGcfr5NnTqbxRQ-wXKwWeJNtzUDOhfhSedLHPJCMBGR5HneMGb-sWDG_o9oosBuaNXMUJTIY7A6sgGFBe6DOLXItIkpo7nSmjRRaWctlD-x1I0zKvkljMbpnaHpqE_kO5r7e_glAhl2b-MVfXguRS-Uv7IC6t9WuTeHg9DHISpVFxu-3UHD8oYWH5DzAs8shRk64hU-JZw8bEFQ"/>
+</button>
+<button class="w-20 h-20 flex-shrink-0 bg-white rounded-lg border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A lifestyle photo of a modern laundry room with the stainless steel washing machine integrated into a minimalist white cabinet setup with soft natural daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX4RDvI7NUnljH4dmI71OnXuW5HEmCEmcqVHbL149McDahA-8PJju4oL7ctgfZc3DrzrbAY-Ab4yqce2JhR91QtDa7LKZJWAjSi51TxT5oIaE4SyAyZa3PF7rlO8x4nToETofF_nWJ_cJfTtH79LPASj4yN93l4Foow9_DuCBFjMAMzatm1xlcnUGWJo6Xnxdzz6pVhH3yLSbH5aU1DYpi4LKpdiC4JEUpGM29J3uN-y9C_BUIV6Q6xLobvMaQBWH9_wofdFACWek"/>
+</button>
+</div>
+<!-- Main Image -->
+<div class="flex-1 order-1 md:order-2 bg-white rounded-xl overflow-hidden shadow-md border border-surface-container zoom-container cursor-zoom-in relative group">
+<img class="w-full h-auto transition-transform duration-500 ease-out" data-alt="A high-resolution, full-body portrait of a premium front-load washing machine in titanium gray. The product has a minimalist design with a large tinted glass door and a refined metallic finish. The lighting is soft and professional, highlighting the luxury corporate aesthetic of the appliance." id="mainImage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK40TueKiwJGM7_xq02jmAmx4LIwndZ4SiRk4bs33jwe8R23pQ9VB3oI3p8ESuiUoHt1mz2HBTV3xCWEUqQcvrIpGfh_pvN4lS8eQkAaURfsMZuXK0m1U1wL__whhnBSPbE_XUhLgYHTsR_CtZVmGyzNPbxePoH9KaGl8cV1DNB-5u-2W9PmTuUHCicXOxqkchRR-5Osce5gvXcmckVZcrl_cPBHdPbhKvfcVwt9dOT8xsQzB4z4elf2pFNNa4D226qCl7pToSGCE"/>
+<div class="absolute top-md right-md bg-white/90 backdrop-blur-md px-sm py-xs rounded-full shadow-sm">
+<span class="text-label-sm font-label-sm text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">fullscreen</span> Zoom view
+                        </span>
+</div>
+</div>
+</div>
+<!-- Right Side: Product Details -->
+<div class="lg:col-span-5 flex flex-col gap-md">
+<div>
+<span class="bg-surface-container text-primary px-sm py-xs rounded-full text-label-sm font-label-sm mb-sm inline-block">Best Seller</span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-xs">UltraWash X900</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Front-Load Washer with AI Sense &amp; Steam Tech, 12kg</p>
+<div class="flex items-center gap-xs mt-sm">
+<div class="flex text-[#FFB800]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">star_half</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">(128 Reviews) | 12 Q&amp;As</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant/30">
+<div class="flex flex-col gap-xs">
+<span class="text-label-sm font-label-sm text-on-surface-variant line-through">R$ 5.499,00</span>
+<div class="flex items-baseline gap-xs">
+<span class="text-headline-md font-headline-md text-primary">R$ 4.299,00</span>
+<span class="bg-secondary text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">21% OFF</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">or 10x of <span class="font-bold text-on-surface">R$ 429,90</span> without interest.</p>
+</div>
+</div>
+<!-- Color Selector -->
+<div class="flex flex-col gap-sm">
+<h3 class="font-label-md text-label-md text-primary">Select Finish: <span class="font-normal text-on-surface-variant">Titanium Gray</span></h3>
+<div class="flex gap-sm">
+<button class="w-10 h-10 rounded-full bg-[#D1D5DB] border-2 border-white shadow-md ring-2 ring-secondary" title="Titanium Gray"></button>
+<button class="w-10 h-10 rounded-full bg-[#FFFFFF] border-2 border-outline-variant shadow-sm" title="Cloud White"></button>
+<button class="w-10 h-10 rounded-full bg-[#2D3135] border-2 border-outline-variant shadow-sm" title="Obsidian Black"></button>
+</div>
+</div>
+<!-- CTA Buttons -->
+<div class="flex flex-col gap-sm mt-md">
+<button class="bg-secondary hover:bg-secondary-container text-white py-md rounded-lg font-bold transition-all shadow-md active:scale-[0.98]">
+                        BUY NOW
+                    </button>
+<button class="border-2 border-primary text-primary hover:bg-primary hover:text-white py-md rounded-lg font-bold transition-all active:scale-[0.98]">
+                        ADD TO CART
+                    </button>
+</div>
+<!-- Delivery Check -->
+<div class="flex flex-col gap-sm border-t border-outline-variant pt-md mt-sm">
+<label class="text-label-md font-label-md text-primary">Calculate Shipping &amp; Delivery</label>
+<div class="flex gap-sm">
+<input class="flex-1 rounded-lg border-outline-variant focus:border-secondary focus:ring-secondary text-sm" placeholder="Zip Code (00000-000)" type="text"/>
+<button class="px-md bg-surface-container-high text-primary font-bold rounded-lg text-sm">CALCULATE</button>
+</div>
+<div class="flex items-center gap-xs text-label-sm font-label-sm text-secondary mt-xs">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+<span>Free Installation included for this model.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Specs & Details (Bento/Grid Style) -->
+<section class="mt-xl py-lg border-t border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary mb-lg">Product Information</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Features List -->
+<div class="bg-white p-md rounded-xl shadow-sm border border-surface-container">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg mb-sm">
+<span class="material-symbols-outlined text-primary">settings_suggest</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">AI DD Intelligence</h4>
+<p class="text-body-md text-on-surface-variant">Analyzes fabric type and weight to optimize wash patterns automatically for 18% more protection.</p>
+</div>
+<div class="bg-white p-md rounded-xl shadow-sm border border-surface-container">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg mb-sm">
+<span class="material-symbols-outlined text-primary">air</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">Steam+ Technology</h4>
+<p class="text-body-md text-on-surface-variant">Removes 99.9% of allergens such as dust mites that can cause respiratory issues.</p>
+</div>
+<div class="bg-white p-md rounded-xl shadow-sm border border-surface-container">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg mb-sm">
+<span class="material-symbols-outlined text-primary">memory</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">Smart Diagnosis</h4>
+<p class="text-body-md text-on-surface-variant">Connect via Wi-Fi with ElectroApp to troubleshoot minor issues and monitor cycles from anywhere.</p>
+</div>
+</div>
+<!-- Specs Table -->
+<div class="mt-lg overflow-hidden border border-outline-variant rounded-xl">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container">
+<th class="p-md font-headline-sm text-headline-sm text-primary" colspan="2">Full Specifications</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md w-1/3 text-on-surface-variant">Capacity</td>
+<td class="p-md text-body-md">12kg Washing / 8kg Drying</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md text-on-surface-variant">Inverter Motor</td>
+<td class="p-md text-body-md">Inverter Direct Drive (10 Year Warranty)</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md text-on-surface-variant">Spin Speed</td>
+<td class="p-md text-body-md">Up to 1400 RPM</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md text-on-surface-variant">Energy Rating</td>
+<td class="p-md text-body-md text-secondary font-bold">A (Procel Gold)</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md text-on-surface-variant">Dimensions (WxHxD)</td>
+<td class="p-md text-body-md">600 x 850 x 565 mm</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-label-md text-on-surface-variant">Voltage</td>
+<td class="p-md text-body-md">110V or 220V (Not Bi-volt)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Customers Also Bought Section -->
+<section class="mt-xl py-lg">
+<div class="flex justify-between items-end mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary">Customers also bought</h2>
+<a class="text-secondary font-bold hover:underline" href="#">View all</a>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Related Card 1 -->
+<div class="bg-white rounded-xl shadow-sm border border-surface-container p-md flex flex-col gap-sm hover:-translate-y-1 transition-transform group">
+<div class="aspect-square bg-surface-container-low rounded-lg overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-105 transition-transform" data-alt="A premium laundry stacked unit with a matching dryer and washer in a modern dark charcoal finish, professional product photography on a neutral studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAccgsY_i8Vz9UBE-nokfzWQ-bgRGP_qEhvuIsVGCPx4VuqgcHOlAgPdaSA1GYV10R_t01te5GGTzlo9WEV2ZoJwv3iXFKltdE0J-eWigxV7fx4H9l8-xb5Q8Px8G754kTG8EthmAYnN4jdsDrVMAnNCpuMXOV5NoBYBU62UfejYuUSsy_IDGl-axV0RcNCnjNsZCDEQbkfGUIfJxEEQjXPPAIVriQiDFyW3jb0N8mfJOOVQgscBAKNIL_dZdq9-VaZjECU7Wzl6c"/>
+</div>
+<div>
+<h5 class="text-label-md font-bold text-primary truncate">Smart Dryer Series 5</h5>
+<p class="text-label-sm text-on-surface-variant mb-xs">Matching Set Accessory</p>
+<span class="text-body-md font-bold text-secondary">R$ 2.999,00</span>
+</div>
+</div>
+<!-- Related Card 2 -->
+<div class="bg-white rounded-xl shadow-sm border border-surface-container p-md flex flex-col gap-sm hover:-translate-y-1 transition-transform group">
+<div class="aspect-square bg-surface-container-low rounded-lg overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-105 transition-transform" data-alt="A professional technician installing a washing machine in a modern house, showing high-end technical service with focus on precision and reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV-ptI9DizbARUrlJzFXN9bImC3QZF7s1NfKeWx__BR1Dmf6MfsUIbDxzMUBETOjBrPJJlF9ifWuGmdDhzP315dgcRC1zA8V5wEnxolzjYAdy6-b3pcnHVK1nSoul8NcZ7wVNLq4oJJLL0crDxf5OfoJiLKGdRz8z0b1cShUfpLxh1HfcPTLcYQaFxIb4doG2TN84iUncU9dRdnbqEuckaFQ90cpgUwtNeKHQ_Q4qjawU5UJozhxe5kQs9VDt4KkbnTherXGqen1g"/>
+</div>
+<div>
+<h5 class="text-label-md font-bold text-primary truncate">Premium Installation</h5>
+<p class="text-label-sm text-on-surface-variant mb-xs">Service Plan</p>
+<span class="text-body-md font-bold text-secondary">R$ 199,00</span>
+</div>
+</div>
+<!-- Related Card 3 -->
+<div class="bg-white rounded-xl shadow-sm border border-surface-container p-md flex flex-col gap-sm hover:-translate-y-1 transition-transform group">
+<div class="aspect-square bg-surface-container-low rounded-lg overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-105 transition-transform" data-alt="An assortment of eco-friendly, high-performance laundry detergent bottles and softener containers, designed with premium minimalist branding in shades of blue and white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHKm0tVHH-ezl7a9Br7I3TFLAEaVt13QrooHJFGv5qp9Q6dy5BVUmXMsResOvaDLeq5uorWfB47ICgZDHQ1TupeSwA6_XI8D9ETKUyxaQwHF3IwqqQAlwfUMrw7LDEvo9CuB87-u6d9xgnT8Sp3XPwjCKrkf_D0mY8NlqR7sIZ897eJTGUVmkK8-YBwxWAT6Lud4jmdOEnMcAgXTUaG_bWeKCAnHGqPL80u5WJHwqOtycg_Lfl9dkyFxK_YVEj1ABrgQbifXdNq04"/>
+</div>
+<div>
+<h5 class="text-label-md font-bold text-primary truncate">EcoCare Starter Kit</h5>
+<p class="text-label-sm text-on-surface-variant mb-xs">Cleaning &amp; Maintenance</p>
+<span class="text-body-md font-bold text-secondary">R$ 149,90</span>
+</div>
+</div>
+<!-- Related Card 4 -->
+<div class="bg-white rounded-xl shadow-sm border border-surface-container p-md flex flex-col gap-sm hover:-translate-y-1 transition-transform group">
+<div class="aspect-square bg-surface-container-low rounded-lg overflow-hidden">
+<img class="w-full h-full object-contain group-hover:scale-105 transition-transform" data-alt="A high-end multi-socket surge protector with a metallic finish and blue indicator lights, specifically for heavy appliances, studio shot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXFQfU7uumfBOUdW4X7RxSAYbjeg-5LwzOLe42ySWgkBtVDWSt2fXNZUoYT_zKSqYxLwkx-5msLluyHLdQ_Gh4bR0cG2F-yxz0-oJLWdzUnj471aATVS39LB-tc4mbRPQSfnY9MByP_F1DqW3zSkgGcE8buPpavyv2Trqeo2gbVLPMPMefxRXe-DjYbIwnuIx-H368a6vmy3khVX_8VbJ96QFg_u9IOKp5j-wOBqhkncV9ruI_w1SL-m5FS7-sxPZZ6zzmfMPG2Gk"/>
+</div>
+<div>
+<h5 class="text-label-md font-bold text-primary truncate">Surge Protector XL</h5>
+<p class="text-label-sm text-on-surface-variant mb-xs">Electrical Safety</p>
+<span class="text-body-md font-bold text-secondary">R$ 89,00</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Reviews & Q&A -->
+<section class="mt-xl py-lg border-t border-outline-variant">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-xl">
+<!-- Summary -->
+<div class="flex flex-col gap-md">
+<h2 class="font-headline-md text-headline-md text-primary">Customer Feedback</h2>
+<div class="flex items-center gap-md">
+<span class="text-[64px] font-extrabold text-primary leading-none">4.8</span>
+<div>
+<div class="flex text-[#FFB800]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Based on 128 reviews</p>
+</div>
+</div>
+<button class="w-full py-md border-2 border-secondary text-secondary font-bold rounded-lg hover:bg-secondary hover:text-white transition-all">
+                        Write a Review
+                    </button>
+</div>
+<!-- Reviews List -->
+<div class="lg:col-span-2 flex flex-col gap-lg">
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-bold text-primary">Ricardo M.</span>
+<div class="flex text-[#FFB800] text-xs">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<span class="text-label-sm text-on-surface-variant">2 weeks ago</span>
+</div>
+<p class="text-body-md text-on-surface">Extremely quiet machine. The AI sense really makes a difference on drying times. Highly recommend for those living in apartments.</p>
+<div class="flex gap-xs mt-xs">
+<span class="bg-surface-container text-on-surface-variant text-[10px] px-2 py-1 rounded font-bold">VERIFIED PURCHASE</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm border-t border-surface-container pt-md">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-bold text-primary">Leticia S.</span>
+<div class="flex text-[#FFB800] text-xs">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">star</span>
+</div>
+</div>
+<span class="text-label-sm text-on-surface-variant">1 month ago</span>
+</div>
+<p class="text-body-md text-on-surface">Great washing machine, beautiful design. Only downside is the touch panel is a bit sensitive when cleaning.</p>
+<div class="flex gap-xs mt-xs">
+<span class="bg-surface-container text-on-surface-variant text-[10px] px-2 py-1 rounded font-bold">VERIFIED PURCHASE</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-4 gap-md max-w-container-max mx-auto bg-primary text-on-primary">
+<div class="md:col-span-1">
+<span class="font-headline-sm text-headline-sm font-bold text-on-primary">ElectroService</span>
+<p class="mt-md text-label-md opacity-80">Specialized technical support and premium appliances for a modern lifestyle.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-bold text-lg">Support</h4>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Service Policy</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Maintenance Plans</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Warranty Info</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Contact Us</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-bold text-lg">Categories</h4>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Washing Machines</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Refrigerators</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Spare Parts</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity text-body-md" href="#">Professional Tools</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-bold text-lg">Newsletter</h4>
+<p class="text-sm opacity-80">Get exclusive service maintenance alerts and offers.</p>
+<div class="flex gap-xs mt-xs">
+<input class="bg-white/10 border-white/20 text-white rounded-lg px-sm py-xs w-full" placeholder="Email address" type="email"/>
+<button class="bg-secondary px-sm py-xs rounded-lg font-bold">JOIN</button>
+</div>
+</div>
+<div class="md:col-span-4 border-t border-white/10 pt-lg mt-lg flex flex-col md:flex-row justify-between items-center opacity-80 gap-md">
+<span>© 2024 ElectroService. Specialized Technical Support.</span>
+<div class="flex gap-md">
+<span class="material-symbols-outlined">payments</span>
+<span class="material-symbols-outlined">credit_card</span>
+<span class="material-symbols-outlined">shield</span>
+</div>
+</div>
+</footer>
+<script>
+        // Simple Thumbnail Switcher & Zoom Effect
+        const thumbs = document.querySelectorAll('.md\\:order-1 button');
+        const mainImg = document.getElementById('mainImage');
+        
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                // Clear active states
+                thumbs.forEach(t => t.classList.remove('active-thumb'));
+                // Set active
+                thumb.classList.add('active-thumb');
+                // Change src
+                const newSrc = thumb.querySelector('img').getAttribute('src');
+                const newAlt = thumb.querySelector('img').getAttribute('data-alt');
+                mainImg.setAttribute('src', newSrc);
+                mainImg.setAttribute('data-alt', newAlt);
+            });
+        });
+
+        // Interactive behavior for Color Selectors
+        const colorBtns = document.querySelectorAll('[title]');
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                colorBtns.forEach(b => b.classList.remove('ring-2', 'ring-secondary'));
+                btn.classList.add('ring-2', 'ring-secondary');
+            });
+        });
+    </script>
+</body></html>
+
+<!-- ElectroService - Technical Support & Repairs -->
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroService | Technical Support &amp; Repair</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f7f9ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #003366;
+            border-radius: 4px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 227, 232, 0.5);
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0px 12px 40px rgba(0, 51, 102, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3135",
+                    "primary": "#001e40",
+                    "on-secondary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#191c1d",
+                    "surface-container-highest": "#e0e3e8",
+                    "outline": "#737780",
+                    "inverse-primary": "#a7c8ff",
+                    "tertiary": "#1c1f20",
+                    "secondary-fixed-dim": "#adc7ff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-container": "#ebeef3",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#313435",
+                    "surface-container-low": "#f1f4f9",
+                    "surface-tint": "#3a5f94",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-secondary-fixed-variant": "#004493",
+                    "surface-bright": "#f7f9ff",
+                    "background": "#f7f9ff",
+                    "on-primary-container": "#799dd6",
+                    "surface-dim": "#d7dadf",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "surface-container-high": "#e5e8ee",
+                    "inverse-on-surface": "#eef1f6",
+                    "on-surface": "#181c20",
+                    "secondary": "#0059bb",
+                    "on-tertiary-container": "#9a9c9d",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#003366",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "on-secondary-container": "#fefcff",
+                    "primary-fixed": "#d5e3ff",
+                    "on-primary-fixed": "#001b3c",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#0070ea",
+                    "tertiary-fixed": "#e1e3e4",
+                    "on-surface-variant": "#43474f",
+                    "surface": "#f7f9ff",
+                    "on-background": "#181c20",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c3c6d1",
+                    "surface-variant": "#e0e3e8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "xl": "80px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest shadow-sm">
+<nav class="max-w-container-max mx-auto px-gutter h-20 flex justify-between items-center">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ElectroService</h1>
+</div>
+<div class="hidden md:flex gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Laundry</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Refrigerators</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Microwaves</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Parts</a>
+<a class="font-label-md text-label-md text-secondary border-b-2 border-secondary pb-1" href="#">Services</a>
+</div>
+<div class="flex items-center gap-sm">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xl">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-secondary w-48 lg:w-64" placeholder="Track my repair..." type="text"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</nav>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex items-center overflow-hidden bg-primary text-on-primary">
+<div class="absolute inset-0 opacity-20">
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-transparent to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Close-up of a professional technician's hands using a multimeter to test a complex circuit board of a modern refrigerator. The lighting is cinematic with deep blue tones and bright highlights on metallic surfaces, conveying a high-tech and meticulous engineering environment. Professional grade tools and components are visible in the shallow focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-dOQR0Qh7ljgYxNx_ax0vqC69aU6M1z1pjo8xUS-3DL7JMNwM_Sx6_LQOqdy660Mo2XJulHtLzDmM-EwMc64UmQXHBd--dzndmdzqQKxvckIWzUaRTX1JKTucPPnAKRIeqWG157fOaPtu3IaY7tFTuqXPScle0kmEBXaGNrrpIJwBmovGJmcA7ueCmoz5fM5HLZ_Qz1y9cywf7X0J43rPdHNEnn974dD-_xEGkYhhKB8FcEeQZIx6-5JGIhxcyxRabSGBTuO9PyM"/>
+</div>
+<div class="max-w-container-max mx-auto px-gutter relative z-20 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<div>
+<div class="inline-flex items-center gap-xs px-3 py-1 bg-secondary/20 rounded-full border border-secondary/30 mb-md">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary-fixed">Authorized Technical Support</span>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-md leading-tight">Expert Repair For Your Premium Home.</h2>
+<p class="font-body-lg text-body-lg text-on-primary/80 mb-lg max-w-lg">We restore the performance of your high-end appliances with certified precision, original parts, and an uncompromising warranty.</p>
+<div class="flex flex-wrap gap-md">
+<a class="px-xl py-md bg-secondary text-on-secondary font-label-md text-label-md rounded-lg hover:scale-105 transition-transform shadow-lg" href="#request-form">Schedule Visit</a>
+<a class="px-xl py-md border-2 border-on-primary/30 text-on-primary font-label-md text-label-md rounded-lg hover:bg-on-primary/10 transition-colors" href="#how-it-works">How it works</a>
+</div>
+</div>
+<div class="hidden lg:grid grid-cols-2 gap-md">
+<div class="space-y-md pt-lg">
+<div class="glass-card p-md rounded-xl text-primary">
+<h3 class="font-headline-sm text-headline-sm mb-xs">98%</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Same-Day Resolution</p>
+</div>
+<div class="glass-card p-md rounded-xl text-primary">
+<h3 class="font-headline-sm text-headline-sm mb-xs">15k+</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Appliances Restored</p>
+</div>
+</div>
+<div class="space-y-md">
+<div class="glass-card p-md rounded-xl text-primary">
+<h3 class="font-headline-sm text-headline-sm mb-xs">12mo</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Parts Warranty</p>
+</div>
+<div class="glass-card p-md rounded-xl text-primary">
+<h3 class="font-headline-sm text-headline-sm mb-xs">24/7</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Priority Support</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Service Categories -->
+<section class="py-xl bg-surface">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-xs">Specialized Technical Solutions</h2>
+<p class="font-body-md text-body-md text-outline">Precise diagnostics for every essential household appliance.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Category 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden hover-lift group border border-outline-variant">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A modern front-loading washing machine in a bright, minimalist laundry room. The lighting is soft and natural, emphasizing the clean white surfaces and chrome finishes of the machine. The aesthetic is corporate and premium, with a slight blue tint in the shadows to align with the brand's professional tech identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJUK-6ltA15OVAXXLKpq7lVHjBk7Il_uu5y_COok6e5Y2NrrPxkweYPfnerxeEYyK20p_wXMBvDqnVitHf7wDdzg8VXojSMyMKqCIoPwgW0MBnSr2E4nJKTTbX-069-kC6Og6vukJW6DIPGl0yPqJeEJYrNGfIqo0nebteCiXCUVqyxIRhS4ym1RF6afKPSceR_xyHLl1QFWeQ8XFJP4BQF_CqGyu_94b6MhZOW_f_kuKZ1C-dSOvJC_1bJJXvdpdbAA5k9fJ5QVw"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Washing Machines</h3>
+<span class="material-symbols-outlined text-secondary">local_laundry_service</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Advanced error code diagnosis, drum replacement, and pump maintenance for all major brands.</p>
+<ul class="space-y-xs mb-md">
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Calibration &amp; Electronics
+                                </li>
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Leakage Resolution
+                                </li>
+</ul>
+<button class="w-full py-2 border-2 border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors">Select Service</button>
+</div>
+</div>
+<!-- Category 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden hover-lift group border border-outline-variant">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Interior of a high-end French door refrigerator with professional cool white lighting. The shelves are neatly arranged, showcasing clean lines and technological precision. The style is crisp and modern, featuring stainless steel accents and clear glass shelves, reflecting an atmosphere of elite technical maintenance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYso9uRgkH4DxrBi6LWKXLd2pawxwq14Uz3LMDwbwNRYe6uNkvYZyeLl20a9dBSqsUTkmdtqqlu7vj-rYpg7P49rPeqsQT9P83FHlKsX5ALfVt3uGqm80KsdBBtfwdHLvhnOrahK4nraP6E6QmIXxCGn7E6woLOYCFEPCllsoTbNkRrpdDvBZRhgP68PJF8qK3Q1F9oJfJE8co_7_crewnMkinu__KPVwtzPHcFDHXVrFpAmjirWVQfEgdHTSDk4-uppodpCMQaCg"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Refrigerators</h3>
+<span class="material-symbols-outlined text-secondary">kitchen</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Compressor repair, gas recharging, and digital thermostat recalibration for premium cooling systems.</p>
+<ul class="space-y-xs mb-md">
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Smart System Diagnosis
+                                </li>
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Cooling Cycle Optimization
+                                </li>
+</ul>
+<button class="w-full py-2 border-2 border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors">Select Service</button>
+</div>
+</div>
+<!-- Category 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden hover-lift group border border-outline-variant">
+<div class="h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Close-up of a sleek, black glass microwave panel with modern digital displays glowing in blue. The kitchen environment is blurred in the background, creating a focus on the precision interface. The aesthetic is sophisticated and corporate, emphasizing reliability and professional grade kitchen technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlAMPnosT6YCT68lhSPrjabXDOPENhTKPGQzYpwcEUrP8vW3LcGl3J10FgJf5QlC1DyjcyPqN8BbpGSp0vs9YC9d0BB-xroykNytp8qiRxS5LOHSDawXBxY0EGcClrRkODx1Nupj3ofooy_RPjO1wIxgMm1ojbaiIIrp1QU9ud98pWE1WCC-jJEDCHHokQZf1xsgWXRTRq_I9DkcuGNJ1ZZLWi2IKelg97cTLfdPfTReuhHvynmK5x714plFq_kLXAmjU0Gw8A43o"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Microwaves</h3>
+<span class="material-symbols-outlined text-secondary">microwave</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Magnetron replacement, control board troubleshooting, and internal wave testing for safe operation.</p>
+<ul class="space-y-xs mb-md">
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Magnetron Calibration
+                                </li>
+<li class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-secondary">check_circle</span> Panel &amp; Logic Board
+                                </li>
+</ul>
+<button class="w-full py-2 border-2 border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-colors">Select Service</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Repair Workflow -->
+<section class="py-xl bg-surface-container-low" id="how-it-works">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-xl gap-md">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary">Efficiency in Every Step</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">A streamlined process designed for your convenience.</p>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-label-md text-label-md text-primary font-bold">Estimated time: 24h</span>
+<div class="w-12 h-1 bg-secondary rounded-full"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg relative">
+<!-- Connector line -->
+<div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-outline-variant -z-10"></div>
+<!-- Step 1 -->
+<div class="flex flex-col items-center text-center">
+<div class="w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-secondary flex items-center justify-center mb-md shadow-lg">
+<span class="material-symbols-outlined text-4xl text-secondary">calendar_today</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">1. Schedule</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Choose your preferred date and time through our online platform.</p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center text-center">
+<div class="w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-outline-variant flex items-center justify-center mb-md shadow-md transition-all duration-300" id="step-2-circle">
+<span class="material-symbols-outlined text-4xl text-outline" id="step-2-icon">home_repair_service</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">2. Visit</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">A certified technician arrives at your home with original diagnostic tools.</p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center text-center">
+<div class="w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-outline-variant flex items-center justify-center mb-md shadow-md">
+<span class="material-symbols-outlined text-4xl text-outline">build</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">3. Repair</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Immediate resolution using high-quality genuine spare parts.</p>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center text-center">
+<div class="w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-outline-variant flex items-center justify-center mb-md shadow-md">
+<span class="material-symbols-outlined text-4xl text-outline">verified_user</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">4. Warranty</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Receive your technical certificate and a 1-year service warranty.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Request Form & Map -->
+<section class="py-xl" id="request-form">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xl border border-outline-variant grid grid-cols-1 lg:grid-cols-2">
+<!-- Interactive Form -->
+<div class="p-lg lg:p-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Book a Technical Visit</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">Fill out the form below and our coordination team will contact you within 60 minutes.</p>
+<form class="space-y-md" onsubmit="event.preventDefault(); alert('Request received. We will contact you soon!');">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-primary">Full Name</label>
+<input class="w-full p-3 rounded-lg border border-outline-variant focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="John Doe" required="" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-primary">Phone Number</label>
+<input class="w-full p-3 rounded-lg border border-outline-variant focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="+55 (11) 99999-9999" required="" type="tel"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-primary">Appliance Type</label>
+<select class="w-full p-3 rounded-lg border border-outline-variant focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all bg-white" required="">
+<option value="">Select an appliance...</option>
+<option value="laundry">Washing Machine / Dryer</option>
+<option value="refrigerator">Refrigerator / Freezer</option>
+<option value="microwave">Microwave Oven</option>
+<option value="dishwasher">Dishwasher</option>
+<option value="other">Other Specialist Equipment</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-primary">Problem Description</label>
+<textarea class="w-full p-3 rounded-lg border border-outline-variant focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="Describe the symptoms (e.g., unusual noise, not heating, error code E10)..." required="" rows="4"></textarea>
+</div>
+<button class="w-full py-md bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-secondary transition-colors shadow-lg active:scale-95 duration-150" type="submit">Request Visit Confirmation</button>
+</form>
+</div>
+<!-- Map/Coverage -->
+<div class="relative bg-surface-container h-full min-h-[400px]">
+<div class="absolute inset-0 grayscale opacity-60">
+<!-- Using placeholder for map as requested -->
+<img class="w-full h-full object-cover" data-alt="A stylized, clean architectural map of a metropolitan area, focusing on major boulevards and technical service hubs. The map uses a premium professional palette of cool grays, deep blues, and subtle white paths. Minimalist markers represent service coverage areas, highlighting reliability and broad availability in a corporate technical context." data-location="São Paulo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA30_CEbqHbH7OLeraWlIx_jiR8bLitpB__tXlfqtLCfVDmz8mArji4DMFYUBcHP_q7GoI0D01f6z4CtKWbAg3R5SGDo-n3AAVBXJizqt-CxDM-6s51j9J0rSPFeRl0sVJdjVkuU9dt92YsPGLCUzQlth92VapNQq-cx6-0GhuePrfI-BjAeshCArLfA4D1emE23Ngt0izLLcmxTSbH4mj0JbFa05QgRmhg1lXtvZWjzhqbO80awlS8qMLW5h8LzbU-3GvMOqec0F8"/>
+</div>
+<div class="absolute inset-0 bg-primary/10"></div>
+<div class="absolute bottom-md left-md right-md bg-surface-container-lowest/90 backdrop-blur-md p-md rounded-xl border border-outline-variant shadow-lg">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-sm">Service Coverage</h3>
+<div class="grid grid-cols-2 gap-sm">
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span> Metropolitan Area
+                                </div>
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span> Industrial Zones
+                                </div>
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span> Satellite Cities
+                                </div>
+<div class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span> Tech Districts
+                                </div>
+</div>
+<div class="mt-md pt-sm border-t border-outline-variant">
+<p class="font-body-md text-body-md text-primary font-bold">Priority dispatch available in these regions.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="py-xl bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="max-w-3xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-primary mb-xl text-center">Frequently Asked Questions</h2>
+<div class="space-y-md">
+<!-- FAQ 1 -->
+<details class="group bg-surface-container-lowest rounded-xl border border-outline-variant open:shadow-md transition-all duration-300">
+<summary class="flex justify-between items-center p-md cursor-pointer list-none">
+<span class="font-headline-sm text-headline-sm text-primary">Are the replacement parts original?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-md pb-md font-body-md text-body-md text-on-surface-variant">
+                                Yes, we exclusively use original manufacturer parts for all repairs. This ensures the longevity of your appliance and maintains any existing manufacturer warranty.
+                            </div>
+</details>
+<!-- FAQ 2 -->
+<details class="group bg-surface-container-lowest rounded-xl border border-outline-variant open:shadow-md transition-all duration-300">
+<summary class="flex justify-between items-center p-md cursor-pointer list-none">
+<span class="font-headline-sm text-headline-sm text-primary">How long does a typical repair take?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-md pb-md font-body-md text-body-md text-on-surface-variant">
+                                Most common issues (pumps, gaskets, sensors) are resolved during the first visit. More complex electronic or mechanical failures typically take 24-48 hours depending on parts availability.
+                            </div>
+</details>
+<!-- FAQ 3 -->
+<details class="group bg-surface-container-lowest rounded-xl border border-outline-variant open:shadow-md transition-all duration-300">
+<summary class="flex justify-between items-center p-md cursor-pointer list-none">
+<span class="font-headline-sm text-headline-sm text-primary">What is covered by the service warranty?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-md pb-md font-body-md text-body-md text-on-surface-variant">
+                                Our technical warranty covers both the specific labor performed and the replacement parts for a period of 12 months. If the same issue persists, we return and fix it at no extra cost.
+                            </div>
+</details>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary text-on-primary py-xl px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-md">
+<div>
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-on-primary-container text-2xl" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+<h2 class="font-headline-sm text-headline-sm font-bold">ElectroService</h2>
+</div>
+<p class="font-body-md text-body-md text-on-primary/80">Certified technical excellence for the modern home. Reliability you can trust.</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md">Services</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Laundry Care</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Cooling Systems</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Kitchen Tech</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">HVAC Support</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md">Support</h4>
+<ul class="space-y-sm">
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Service Policy</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Maintenance Plans</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Warranty Info</a></li>
+<li><a class="font-body-md text-body-md text-on-primary/80 hover:text-white transition-opacity" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-md">Emergency Line</h4>
+<p class="font-headline-sm text-headline-sm mb-xs">0800-EL-SERVICE</p>
+<p class="font-body-md text-body-md text-on-primary/60 mb-md">Available 24/7 for urgent technical assistance.</p>
+<div class="flex gap-sm">
+<a class="w-10 h-10 rounded-full border border-on-primary/30 flex items-center justify-center hover:bg-white/10" href="#">
+<span class="material-symbols-outlined text-sm">alternate_email</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-on-primary/30 flex items-center justify-center hover:bg-white/10" href="#">
+<span class="material-symbols-outlined text-sm">support_agent</span>
+</a>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-xl pt-md border-t border-on-primary/10 text-center">
+<p class="font-label-sm text-label-sm text-on-primary/50">© 2024 ElectroService. Specialized Technical Support. All rights reserved.</p>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const steps = [
+                { id: 'step-2-circle', icon: 'step-2-icon' }
+            ];
+
+            // Subtle animation for the workflow steps
+            const observerOptions = {
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const circle = document.getElementById('step-2-circle');
+                        const icon = document.getElementById('step-2-icon');
+                        if (circle && icon) {
+                            circle.classList.remove('border-outline-variant');
+                            circle.classList.add('border-secondary');
+                            icon.classList.remove('text-outline');
+                            icon.classList.add('text-secondary');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            const workflowSection = document.querySelector('#how-it-works');
+            if (workflowSection) observer.observe(workflowSection);
+        });
+    </script>
+</body></html>
+
+<!-- ElectroService - Checkout -->
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Checkout | ElectroService</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3135",
+                    "primary": "#001e40",
+                    "on-secondary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#191c1d",
+                    "surface-container-highest": "#e0e3e8",
+                    "outline": "#737780",
+                    "inverse-primary": "#a7c8ff",
+                    "tertiary": "#1c1f20",
+                    "secondary-fixed-dim": "#adc7ff",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-container": "#ebeef3",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#313435",
+                    "surface-container-low": "#f1f4f9",
+                    "surface-tint": "#3a5f94",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "on-secondary-fixed-variant": "#004493",
+                    "surface-bright": "#f7f9ff",
+                    "background": "#f7f9ff",
+                    "on-primary-container": "#799dd6",
+                    "surface-dim": "#d7dadf",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "surface-container-high": "#e5e8ee",
+                    "inverse-on-surface": "#eef1f6",
+                    "on-surface": "#181c20",
+                    "secondary": "#0059bb",
+                    "on-tertiary-container": "#9a9c9d",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#003366",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "on-secondary-container": "#fefcff",
+                    "primary-fixed": "#d5e3ff",
+                    "on-primary-fixed": "#001b3c",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#0070ea",
+                    "tertiary-fixed": "#e1e3e4",
+                    "on-surface-variant": "#43474f",
+                    "surface": "#f7f9ff",
+                    "on-background": "#181c20",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c3c6d1",
+                    "surface-variant": "#e0e3e8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "48px",
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "xl": "80px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .checkout-card { background: white; border-radius: 16px; box-shadow: 0px 4px 20px rgba(0, 51, 102, 0.08); }
+        .step-active { color: #007BFF; font-weight: 700; border-bottom: 3px solid #007BFF; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest shadow-sm flex justify-between items-center px-gutter h-20 max-w-container-max mx-auto left-0 right-0 border-b border-surface-variant/20">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">ElectroService</span>
+</div>
+<nav class="hidden md:flex gap-md items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Laundry</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Refrigerators</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Microwaves</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Parts</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Services</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="p-xs hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="shopping_cart">shopping_cart</span>
+</button>
+<button class="p-xs hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-32 pb-xl px-gutter max-w-container-max mx-auto w-full">
+<!-- Progress Stepper -->
+<div class="flex justify-center mb-xl">
+<div class="flex items-center gap-lg text-label-md font-label-md text-outline">
+<div class="flex items-center gap-xs text-primary font-bold">
+<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">1</span>
+<span>Shopping Cart</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs text-secondary">
+<span class="w-8 h-8 rounded-full border-2 border-secondary flex items-center justify-center font-bold">2</span>
+<span>Checkout Flow</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs">
+<span class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center">3</span>
+<span>Confirmation</span>
+</div>
+</div>
+</div>
+<!-- Checkout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-md">
+<!-- Left Column: Shipping & Payment -->
+<div class="lg:col-span-7 space-y-md">
+<!-- Shipping Information -->
+<section class="checkout-card p-md">
+<div class="flex items-center gap-xs mb-md text-primary">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<h2 class="font-headline-sm text-headline-sm">Shipping Information</h2>
+</div>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<div class="md:col-span-2">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Full Name</label>
+<input class="w-full h-12 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="John Doe" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">CEP (Zip Code)</label>
+<div class="relative">
+<input class="w-full h-12 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="00000-000" type="text"/>
+<button class="absolute right-2 top-2 h-8 px-sm bg-surface-container text-primary rounded-md font-label-sm hover:bg-surface-container-highest transition-colors" type="button">Find</button>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Street Address</label>
+<input class="w-full h-12 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="Av. Paulista" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Number</label>
+<input class="w-full h-12 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="123" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">City</label>
+<input class="w-full h-12 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="São Paulo" type="text"/>
+</div>
+</form>
+</section>
+<!-- Payment Method -->
+<section class="checkout-card p-md">
+<div class="flex items-center gap-xs mb-md text-primary">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<h2 class="font-headline-sm text-headline-sm">Payment Method</h2>
+</div>
+<div class="space-y-sm">
+<!-- Credit Card Option -->
+<div class="border-2 border-secondary rounded-xl p-sm bg-surface-container-low cursor-pointer">
+<div class="flex items-center justify-between mb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+<span class="font-label-md text-label-md text-primary">Credit Card</span>
+</div>
+<div class="flex gap-xs">
+<img class="h-6 w-auto grayscale opacity-50" data-alt="Small minimal icons of Visa and Mastercard logos in corporate blue and red colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkxV7l1DmZrNNJXnbBjvWVKru2NsFRb1GgMsQ6yhpV1JwOeDgiAuiliG4IuDCNbfVvl-8ChNNqK1hfG7aOnWBaoVtvCJgaaKTMQv10vK27X-74en6cXr-UFTZXQpebyH2HwOZAlKlFlmg1DeOofSOBkz8b9cp3oO-XHYaFte0Aj_eZhx4yiVK6l7RXAYgrDN27gSx1dCdGpgEnco0cBhUme9a7yJTqGLwjyMa7GxtuBd-Xl-35qMPDT2mG5LelFhQqc5dT-n3tuiE"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="col-span-2">
+<input class="w-full h-11 px-sm border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all" placeholder="Card Number" type="text"/>
+</div>
+<input class="w-full h-11 px-sm border border-outline-variant rounded-lg" placeholder="MM/YY" type="text"/>
+<input class="w-full h-11 px-sm border border-outline-variant rounded-lg" placeholder="CVV" type="text"/>
+</div>
+</div>
+<!-- Pix Option -->
+<div class="border-2 border-outline-variant/30 rounded-xl p-sm hover:border-secondary/50 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+<span class="font-label-md text-label-md text-on-surface">PIX (5% Discount)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="qr_code">qr_code</span>
+</div>
+</div>
+<!-- Boleto Option -->
+<div class="border-2 border-outline-variant/30 rounded-xl p-sm hover:border-secondary/50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+<span class="font-label-md text-label-md text-on-surface">Boleto Bancário</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Security Badges -->
+<div class="flex flex-wrap items-center gap-md pt-sm">
+<div class="flex items-center gap-xs text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user">verified_user</span>
+<span class="font-label-sm text-label-sm">SSL Secure Payment</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm" data-icon="shield">shield</span>
+<span class="font-label-sm text-label-sm">Safe Browsing Certified</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+<span class="font-label-sm text-label-sm">256-bit Encryption</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Order Summary -->
+<div class="lg:col-span-5">
+<div class="checkout-card p-md sticky top-24">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-md">Order Summary</h2>
+<!-- Item List -->
+<div class="space-y-sm mb-md max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+<div class="flex gap-sm">
+<div class="w-20 h-20 bg-surface-container-low rounded-lg shrink-0 overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover" data-alt="A premium, professional-grade refrigerator with a stainless steel finish and digital display panel, set against a clean studio background with soft technical lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAxFGChGeENBfMumESmTq95iRsbMp5QZs-dAu5vbUkPpccZKt5cmFNsNZjzVvSSoxtZ1fwF91V2gvSUxHJee8CkiKHj7dEvpIDjXpsga_I7XEviMpcA_vp-w5pST6Vy-JyJ27MEb1i1azcRsx29Cu8j5QqJZaOhh0tv9fa1yME54DX8WBbzajm7GTjzFf7Kc14cSHNnaoxWH04N1vLW9esmfreZQcZ7q7FashtIdeKhjzK8MzIUy4mOo8ciPzLqN5lsdSUUwZqFRY"/>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-md text-label-md text-on-surface">Samsung Family Hub Fridge</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Qty: 1</p>
+<p class="font-label-md text-label-md text-primary font-bold">R$ 8.499,00</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<div class="w-20 h-20 bg-surface-container-low rounded-lg shrink-0 overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover" data-alt="Close up of a high-tech internal replacement part for a microwave oven, professional macro photography highlighting clean metal and circuitry components on a neutral blue technical background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2XMXdjcmBS8Ed8Q2f93wYVyTQQxVzqcvYznGuoDM9IjV7LFG8cqJl0_F4aMFD_WZ_eMXtswRoNkf7q-raKUEAvA7rB9vK6LwWNt5jmeKLW98ytTK52BUqM0AYoulHvkLguoERLxxtt18giixb-gmBFDlhak-45rX0JQ0mBXKY8qO100KDD3y4Wco5OTj7bmIgtkS2w7LlpxFMAVAfU1axKzD_OMAmdGbNsKdad92GO3Bu50FAXbjQwfBMxJ61w6x1OQuwfuC0EE0"/>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-md text-label-md text-on-surface">Magnetron Pro Replacement</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Qty: 2</p>
+<p class="font-label-md text-label-md text-primary font-bold">R$ 450,00</p>
+</div>
+</div>
+</div>
+<!-- Discount / Coupon -->
+<div class="border-y border-outline-variant/20 py-sm mb-sm">
+<div class="flex gap-xs">
+<input class="flex-grow h-10 px-sm border border-outline-variant rounded-lg text-label-sm outline-none" placeholder="Promo Code" type="text"/>
+<button class="h-10 px-md bg-primary-container text-on-primary-container font-label-sm rounded-lg hover:bg-primary transition-colors">Apply</button>
+</div>
+</div>
+<!-- Financial Breakdown -->
+<div class="space-y-xs font-body-md text-body-md text-on-surface-variant mb-md">
+<div class="flex justify-between">
+<span>Subtotal</span>
+<span>R$ 8.949,00</span>
+</div>
+<div class="flex justify-between">
+<span>Shipping</span>
+<span class="text-secondary font-medium">Free</span>
+</div>
+<div class="flex justify-between">
+<span>Tax estimate</span>
+<span>R$ 142,50</span>
+</div>
+<div class="flex justify-between pt-sm border-t border-outline-variant/20 font-bold text-primary text-headline-sm">
+<span>Total</span>
+<span>R$ 9.091,50</span>
+</div>
+<p class="text-label-sm text-on-surface-variant/70 text-right">or 10x of R$ 909,15 without interest</p>
+</div>
+<button class="w-full py-md bg-secondary text-white font-headline-sm rounded-xl shadow-lg shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-sm">
+                        Confirm Purchase
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="mt-md text-center font-label-sm text-label-sm text-on-surface-variant/60 flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+                        Encrypted transaction. Data protected.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-primary py-xl px-gutter grid grid-cols-1 md:grid-cols-4 gap-md max-w-container-max mx-auto w-full text-on-primary">
+<div class="space-y-sm">
+<span class="font-headline-sm text-headline-sm font-bold text-on-primary">ElectroService</span>
+<p class="font-body-md text-body-md text-on-primary/80">© 2024 ElectroService. Specialized Technical Support.</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-sm">Links</h4>
+<ul class="space-y-xs font-body-md text-body-md text-on-primary/80">
+<li><a class="hover:text-white transition-opacity" href="#">Service Policy</a></li>
+<li><a class="hover:text-white transition-opacity" href="#">Maintenance Plans</a></li>
+<li><a class="hover:text-white transition-opacity" href="#">Warranty Info</a></li>
+<li><a class="hover:text-white transition-opacity" href="#">Contact Us</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-sm">Technical Center</h4>
+<p class="font-body-md text-body-md text-on-primary/80">Rua da Tecnologia, 1024<br/>São Paulo, SP</p>
+<p class="font-body-md text-body-md text-on-primary/80 mt-xs">0800-ELECTRO-00</p>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold mb-sm">Follow Us</h4>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined cursor-pointer hover:text-white" data-icon="facebook">face_nod</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white" data-icon="share">share</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white" data-icon="hub">hub</span>
+</div>
+</div>
+</footer>
+<script>
+        // Simple interactivity for payment method switching
+        document.querySelectorAll('.payment-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // This would handle UI state switching in a real app
+                console.log('Payment method selected');
+            });
+        });
+    </script>
+</body></html>
+
+<!-- ElectroService - My Account -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroService | User Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2d3135",
+                        "primary": "#001e40",
+                        "on-secondary-fixed": "#001a41",
+                        "on-tertiary-fixed": "#191c1d",
+                        "surface-container-highest": "#e0e3e8",
+                        "outline": "#737780",
+                        "inverse-primary": "#a7c8ff",
+                        "tertiary": "#1c1f20",
+                        "secondary-fixed-dim": "#adc7ff",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-container": "#ebeef3",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#313435",
+                        "surface-container-low": "#f1f4f9",
+                        "surface-tint": "#3a5f94",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "on-secondary-fixed-variant": "#004493",
+                        "surface-bright": "#f7f9ff",
+                        "background": "#f7f9ff",
+                        "on-primary-container": "#799dd6",
+                        "surface-dim": "#d7dadf",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "surface-on-surface": "#181c20",
+                        "on-surface": "#181c20",
+                        "secondary": "#0059bb",
+                        "on-tertiary-container": "#9a9c9d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#003366",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-secondary-container": "#fefcff",
+                        "primary-fixed": "#d5e3ff",
+                        "on-primary-fixed": "#001b3c",
+                        "secondary-fixed": "#d8e2ff",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#0070ea",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-surface-variant": "#43474f",
+                        "surface": "#f7f9ff",
+                        "on-background": "#181c20",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c3c6d1",
+                        "surface-variant": "#e0e3e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "base": "8px",
+                        "lg": "48px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "xl": "80px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #f7f9ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .card-shadow { box-shadow: 0px 4px 20px rgba(0, 51, 102, 0.08); }
+        .active-nav-border { border-bottom: 2px solid #0059bb; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest shadow-sm flex justify-center items-center h-16">
+<div class="w-full max-w-container-max flex justify-between items-center px-gutter">
+<div class="font-headline-md text-headline-md font-bold text-primary">ElectroService</div>
+<nav class="hidden md:flex gap-md h-full items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Laundry</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Refrigerators</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Microwaves</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Parts</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Services</a>
+</nav>
+<div class="flex items-center gap-sm">
+<div class="hidden sm:flex items-center bg-surface-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md p-1 w-32 md:w-48" placeholder="Search appliances..." type="text"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="p-2 text-secondary active:scale-95 transition-transform duration-150 border-b-2 border-secondary pb-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-xl pb-xl max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-12 gap-md mt-16">
+<!-- Sidebar Navigation (Responsive) -->
+<aside class="lg:col-span-3 space-y-base">
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow flex flex-col gap-xs">
+<div class="flex items-center gap-sm mb-md px-2">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-headline-sm">JS</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Joao Silva</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Member since 2022</p>
+</div>
+</div>
+<a class="flex items-center gap-sm p-sm rounded-lg bg-secondary text-on-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-label-md text-label-md">Recent Orders</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-label-md text-label-md">My Appliances</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Scheduled Repairs</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Account Settings</span>
+</a>
+<hr class="my-xs border-outline-variant opacity-50"/>
+<a class="flex items-center gap-sm p-sm rounded-lg text-primary hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="font-label-md text-label-md">Support Center</span>
+</a>
+</div>
+</aside>
+<!-- Main Dashboard Content -->
+<div class="lg:col-span-9 space-y-md">
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow border-l-4 border-secondary">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Active Warranties</p>
+<p class="font-display-lg text-headline-md text-primary">03</p>
+</div>
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow border-l-4 border-on-secondary-fixed-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Upcoming Repairs</p>
+<p class="font-display-lg text-headline-md text-primary">01</p>
+</div>
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow border-l-4 border-outline">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Total Rewards</p>
+<p class="font-display-lg text-headline-md text-primary">R$ 145</p>
+</div>
+</div>
+<!-- Recent Orders (Horizontal Scroll on Mobile) -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Recent Orders</h3>
+<a class="text-secondary font-label-md text-label-md hover:underline" href="#">View All</a>
+</div>
+<div class="overflow-x-auto pb-4 -mx-gutter px-gutter md:mx-0 md:px-0">
+<div class="flex gap-md min-w-[600px] md:min-w-full">
+<!-- Order Card 1 -->
+<div class="flex-1 p-md bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant/30">
+<div class="flex justify-between mb-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Order #98214</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-label-sm text-label-sm">Delivered</span>
+</div>
+<div class="flex gap-sm items-center mb-md">
+<div class="w-16 h-16 rounded-lg bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">microwave</span>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">ProSeries Smart Microwave</p>
+<p class="text-label-sm text-on-surface-variant">Arrived June 12, 2024</p>
+</div>
+</div>
+<button class="w-full py-2 border-2 border-primary-container text-primary rounded-lg font-label-md hover:bg-surface-container transition-colors">Details</button>
+</div>
+<!-- Order Card 2 -->
+<div class="flex-1 p-md bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant/30">
+<div class="flex justify-between mb-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Order #99052</span>
+<span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-label-sm text-label-sm">Shipped</span>
+</div>
+<div class="flex gap-sm items-center mb-md">
+<div class="w-16 h-16 rounded-lg bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">filter_alt</span>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">HEPA Filter Replacement Kit</p>
+<p class="text-label-sm text-on-surface-variant">Est. June 18, 2024</p>
+</div>
+</div>
+<button class="w-full py-2 border-2 border-primary-container text-primary rounded-lg font-label-md hover:bg-surface-container transition-colors">Track</button>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- My Appliances Section -->
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Registered Appliances</h3>
+<div class="space-y-sm">
+<div class="flex items-center gap-md p-sm bg-surface-container-lowest rounded-xl card-shadow hover:-translate-y-1 transition-transform">
+<div class="w-14 h-14 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">kitchen</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold">Inverter Refrigerator X-800</p>
+<p class="text-label-sm text-on-surface-variant">Warranty expires: Dec 2025</p>
+</div>
+<span class="material-symbols-outlined text-secondary">verified</span>
+</div>
+<div class="flex items-center gap-md p-sm bg-surface-container-lowest rounded-xl card-shadow hover:-translate-y-1 transition-transform">
+<div class="w-14 h-14 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">local_laundry_service</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold">Front Load Washer G2</p>
+<p class="text-label-sm text-on-surface-variant">Warranty expires: Aug 2024</p>
+</div>
+<span class="material-symbols-outlined text-secondary">verified</span>
+</div>
+<button class="w-full py-3 bg-secondary-container/10 border-2 border-dashed border-secondary text-secondary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-secondary-container/20 transition-all">
+<span class="material-symbols-outlined">add_circle</span>
+                            Register New Appliance
+                        </button>
+</div>
+</section>
+<!-- Scheduled Repair Visits -->
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Service Visits</h3>
+<div class="p-md bg-primary text-on-primary rounded-xl card-shadow space-y-md relative overflow-hidden">
+<!-- Decorative glow -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-accent-blue/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-sm text-label-sm text-on-primary/70 uppercase tracking-widest">Next Appointment</p>
+<p class="font-headline-md text-headline-md">June 22, 2024</p>
+</div>
+<div class="bg-white/20 p-2 rounded-lg">
+<span class="material-symbols-outlined">calendar_month</span>
+</div>
+</div>
+<div class="space-y-base">
+<div class="flex gap-sm items-center">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="font-label-md text-label-md">09:00 AM - 11:00 AM</span>
+</div>
+<div class="flex gap-sm items-center">
+<span class="material-symbols-outlined text-sm">construction</span>
+<span class="font-label-md text-label-md">Dishwasher Drainage System Repair</span>
+</div>
+<div class="flex gap-sm items-center">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Technician: Roberto M.</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="flex-1 py-2 bg-on-primary text-primary rounded-lg font-bold text-label-md">Reschedule</button>
+<button class="flex-1 py-2 bg-white/10 border border-white/30 rounded-lg font-bold text-label-md">Cancel</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Profile Quick Settings -->
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm text-primary">Profile Quick Access</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow flex items-center justify-between group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-low rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">location_on</span>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">Address Book</p>
+<p class="text-label-sm text-on-surface-variant">2 saved addresses</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<div class="p-md bg-surface-container-lowest rounded-xl card-shadow flex items-center justify-between group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-low rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold">Payment Methods</p>
+<p class="text-label-sm text-on-surface-variant">Visa ending in 4421</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Support Floating Button -->
+<div class="fixed bottom-gutter right-gutter z-40">
+<button class="w-14 h-14 bg-secondary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="w-full bg-primary py-xl px-gutter mt-xl">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-md">
+<div class="col-span-1">
+<div class="font-headline-sm text-headline-sm font-bold text-on-primary mb-md">ElectroService</div>
+<p class="text-on-primary/80 font-body-md text-body-md">Advanced appliance care and high-end tech services for your home.</p>
+</div>
+<div class="col-span-1">
+<h4 class="text-on-primary font-bold mb-md uppercase text-label-sm tracking-widest">Support</h4>
+<nav class="flex flex-col gap-sm">
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">Service Policy</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">Maintenance Plans</a>
+</nav>
+</div>
+<div class="col-span-1">
+<h4 class="text-on-primary font-bold mb-md uppercase text-label-sm tracking-widest">Legal</h4>
+<nav class="flex flex-col gap-sm">
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">Warranty Info</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">Privacy Policy</a>
+</nav>
+</div>
+<div class="col-span-1">
+<h4 class="text-on-primary font-bold mb-md uppercase text-label-sm tracking-widest">Company</h4>
+<nav class="flex flex-col gap-sm">
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">Contact Us</a>
+<a class="text-on-primary/80 hover:text-on-primary transition-opacity font-body-md" href="#">About Us</a>
+</nav>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-lg pt-md border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="text-on-primary/60 text-label-sm">© 2024 ElectroService. Specialized Technical Support.</p>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-on-primary/60">language</span>
+<span class="text-on-primary/60 text-label-sm">Brazil (PT-BR)</span>
+</div>
+</div>
+</footer>
+<!-- Mobile Bottom NavBar (Visible on Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-lowest flex justify-around items-center h-16 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-50">
+<a class="flex flex-col items-center text-on-surface-variant hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center text-on-surface-variant hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-bold">Explore</span>
+</a>
+<a class="flex flex-col items-center text-on-surface-variant hover:text-secondary transition-colors" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="text-[10px] font-bold">Orders</span>
+</a>
+<a class="flex flex-col items-center text-secondary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="text-[10px] font-bold">Account</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.card-shadow').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.transition = 'transform 0.2s ease-out';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

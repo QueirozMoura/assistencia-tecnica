@@ -1,0 +1,6 @@
+- [ ] Integrar Navbar pública com ClientAuthContext
+- [ ] Exibir ações de autenticação para usuário deslogado (desktop e mobile)
+- [ ] Exibir avatar + primeiro nome + dropdown para usuário logado
+- [ ] Implementar UX do dropdown (click fora, ESC, animação, hover)
+- [ ] Garantir que carrinho, wishlist, busca, CTA e menu mobile permaneçam funcionais
+- [ ] Testar fluxos: deslogado, logado, logout, dropdown, mobile
