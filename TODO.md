@@ -1,6 +1,10 @@
-- [ ] Integrar Navbar pública com ClientAuthContext
-- [ ] Exibir ações de autenticação para usuário deslogado (desktop e mobile)
-- [ ] Exibir avatar + primeiro nome + dropdown para usuário logado
-- [ ] Implementar UX do dropdown (click fora, ESC, animação, hover)
-- [ ] Garantir que carrinho, wishlist, busca, CTA e menu mobile permaneçam funcionais
-- [ ] Testar fluxos: deslogado, logado, logout, dropdown, mobile
+# TODO - Redesign Home (Hero only)
+
+- [ ] Atualizar somente a Hero em `frontend/src/pages/Home.jsx`
+- [ ] Manter intactas todas as demais seções da Home
+- [ ] Rodar build do frontend
+- [ ] Validar renderização da Home em desktop
+- [ ] Validar renderização da Home em tablet
+- [ ] Validar renderização da Home em mobile
+- [ ] Confirmar ausência de regressão nas demais seções
+- [ ] Consolidar relatório final

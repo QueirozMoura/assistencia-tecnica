@@ -100,22 +100,16 @@ body {
   background-clip: text;
 }
 
-/* ── Scrollbar Customizada ── */
-::-webkit-scrollbar {
-  width: 6px;
+/* ── Scrollbar Oculta (mantém scroll funcional) ── */
+html, body {
+  -ms-overflow-style: none;   /* IE/Edge antigo */
+  scrollbar-width: none;      /* Firefox */
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f4f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c3c6d1;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #0070ea;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* ── Animações ── */

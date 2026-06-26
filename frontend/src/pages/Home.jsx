@@ -6,7 +6,6 @@ import {
   Star,
   Shield,
   Clock,
-  Zap,
   Wrench,
   Phone,
   ChevronDown,
@@ -131,122 +130,103 @@ export default function Home() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative bg-gradient-to-br from-[#001e40] via-[#003366] to-[#0059bb] overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-28">
-        {/* Decorative circles */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0070ea]/20 rounded-full translate-y-1/2 -translate-x-1/3" />
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_right,_#dcecff_0%,_#f5f9ff_40%,_#ffffff_100%)] pt-14 pb-16 sm:pt-16 sm:pb-18 lg:pt-20 lg:pb-24">
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#0070ea]/10 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#003366]/10 blur-3xl" />
 
         <div className="container-max relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             {/* Left */}
-            <div>
-              <span className="inline-block bg-[#0070ea]/20 text-[#a7c8ff] text-xs font-semibold px-4 py-1.5 rounded-full mb-5 uppercase tracking-wider border border-[#0070ea]/30">
-                Especialistas em Eletrodomésticos
+            <div className="text-center lg:text-left">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#cce0ff] bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#003366] shadow-sm">
+                <Wrench size={14} className="text-[#0070ea]" />
+                Assistência Técnica Especializada
               </span>
-              <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-5">
-                Assistência Técnica{" "}
-                <span className="text-[#a7c8ff]">Especializada</span> em
-                Máquinas de Lavar
+
+              <h1 className="mt-5 text-4xl font-bold leading-tight text-[#003366] sm:text-[2.7rem] lg:text-5xl">
+                Seu e-commerce de
+                <span className="block text-[#0070ea]">
+                  Eletrodomésticos e Assistência
+                </span>
+                com padrão premium
               </h1>
-              <p className="text-[#8fa8c8] text-lg leading-relaxed mb-8 max-w-lg">
-                Conserto, manutenção e venda de equipamentos com atendimento
-                rápido e garantia. Técnicos certificados na sua casa em até 24
-                horas.
+
+              <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#43474f] sm:text-lg lg:mx-0">
+                Compre com segurança, agende assistência com rapidez e conte com
+                atendimento especializado para manter seus equipamentos sempre
+                em alta performance.
               </p>
 
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mb-10">
-                <Link
-                  to="/agendamento"
-                  className="flex items-center gap-2 bg-[#0070ea] text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-[#0059bb] transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#0070ea]/30"
-                >
-                  <Wrench size={18} />
-                  Solicitar Orçamento
-                </Link>
-                <Link
-                  to="/agendamento"
-                  className="flex items-center gap-2 border-2 border-white/30 text-white px-6 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition-all"
-                >
-                  <Phone size={18} />
-                  Agendar Visita Técnica
-                </Link>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
                 <Link
                   to="/catalogo"
-                  className="flex items-center gap-2 text-[#a7c8ff] px-4 py-3.5 font-medium hover:text-white transition-colors"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0070ea] px-6 py-3.5 font-semibold text-white shadow-lg shadow-[#0070ea]/25 transition-all hover:-translate-y-0.5 hover:bg-[#0059bb] sm:w-auto"
                 >
-                  Ver Produtos
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
+                  Comprar Agora
+                  <ArrowRight size={16} />
+                </Link>
+                <Link
+                  to="/agendamento"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#b7d2f8] bg-white px-6 py-3.5 font-semibold text-[#003366] shadow-sm transition-all hover:border-[#0070ea] hover:text-[#0070ea] sm:w-auto"
+                >
+                  <Phone size={16} />
+                  Agendar Assistência
                 </Link>
               </div>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap gap-4">
+              <div className="mt-7 grid gap-2.5 sm:grid-cols-3 sm:gap-3">
                 {[
-                  { icon: CheckCircle, text: "Diagnóstico Gratuito" },
-                  { icon: Shield, text: "90 dias de Garantia" },
-                  { icon: Clock, text: "Atendimento em 24h" },
-                ].map(({ icon: Icon, text }) => (
+                  "Atendimento especializado",
+                  "Garantia nos serviços",
+                  "Produtos originais",
+                ].map((item) => (
                   <div
-                    key={text}
-                    className="flex items-center gap-2 text-sm text-[#8fa8c8]"
+                    key={item}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-[#e5e8ee] bg-white px-3 py-2 text-sm text-[#43474f] shadow-sm lg:justify-start"
                   >
-                    <Icon size={15} className="text-[#0070ea]" />
-                    {text}
+                    <CheckCircle size={15} className="text-[#0070ea]" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right — Image + floating card */}
-            <div className="relative hidden lg:block">
-              <div className="relative w-full h-[480px] rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={heroImg}
-                  alt="Máquina de lavar moderna"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001e40]/40 to-transparent" />
+            {/* Right */}
+            <div className="relative mx-auto w-full max-w-[620px]">
+              <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white p-2 shadow-[0_20px_60px_-25px_rgba(0,51,102,0.35)]">
+                <div className="relative overflow-hidden rounded-[1.35rem]">
+                  <img
+                    src={heroImg}
+                    alt="Assistência técnica premium em eletrodomésticos"
+                    className="h-[280px] w-full object-cover sm:h-[360px] lg:h-[450px]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#003366]/35 via-transparent to-[#0070ea]/10" />
+                </div>
               </div>
 
-              {/* Floating stats card */}
-              <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl p-5 shadow-xl">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-[#cce0ff] rounded-xl flex items-center justify-center">
-                    <Star
-                      size={18}
-                      className="text-[#003366]"
-                      fill="currentColor"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-bold text-[#003366] text-lg leading-none">
-                      4.9/5
-                    </p>
-                    <p className="text-xs text-[#737780]">Avaliação média</p>
-                  </div>
-                </div>
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star
-                      key={s}
-                      size={14}
-                      className="text-amber-400"
-                      fill="currentColor"
-                    />
-                  ))}
-                </div>
-                <p className="text-xs text-[#737780] mt-1">
-                  +5.000 clientes satisfeitos
+              <div className="absolute -left-3 top-5 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-left-5 sm:px-5">
+                <p className="text-xl font-bold leading-none text-[#003366] sm:text-2xl">
+                  +1000
+                </p>
+                <p className="mt-1 text-xs font-medium text-[#5d6672]">
+                  clientes atendidos
                 </p>
               </div>
 
-              {/* Floating badge */}
-              <div className="absolute -top-4 -right-4 bg-[#0070ea] text-white rounded-2xl p-4 shadow-xl">
-                <p className="font-bold text-2xl leading-none">+10</p>
-                <p className="text-xs text-[#a7c8ff]">anos de mercado</p>
+              <div className="absolute -right-3 top-1/2 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-right-5 sm:px-5">
+                <p className="text-sm font-bold text-[#003366] sm:text-base">
+                  Garantia de 90 dias
+                </p>
+                <p className="text-xs text-[#5d6672]">em serviços prestados</p>
+              </div>
+
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:bottom-5 sm:px-5">
+                <div className="flex items-center gap-2">
+                  <Clock size={15} className="text-[#0070ea]" />
+                  <p className="text-sm font-semibold text-[#003366]">
+                    Atendimento rápido
+                  </p>
+                </div>
               </div>
             </div>
           </div>

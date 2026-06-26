@@ -173,7 +173,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
           </nav>
 
           {/* Search + Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 lg:-ml-4">
             {/* Search Bar (desktop) */}
             <form onSubmit={handleSearch} className="hidden md:flex items-center bg-[#f1f4f9] rounded-full px-4 py-2 gap-2 w-48 lg:w-64 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white transition-all">
               <Search size={15} className="text-[#737780] flex-shrink-0" />
@@ -277,13 +277,13 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
               <div className="hidden md:flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3 py-2 rounded-lg text-sm font-semibold text-[#43474f] border border-[#d8dce5] hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center h-10 px-4 py-2 rounded-lg text-sm leading-5 font-semibold text-[#43474f] bg-white border border-[#d8dce5] hover:bg-gray-50 transition-colors whitespace-nowrap"
                 >
                   Entrar
                 </Link>
                 <Link
                   to="/cadastro"
-                  className="px-3 py-2 rounded-lg text-sm font-semibold text-white bg-[#0070ea] hover:bg-[#0059bb] transition-colors"
+                  className="inline-flex items-center justify-center h-10 px-4 py-2 rounded-lg text-sm leading-5 font-semibold text-white bg-[#0070ea] hover:bg-[#0059bb] transition-colors whitespace-nowrap"
                 >
                   Criar conta
                 </Link>
@@ -293,7 +293,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             {/* CTA Agendar */}
             <Link
               to="/agendamento"
-              className="hidden lg:flex items-center gap-2 bg-[#0070ea] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0059bb] transition-colors"
+              className="hidden lg:inline-flex items-center justify-center h-10 gap-2 bg-[#0070ea] text-white px-4 py-2 rounded-lg text-sm leading-5 font-semibold hover:bg-[#0059bb] transition-colors"
             >
               <Wrench size={14} />
               Agendar
@@ -356,24 +356,24 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
               </div>
             ))}
 
-            <div className="pt-3 border-t border-[#e5e8ee] space-y-2">
+            <div className="pt-3 border-t border-[#e5e8ee]">
               {!isAuthenticated ? (
-                <>
+                <div className="grid grid-cols-2 gap-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 border border-[#d8dce5] text-[#43474f] px-4 py-3 rounded-lg text-sm font-semibold w-full hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-center gap-2 border border-[#d8dce5] text-[#43474f] px-3 py-2 rounded-lg text-sm font-semibold w-full hover:bg-gray-50 transition-colors"
                   >
                     Entrar
                   </Link>
                   <Link
                     to="/cadastro"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 bg-[#0070ea] text-white px-4 py-3 rounded-lg text-sm font-semibold w-full hover:bg-[#0059bb] transition-colors"
+                    className="flex items-center justify-center gap-2 bg-[#0070ea] text-white px-3 py-2 rounded-lg text-sm font-semibold w-full hover:bg-[#0059bb] transition-colors"
                   >
                     Criar conta
                   </Link>
-                </>
+                </div>
               ) : (
                 <div className="bg-[#f7f9ff] border border-[#e5e8ee] rounded-xl p-3 space-y-1">
                   <div className="flex items-center gap-2 px-1 pb-2">
