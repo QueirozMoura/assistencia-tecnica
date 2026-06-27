@@ -61,7 +61,7 @@ export async function buscarPedidoPorId(id) {
 }
 
 export async function criarPedido(dados) {
-  const { clienteId, itens, observacoes } = dados;
+  const clienteId = req.cliente.id;
 
   // Verificar cliente
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
@@ -242,6 +242,20 @@ export async function criarPedidoComPagamento(dados) {
   });
 
   return resultado;
+}
+
+export async function listarMeusPedidos(clienteId) {
+  return prisma.pedido.findMany({
+    where: { clienteId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      createdAt: true,
+      status: true,
+      valorTotal: true,
+      paymentStatus: true,
+    },
+  });
 }
 
 export async function atualizarStatusPedido(id, status) {

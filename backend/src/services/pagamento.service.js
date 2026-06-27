@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import logger from "../config/logger.js";
+import prisma from "../config/prisma.js";
 
 /**
  * Valida assinatura do webhook do Mercado Pago de forma opcional.
@@ -157,6 +158,64 @@ export function normalizeMercadoPagoNotification(payload = {}) {
  * Processamento inicial (infraestrutura): apenas log estruturado.
  * Sem efeitos colaterais em pedidos para não alterar comportamento atual.
  */
+function mapMercadoPagoStatusToInternal(status) {
+  const normalizedStatus = String(status || "").toLowerCase();
+
+  if (normalizedStatus === "approved") {
+    return { pedidoStatus: "CONCLUIDO", paymentStatus: "PAID" };
+  }
+
+  if (normalizedStatus === "rejected" || normalizedStatus === "cancelled" || normalizedStatus === "cancelled_by_user") {
+    return { pedidoStatus: "CANCELADO", paymentStatus: "FAILED" };
+  }
+
+  return { pedidoStatus: "PENDENTE", paymentStatus: "PENDING" };
+}
+
+function extractPedidoIdFromExternalReference(externalReference) {
+  if (!externalReference) return null;
+  const match = String(externalReference).match(/pedido_(\d+)/i);
+  if (!match) return null;
+  return Number(match[1]);
+}
+
+async function getMercadoPagoPaymentById(paymentId) {
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!accessToken) {
+    throw Object.assign(new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."), { statusCode: 500 });
+  }
+
+  const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    logger.error("Erro ao consultar pagamento no Mercado Pago", {
+      paymentId,
+      status: response.status,
+      statusText: response.statusText,
+      responseData: data,
+    });
+
+    const err = new Error("Falha ao consultar pagamento no Mercado Pago.");
+    err.statusCode = 502;
+    throw err;
+  }
+
+  return data;
+}
+
 export async function processMercadoPagoWebhook(payload) {
   const normalized = normalizeMercadoPagoNotification(payload);
 
@@ -169,5 +228,78 @@ export async function processMercadoPagoWebhook(payload) {
     liveMode: normalized.liveMode,
   });
 
-  return normalized;
+  const paymentEvent =
+    normalized.type === "payment" ||
+    normalized.action?.toLowerCase().includes("payment");
+
+  if (!paymentEvent || !normalized.dataId) {
+    logger.info("Webhook ignorado por não ser evento de pagamento válido", {
+      notificationType: normalized.type,
+      action: normalized.action,
+      dataId: normalized.dataId,
+    });
+    return { ...normalized, ignored: true, reason: "NOT_PAYMENT_EVENT_OR_MISSING_DATA_ID" };
+  }
+
+  const payment = await getMercadoPagoPaymentById(normalized.dataId);
+  const externalReference = payment?.external_reference || null;
+  const pedidoId = extractPedidoIdFromExternalReference(externalReference);
+
+  if (!pedidoId) {
+    logger.warn("Webhook sem external_reference mapeável para pedido", {
+      paymentId: payment?.id,
+      externalReference,
+    });
+    return { ...normalized, ignored: true, reason: "EXTERNAL_REFERENCE_NOT_MAPPABLE", payment };
+  }
+
+  const pedidoAtual = await prisma.pedido.findUnique({ where: { id: pedidoId } });
+
+  if (!pedidoAtual) {
+    logger.warn("Pedido não encontrado para external_reference do webhook", {
+      pedidoId,
+      paymentId: payment?.id,
+      externalReference,
+    });
+    return { ...normalized, ignored: true, reason: "PEDIDO_NOT_FOUND", payment };
+  }
+
+  const mapped = mapMercadoPagoStatusToInternal(payment?.status);
+
+  const pedidoAtualizado = await prisma.pedido.update({
+    where: { id: pedidoId },
+    data: {
+      paymentId: payment?.id ? String(payment.id) : pedidoAtual.paymentId,
+      paymentMethod: payment?.payment_method_id || pedidoAtual.paymentMethod,
+      paymentStatus: mapped.paymentStatus,
+      status: mapped.pedidoStatus,
+      paidAt: mapped.paymentStatus === "PAID" ? new Date() : pedidoAtual.paidAt,
+    },
+    select: {
+      id: true,
+      status: true,
+      paymentStatus: true,
+      paymentId: true,
+      paymentMethod: true,
+      paidAt: true,
+    },
+  });
+
+  logger.info("Pedido atualizado por webhook Mercado Pago", {
+    pedidoId,
+    paymentId: payment?.id,
+    oldStatus: pedidoAtual.status,
+    newStatus: pedidoAtualizado.status,
+    oldPaymentStatus: pedidoAtual.paymentStatus,
+    newPaymentStatus: pedidoAtualizado.paymentStatus,
+  });
+
+  return {
+    ...normalized,
+    paymentId: payment?.id ?? null,
+    paymentStatus: payment?.status ?? null,
+    externalReference,
+    pedidoId,
+    updated: true,
+  };
 }

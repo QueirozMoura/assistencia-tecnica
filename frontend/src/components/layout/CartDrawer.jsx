@@ -129,9 +129,13 @@ export default function CartDrawer({
             <p className="text-xs text-[#737780]">
               Em até 12x de {formatPrice(total / 12)} sem juros
             </p>
-            <button className="w-full bg-[#0070ea] text-white py-3 rounded-xl font-semibold hover:bg-[#0059bb] transition-colors">
+            <Link
+              to="/checkout"
+              onClick={onClose}
+              className="w-full inline-flex items-center justify-center bg-[#0070ea] text-white py-3 rounded-xl font-semibold hover:bg-[#0059bb] transition-colors"
+            >
               Finalizar Compra
-            </button>
+            </Link>
             <button
               onClick={onClose}
               className="w-full border border-[#c3c6d1] text-[#43474f] py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"

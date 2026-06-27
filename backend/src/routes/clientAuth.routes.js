@@ -33,4 +33,7 @@ router.post("/reset-password", validate(resetPasswordSchema), ctrl.resetPassword
 // GET  /api/client-auth/me  (protegido)
 router.get("/me", clientAuthMiddleware, ctrl.getMe);
 
+// GET  /api/client-auth/meus-pedidos (protegido)
+router.get("/meus-pedidos", clientAuthMiddleware, ctrl.getMeusPedidos);
+
 export default router;

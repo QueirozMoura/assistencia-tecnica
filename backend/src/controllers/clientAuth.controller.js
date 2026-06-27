@@ -1,4 +1,5 @@
 import * as clientAuthService from "../services/clientAuth.service.js";
+import * as pedidoService from "../services/pedido.service.js";
 
 export async function register(req, res, next) {
   try {
@@ -52,5 +53,12 @@ export async function getMe(req, res, next) {
   try {
     const cliente = await clientAuthService.getMe(req.cliente.id);
     return res.status(200).json({ success: true, data: cliente });
+  } catch (error) { next(error); }
+}
+
+export async function getMeusPedidos(req, res, next) {
+  try {
+    const pedidos = await pedidoService.listarMeusPedidos(req.cliente.id);
+    return res.status(200).json({ success: true, data: pedidos });
   } catch (error) { next(error); }
 }

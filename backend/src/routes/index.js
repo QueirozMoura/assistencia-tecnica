@@ -24,5 +24,6 @@ router.use("/upload", uploadRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/client-auth", clientAuthRoutes);
 router.use("/webhook", webhookRoutes);
+router.use("/webhooks", webhookRoutes);
 
 export default router;

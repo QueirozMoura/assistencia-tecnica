@@ -31,3 +31,5 @@ export const clientCreatePedidoComPagamento = (data) =>
     method: 'POST',
     body: JSON.stringify(data),
   })
+
+export const clientListMeusPedidos = () => request('/client-auth/meus-pedidos')
