@@ -188,7 +188,7 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
 
         {/* Button */}
         <button
-          onClick={() => product.inStock && onAddToCart && onAddToCart(raw)}
+          onClick={() => product.inStock && onAddToCart && onAddToCart(product)}
           disabled={!product.inStock}
           className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
             product.inStock

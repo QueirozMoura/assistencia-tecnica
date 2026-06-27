@@ -58,11 +58,10 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
         }
       : undefined,
     back_urls: {
-      success: successUrl || "http://localhost:5173/pagamento/sucesso",
-      failure: failureUrl || "http://localhost:5173/pagamento/falha",
-      pending: pendingUrl || "http://localhost:5173/pagamento/pendente",
+      success: successUrl || "https://example.com/pagamento/sucesso",
+      failure: failureUrl || "https://example.com/pagamento/falha",
+      pending: pendingUrl || "https://example.com/pagamento/pendente",
     },
-    auto_return: "approved",
     notification_url: notificationUrl || undefined,
   };
 
@@ -76,31 +75,65 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
 
     if (!response.ok) {
-      logger.error("Erro ao criar preferência Mercado Pago", {
+      const details = {
         status: response.status,
-        response: data,
-      });
+        statusText: response.statusText,
+        message: data?.message ?? null,
+        error: data?.error ?? null,
+        cause: data?.cause ?? null,
+        responseData: data,
+      };
 
-      throw Object.assign(new Error("Erro ao criar preferência no Mercado Pago."), {
-        statusCode: 502,
-      });
+      logger.error(
+        `Erro ao criar preferência Mercado Pago: ${JSON.stringify(details)}`
+      );
+
+      const err = new Error("Erro ao criar preferência no Mercado Pago.");
+      err.statusCode = 502;
+      err.mpStatus = response.status;
+      err.mpStatusText = response.statusText;
+      err.mpResponse = data;
+      err.mpCause = data?.cause ?? null;
+      throw err;
     }
 
     return {
-      preferenceId: data.id,
-      initPoint: data.init_point,
-      sandboxInitPoint: data.sandbox_init_point,
+      preferenceId: data?.id,
+      initPoint: data?.init_point,
+      sandboxInitPoint: data?.sandbox_init_point,
       externalReference,
       raw: data,
+      requestPayload: body,
     };
   } catch (error) {
+    const errorDetails = {
+      message: error?.message ?? null,
+      name: error?.name ?? null,
+      code: error?.code ?? null,
+      status: error?.status ?? error?.statusCode ?? null,
+      responseStatus: error?.response?.status ?? error?.mpStatus ?? null,
+      responseStatusText: error?.response?.statusText ?? error?.mpStatusText ?? null,
+      responseData: error?.response?.data ?? error?.mpResponse ?? null,
+      cause: error?.cause ?? error?.mpCause ?? null,
+      stack: error?.stack ?? null,
+    };
+
+    logger.error(
+      `Falha detalhada Mercado Pago (create preference): ${JSON.stringify(errorDetails)}`
+    );
+
     if (!error.statusCode) {
-      logger.error("Falha de comunicação com Mercado Pago", { error: error.message });
       throw Object.assign(new Error("Erro de comunicação com o Mercado Pago."), { statusCode: 502 });
     }
+
     throw error;
   }
 }

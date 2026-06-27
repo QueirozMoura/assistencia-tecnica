@@ -20,6 +20,7 @@ import RedefinirSenha     from '../pages/RedefinirSenha'
 import MinhaConta         from '../pages/MinhaConta'
 import MeusPedidos        from '../pages/MeusPedidos'
 import MeusAgendamentos   from '../pages/MeusAgendamentos'
+import Checkout           from '../pages/Checkout'
 
 // ── Admin: auth + layout ──────────────────────────────────────────────────────
 import PrivateRoute  from '../components/admin/PrivateRoute'
@@ -58,6 +59,7 @@ export default function AppRoutes() {
         <Route path="/minha-conta"        element={<ClientPrivateRoute><MinhaConta /></ClientPrivateRoute>} />
         <Route path="/meus-pedidos"       element={<ClientPrivateRoute><MeusPedidos /></ClientPrivateRoute>} />
         <Route path="/meus-agendamentos"  element={<ClientPrivateRoute><MeusAgendamentos /></ClientPrivateRoute>} />
+        <Route path="/checkout"           element={<ClientPrivateRoute><Checkout /></ClientPrivateRoute>} />
 
         <Route path="*"              element={<NotFound />} />
       </Route>

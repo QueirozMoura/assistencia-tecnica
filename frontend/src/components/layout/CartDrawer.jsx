@@ -1,8 +1,16 @@
-import { X, ShoppingCart, Trash2, Plus, Minus } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { formatPrice } from '../../utils/formatPrice'
+import { X, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { formatPrice } from "../../utils/formatPrice";
+import { getItemPrice } from "../../hooks/useCart";
 
-export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty, total }) {
+export default function CartDrawer({
+  open,
+  onClose,
+  items,
+  onRemove,
+  onUpdateQty,
+  total,
+}) {
   return (
     <>
       {/* Overlay */}
@@ -16,7 +24,7 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
       {/* Drawer */}
       <div
         className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
-          open ? 'translate-x-0' : 'translate-x-full'
+          open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
@@ -47,7 +55,9 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
               </div>
               <div>
                 <p className="font-medium text-[#181c20]">Carrinho vazio</p>
-                <p className="text-sm text-[#737780] mt-1">Adicione produtos para continuar</p>
+                <p className="text-sm text-[#737780] mt-1">
+                  Adicione produtos para continuar
+                </p>
               </div>
               <Link
                 to="/catalogo"
@@ -59,14 +69,19 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="flex gap-3 p-3 bg-[#f7f9ff] rounded-xl">
+              <div
+                key={item.id}
+                className="flex gap-3 p-3 bg-[#f7f9ff] rounded-xl"
+              >
                 <img
                   src={item.image}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#181c20] line-clamp-2 leading-tight">{item.name}</p>
+                  <p className="text-sm font-medium text-[#181c20] line-clamp-2 leading-tight">
+                    {item.name}
+                  </p>
                   <p className="text-xs text-[#737780] mt-0.5">{item.brand}</p>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center gap-1">
@@ -76,7 +91,9 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
                       >
                         <Minus size={10} />
                       </button>
-                      <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                      <span className="text-sm font-medium w-6 text-center">
+                        {item.quantity}
+                      </span>
                       <button
                         onClick={() => onUpdateQty(item.id, item.quantity + 1)}
                         className="w-6 h-6 rounded-full bg-white border border-[#c3c6d1] flex items-center justify-center hover:border-[#0070ea] transition-colors"
@@ -85,7 +102,7 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
                       </button>
                     </div>
                     <span className="text-sm font-bold text-[#003366]">
-                      {formatPrice(item.price * item.quantity)}
+                      {formatPrice(getItemPrice(item) * Number(item.quantity || 0))}
                     </span>
                   </div>
                 </div>
@@ -105,7 +122,9 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
           <div className="px-5 py-4 border-t border-[#e5e8ee] space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-[#43474f] font-medium">Total</span>
-              <span className="text-xl font-bold text-[#003366]">{formatPrice(total)}</span>
+              <span className="text-xl font-bold text-[#003366]">
+                {formatPrice(total)}
+              </span>
             </div>
             <p className="text-xs text-[#737780]">
               Em até 12x de {formatPrice(total / 12)} sem juros
@@ -123,5 +142,5 @@ export default function CartDrawer({ open, onClose, items, onRemove, onUpdateQty
         )}
       </div>
     </>
-  )
+  );
 }
