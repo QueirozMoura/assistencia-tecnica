@@ -162,9 +162,17 @@ model Pedido {
   clienteId   Int
   cliente     Cliente      @relation(fields: [clienteId], references: [id])
 
-  valorTotal  Decimal      @db.Decimal(10, 2)
-  status      StatusPedido @default(PENDENTE)
-  observacoes String?
+  valorTotal        Decimal      @db.Decimal(10, 2)
+  status            StatusPedido @default(PENDENTE)
+  observacoes       String?
+
+  // ── Infraestrutura de pagamento (Mercado Pago) — aditivo, sem impacto no fluxo atual ──
+  paymentStatus     String?
+  paymentMethod     String?
+  paymentId         String?
+  preferenceId      String?
+  externalReference String?
+  paidAt            DateTime?
 
   itens       ItensPedido[]
 

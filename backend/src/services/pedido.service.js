@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { createMercadoPagoPreference } from "./pagamento.service.js";
 
 export async function listarPedidos(query) {
   const { page = 1, limit = 20, status, clienteId } = query;
@@ -134,6 +135,113 @@ export async function criarPedido(dados) {
   });
 
   return pedido;
+}
+
+export async function criarPedidoComPagamento(dados) {
+  const { clienteId, itens, observacoes } = dados;
+
+  if (!Array.isArray(itens) || itens.length === 0) {
+    throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
+  }
+
+  const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
+  if (!cliente) {
+    throw Object.assign(new Error("Cliente não encontrado."), { statusCode: 404 });
+  }
+
+  const produtoIds = itens.map((i) => i.produtoId);
+  const produtos = await prisma.produto.findMany({
+    where: { id: { in: produtoIds } },
+  });
+
+  if (produtos.length !== produtoIds.length) {
+    throw Object.assign(new Error("Produto inexistente no carrinho."), { statusCode: 400 });
+  }
+
+  let valorTotal = 0;
+  const itensComPreco = itens.map((item) => {
+    const produto = produtos.find((p) => p.id === item.produtoId);
+
+    if (!produto.ativo) {
+      throw Object.assign(new Error(`Produto inativo: "${produto.nome}".`), { statusCode: 400 });
+    }
+
+    if (produto.estoque < item.quantidade) {
+      throw Object.assign(
+        new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.estoque}.`),
+        { statusCode: 400 }
+      );
+    }
+
+    const precoUnitario = Number(produto.precoPromocional || produto.preco);
+    valorTotal += precoUnitario * item.quantidade;
+
+    return {
+      produtoId: item.produtoId,
+      nome: produto.nome,
+      quantidade: item.quantidade,
+      precoUnitario,
+    };
+  });
+
+  const resultado = await prisma.$transaction(async (tx) => {
+    const pedidoInicial = await tx.pedido.create({
+      data: {
+        clienteId,
+        valorTotal,
+        observacoes,
+        status: "PENDENTE",
+        paymentStatus: "PENDING",
+        itens: {
+          create: itensComPreco.map((item) => ({
+            produtoId: item.produtoId,
+            quantidade: item.quantidade,
+            precoUnitario: item.precoUnitario,
+          })),
+        },
+      },
+      include: {
+        cliente: { select: { id: true, nome: true, email: true } },
+        itens: {
+          include: {
+            produto: { select: { id: true, nome: true } },
+          },
+        },
+      },
+    });
+
+    const preferencia = await createMercadoPagoPreference({
+      pedido: pedidoInicial,
+      itens: itensComPreco,
+      payer: cliente,
+    });
+
+    const pedidoAtualizado = await tx.pedido.update({
+      where: { id: pedidoInicial.id },
+      data: {
+        preferenceId: preferencia.preferenceId,
+        externalReference: preferencia.externalReference,
+        paymentStatus: "PENDING",
+      },
+      include: {
+        cliente: { select: { id: true, nome: true, email: true } },
+        itens: {
+          include: {
+            produto: { select: { id: true, nome: true } },
+          },
+        },
+      },
+    });
+
+    return {
+      pedido: pedidoAtualizado,
+      preference_id: preferencia.preferenceId,
+      init_point: preferencia.initPoint,
+      sandbox_init_point: preferencia.sandboxInitPoint,
+    };
+  });
+
+  return resultado;
 }
 
 export async function atualizarStatusPedido(id, status) {

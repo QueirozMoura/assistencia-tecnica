@@ -16,6 +16,9 @@ router.get("/:id", authMiddleware, adminMiddleware, pedidoController.buscarPedid
 // POST /api/pedidos — público (checkout do e-commerce)
 router.post("/", validate(pedidoSchema), pedidoController.criarPedido);
 
+// POST /api/pedidos/com-pagamento — público (Mercado Pago)
+router.post("/com-pagamento", validate(pedidoSchema), pedidoController.criarPedidoComPagamento);
+
 // PATCH /api/pedidos/:id/status — ADMIN
 router.patch(
   "/:id/status",

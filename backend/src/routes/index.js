@@ -9,6 +9,7 @@ import usuarioRoutes from "./usuario.routes.js";
 import uploadRoutes from "./upload.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import clientAuthRoutes from "./clientAuth.routes.js";
+import webhookRoutes from "./webhook.routes.js";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/usuarios", usuarioRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/client-auth", clientAuthRoutes);
+router.use("/webhook", webhookRoutes);
 
 export default router;
