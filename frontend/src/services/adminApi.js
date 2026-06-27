@@ -74,6 +74,10 @@ export async function getDashboardStats() {
   return request('/dashboard/stats')
 }
 
+export async function getDashboard() {
+  return getDashboardStats()
+}
+
 // ─────────────────────────────────────────────
 // PRODUTOS — admin
 // ─────────────────────────────────────────────
@@ -227,11 +231,19 @@ export async function adminGetPedidos(params = {}) {
   return request(`/pedidos${query ? `?${query}` : ''}`)
 }
 
+export async function getPedidos(params = {}) {
+  return adminGetPedidos(params)
+}
+
 /**
  * Busca pedido por ID com itens e cliente.
  */
 export async function adminGetPedidoById(id) {
   return request(`/pedidos/${id}`)
+}
+
+export async function getPedidoById(id) {
+  return adminGetPedidoById(id)
 }
 
 /**

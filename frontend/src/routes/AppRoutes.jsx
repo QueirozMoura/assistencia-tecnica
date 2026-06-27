@@ -33,6 +33,8 @@ import CategoriasList  from '../admin/pages/Categorias/CategoriasList'
 import CategoriaForm   from '../admin/pages/Categorias/CategoriaForm'
 import ProdutosList    from '../admin/pages/Produtos/ProdutosList'
 import ProdutoForm     from '../admin/pages/Produtos/ProdutoForm'
+import Pedidos         from '../admin/pages/Pedidos/Pedidos'
+import PedidoDetail    from '../admin/pages/Pedidos/PedidoDetail'
 
 export default function AppRoutes() {
   return (
@@ -92,9 +94,8 @@ export default function AppRoutes() {
         <Route path="produtos/novo"           element={<ProdutoForm />} />
         <Route path="produtos/:id/editar"     element={<ProdutoForm />} />
 
-        {/* Pedidos e Clientes — placeholder Fase D (próxima etapa) */}
-        <Route path="pedidos"    element={<ComingSoon title="Pedidos" />} />
-        <Route path="pedidos/:id" element={<ComingSoon title="Detalhe do Pedido" />} />
+        <Route path="pedidos" element={<Pedidos />} />
+        <Route path="pedidos/:id" element={<PedidoDetail />} />
         <Route path="clientes"   element={<ComingSoon title="Clientes" />} />
         <Route path="clientes/:id" element={<ComingSoon title="Detalhe do Cliente" />} />
       </Route>

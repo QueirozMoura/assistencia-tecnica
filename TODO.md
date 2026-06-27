@@ -1,7 +1,11 @@
-- [ ] Backend: ajustar rota webhook para `POST /api/webhooks/mercadopago` (manter compatibilidade com legado)
-- [ ] Backend: evoluir processamento do webhook para consultar pagamento na API MP e atualizar pedido
-- [ ] Backend: mapear status MP -> status interno do pedido e paymentStatus
-- [ ] Backend: garantir validações mínimas e ignorar payload inválido com segurança
-- [ ] Backend: adicionar logs obrigatórios (recebido, atualização, status anterior->novo)
-- [ ] Testar webhook via curl (cenários mínimos) e validar atualização no banco
-- [ ] Atualizar TODO.md com progresso final
+- [x] Criar `frontend/src/components/admin/StatsCard.jsx`
+- [x] Criar `frontend/src/components/admin/OrderStatusBadge.jsx`
+- [x] Criar `frontend/src/components/ui/SkeletonLoader.jsx`
+- [x] Criar `frontend/src/components/ui/ErrorState.jsx`
+- [x] Criar `frontend/src/components/ui/EmptyState.jsx`
+- [ ] Refatorar `frontend/src/admin/pages/Dashboard.jsx` para padrão SaaS e componentes reutilizáveis
+- [ ] Criar `frontend/src/admin/pages/Pedidos/Pedidos.jsx`
+- [ ] Criar `frontend/src/admin/pages/Pedidos/PedidoDetail.jsx`
+- [ ] Atualizar `frontend/src/routes/AppRoutes.jsx` para rotas reais de pedidos admin
+- [ ] Atualizar `frontend/src/services/adminApi.js` com aliases `getDashboard`, `getPedidos`, `getPedidoById`
+- [ ] Rodar build do frontend (`npm run build`) para validar
