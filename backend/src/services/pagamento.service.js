@@ -81,8 +81,6 @@ export async function createMercadoPagoPreference({
   };
 
   try {
-    
-
     const response = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
@@ -185,7 +183,7 @@ function mapMercadoPagoStatusToInternal(status) {
   const normalizedStatus = String(status || "").toLowerCase();
 
   if (normalizedStatus === "approved") {
-    return { pedidoStatus: "CONCLUIDO", paymentStatus: "PAID" };
+    return { pedidoStatus: "PAGO", paymentStatus: "PAID" };
   }
 
   if (
@@ -215,6 +213,7 @@ async function getMercadoPagoPaymentById(paymentId) {
     );
   }
 
+  
   const response = await fetch(
     `https://api.mercadopago.com/v1/payments/${paymentId}`,
     {
@@ -229,6 +228,9 @@ async function getMercadoPagoPaymentById(paymentId) {
   let data = null;
   try {
     data = await response.json();
+    console.log("========== RESPONSE MERCADO PAGO ==========");
+    console.log(JSON.stringify(data, null, 2));
+    console.log("===========================================");
   } catch {
     data = null;
   }
