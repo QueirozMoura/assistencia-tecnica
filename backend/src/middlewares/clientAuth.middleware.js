@@ -8,16 +8,17 @@ import prisma from "../config/prisma.js";
  */
 export async function clientAuthMiddleware(req, res, next) {
   try {
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization || req.get("Authorization");
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Accept different casing / extra spaces (e.g. "bearer <token>")
+    if (!authHeader || !authHeader.trim().toLowerCase().startsWith("bearer ")) {
       return res.status(401).json({
         success: false,
         message: "Token de autenticação não fornecido.",
       });
     }
 
-    const token  = authHeader.split(" ")[1];
+    const token = authHeader.split(" ").pop().trim();
     const secret = process.env.JWT_CLIENT_SECRET;
 
     if (!secret) throw new Error("JWT_CLIENT_SECRET não configurado.");
