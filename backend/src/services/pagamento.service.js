@@ -7,7 +7,11 @@ import prisma from "../config/prisma.js";
  * Se MERCADO_PAGO_WEBHOOK_SECRET não estiver configurado, não bloqueia requisição
  * para preservar compatibilidade do ambiente atual.
  */
-export function validateMercadoPagoWebhookSignature({ rawBody, signatureHeader, secret }) {
+export function validateMercadoPagoWebhookSignature({
+  rawBody,
+  signatureHeader,
+  secret,
+}) {
   if (!secret) {
     return { valid: true, reason: "WEBHOOK_SECRET_NOT_CONFIGURED" };
   }
@@ -16,7 +20,10 @@ export function validateMercadoPagoWebhookSignature({ rawBody, signatureHeader, 
     return { valid: false, reason: "MISSING_SIGNATURE_HEADER" };
   }
 
-  const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
   const received = signatureHeader.trim();
 
   const valid =
@@ -30,7 +37,11 @@ export function validateMercadoPagoWebhookSignature({ rawBody, signatureHeader, 
  * Cria preferência de pagamento no Mercado Pago.
  * Integração aditiva para Etapa 2 sem alterar o fluxo legado de pedidos.
  */
-export async function createMercadoPagoPreference({ pedido, itens = [], payer }) {
+export async function createMercadoPagoPreference({
+  pedido,
+  itens = [],
+  payer,
+}) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const notificationUrl = process.env.MERCADO_PAGO_NOTIFICATION_URL;
   const successUrl = process.env.MERCADO_PAGO_SUCCESS_URL;
@@ -38,7 +49,10 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
   const pendingUrl = process.env.MERCADO_PAGO_PENDING_URL;
 
   if (!accessToken) {
-    throw Object.assign(new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."), { statusCode: 500 });
+    throw Object.assign(
+      new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."),
+      { statusCode: 500 },
+    );
   }
 
   const externalReference = `pedido_${pedido.id}`;
@@ -67,14 +81,19 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
   };
 
   try {
-    const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+    
+
+    const response = await fetch(
+      "https://api.mercadopago.com/checkout/preferences",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(body),
       },
-      body: JSON.stringify(body),
-    });
+    );
 
     let data = null;
     try {
@@ -94,7 +113,7 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
       };
 
       logger.error(
-        `Erro ao criar preferência Mercado Pago: ${JSON.stringify(details)}`
+        `Erro ao criar preferência Mercado Pago: ${JSON.stringify(details)}`,
       );
 
       const err = new Error("Erro ao criar preferência no Mercado Pago.");
@@ -121,18 +140,22 @@ export async function createMercadoPagoPreference({ pedido, itens = [], payer })
       code: error?.code ?? null,
       status: error?.status ?? error?.statusCode ?? null,
       responseStatus: error?.response?.status ?? error?.mpStatus ?? null,
-      responseStatusText: error?.response?.statusText ?? error?.mpStatusText ?? null,
+      responseStatusText:
+        error?.response?.statusText ?? error?.mpStatusText ?? null,
       responseData: error?.response?.data ?? error?.mpResponse ?? null,
       cause: error?.cause ?? error?.mpCause ?? null,
       stack: error?.stack ?? null,
     };
 
     logger.error(
-      `Falha detalhada Mercado Pago (create preference): ${JSON.stringify(errorDetails)}`
+      `Falha detalhada Mercado Pago (create preference): ${JSON.stringify(errorDetails)}`,
     );
 
     if (!error.statusCode) {
-      throw Object.assign(new Error("Erro de comunicação com o Mercado Pago."), { statusCode: 502 });
+      throw Object.assign(
+        new Error("Erro de comunicação com o Mercado Pago."),
+        { statusCode: 502 },
+      );
     }
 
     throw error;
@@ -165,7 +188,11 @@ function mapMercadoPagoStatusToInternal(status) {
     return { pedidoStatus: "CONCLUIDO", paymentStatus: "PAID" };
   }
 
-  if (normalizedStatus === "rejected" || normalizedStatus === "cancelled" || normalizedStatus === "cancelled_by_user") {
+  if (
+    normalizedStatus === "rejected" ||
+    normalizedStatus === "cancelled" ||
+    normalizedStatus === "cancelled_by_user"
+  ) {
     return { pedidoStatus: "CANCELADO", paymentStatus: "FAILED" };
   }
 
@@ -182,16 +209,22 @@ function extractPedidoIdFromExternalReference(externalReference) {
 async function getMercadoPagoPaymentById(paymentId) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!accessToken) {
-    throw Object.assign(new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."), { statusCode: 500 });
+    throw Object.assign(
+      new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."),
+      { statusCode: 500 },
+    );
   }
 
-  const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/payments/${paymentId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
     },
-  });
+  );
 
   let data = null;
   try {
@@ -238,7 +271,11 @@ export async function processMercadoPagoWebhook(payload) {
       action: normalized.action,
       dataId: normalized.dataId,
     });
-    return { ...normalized, ignored: true, reason: "NOT_PAYMENT_EVENT_OR_MISSING_DATA_ID" };
+    return {
+      ...normalized,
+      ignored: true,
+      reason: "NOT_PAYMENT_EVENT_OR_MISSING_DATA_ID",
+    };
   }
 
   const payment = await getMercadoPagoPaymentById(normalized.dataId);
@@ -250,10 +287,17 @@ export async function processMercadoPagoWebhook(payload) {
       paymentId: payment?.id,
       externalReference,
     });
-    return { ...normalized, ignored: true, reason: "EXTERNAL_REFERENCE_NOT_MAPPABLE", payment };
+    return {
+      ...normalized,
+      ignored: true,
+      reason: "EXTERNAL_REFERENCE_NOT_MAPPABLE",
+      payment,
+    };
   }
 
-  const pedidoAtual = await prisma.pedido.findUnique({ where: { id: pedidoId } });
+  const pedidoAtual = await prisma.pedido.findUnique({
+    where: { id: pedidoId },
+  });
 
   if (!pedidoAtual) {
     logger.warn("Pedido não encontrado para external_reference do webhook", {
@@ -261,7 +305,12 @@ export async function processMercadoPagoWebhook(payload) {
       paymentId: payment?.id,
       externalReference,
     });
-    return { ...normalized, ignored: true, reason: "PEDIDO_NOT_FOUND", payment };
+    return {
+      ...normalized,
+      ignored: true,
+      reason: "PEDIDO_NOT_FOUND",
+      payment,
+    };
   }
 
   const mapped = mapMercadoPagoStatusToInternal(payment?.status);
