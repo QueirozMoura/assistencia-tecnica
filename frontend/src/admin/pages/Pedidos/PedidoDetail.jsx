@@ -4,7 +4,7 @@ import OrderStatusBadge from '../../../components/admin/OrderStatusBadge'
 import SkeletonLoader from '../../../components/ui/SkeletonLoader'
 import ErrorState from '../../../components/ui/ErrorState'
 import EmptyState from '../../../components/ui/EmptyState'
-import { getPedidoById } from '../../../services/adminApi'
+import { adminUpdateStatusPedido, getPedidoById } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
 
 function formatDateTime(date) {
@@ -17,6 +17,7 @@ export default function PedidoDetail() {
   const [pedido, setPedido] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [updatingStatus, setUpdatingStatus] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -50,9 +51,36 @@ export default function PedidoDetail() {
           <h1 className="text-2xl font-bold text-[#0f172a]">Pedido #{id}</h1>
           <p className="text-sm text-[#5b6472]">Detalhes completos do pedido.</p>
         </div>
-        <Link to="/admin/pedidos" className="rounded-xl border border-[#dbe1ea] px-3 py-2 text-sm font-semibold text-[#334155]">
-          Voltar
-        </Link>
+        <div className="flex items-center gap-2">
+          {pedido && (
+            <select
+              value={pedido.status}
+              disabled={updatingStatus}
+              onChange={async (e) => {
+                try {
+                  setUpdatingStatus(true)
+                  setError('')
+                  const response = await adminUpdateStatusPedido(id, e.target.value)
+                  setPedido(response?.data || pedido)
+                } catch (err) {
+                  setError(err?.message || 'Erro ao atualizar status do pedido.')
+                } finally {
+                  setUpdatingStatus(false)
+                }
+              }}
+              className="rounded-xl border border-[#dbe1ea] bg-white px-3 py-2 text-sm font-medium text-[#334155]"
+            >
+              <option value="PENDENTE">PENDENTE</option>
+              <option value="PAGO">PAGO</option>
+              <option value="ENVIADO">ENVIADO</option>
+              <option value="ENTREGUE">ENTREGUE</option>
+              <option value="CANCELADO">CANCELADO</option>
+            </select>
+          )}
+          <Link to="/admin/pedidos" className="rounded-xl border border-[#dbe1ea] px-3 py-2 text-sm font-semibold text-[#334155]">
+            Voltar
+          </Link>
+        </div>
       </div>
 
       {error && <ErrorState title="Erro ao carregar pedido" message={error} />}

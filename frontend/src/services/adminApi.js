@@ -15,16 +15,48 @@ async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (token) headers['Authorization'] = `Bearer ${token}`
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+  const url = `${BASE_URL}${path}`
+  const method = options.method || 'GET'
+  const startedAt = Date.now()
+
+  console.debug('[adminApi.request] start', {
+    method,
+    path,
+    url,
+    hasToken: Boolean(token),
+    body: options.body,
+    startedAt,
+  })
+
+  const res = await fetch(url, { ...options, headers })
+  const responseBody = await res.json().catch(() => ({}))
+
+  console.debug('[adminApi.request] response', {
+    method,
+    path,
+    url,
+    status: res.status,
+    ok: res.ok,
+    elapsedMs: Date.now() - startedAt,
+    responseBody,
+  })
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    const err  = new Error(body.message || `Erro ${res.status}`)
+    const err = new Error(responseBody.message || `Erro ${res.status}`)
     err.status = res.status
+    err.body = responseBody
+    console.debug('[adminApi.request] error', {
+      method,
+      path,
+      url,
+      status: res.status,
+      elapsedMs: Date.now() - startedAt,
+      err,
+    })
     throw err
   }
 
-  return res.json()
+  return responseBody
 }
 
 // ─────────────────────────────────────────────
@@ -272,6 +304,10 @@ export async function adminGetClientes(params = {}) {
   if (params.busca) qs.set('busca', params.busca)
   const query = qs.toString()
   return request(`/clientes${query ? `?${query}` : ''}`)
+}
+
+export async function getClientes(params = {}) {
+  return adminGetClientes(params)
 }
 
 /**

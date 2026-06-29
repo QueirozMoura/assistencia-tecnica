@@ -61,7 +61,11 @@ export async function buscarPedidoPorId(id) {
 }
 
 export async function criarPedido(dados) {
-  const clienteId = req.cliente.id;
+  const { clienteId, itens, observacoes } = dados;
+
+  if (!Array.isArray(itens) || itens.length === 0) {
+    throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
+  }
 
   // Verificar cliente
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });

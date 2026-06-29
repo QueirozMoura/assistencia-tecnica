@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import StatsCard from '../../components/admin/StatsCard'
@@ -28,23 +28,51 @@ function DashboardSectionSkeleton() {
 export default function Dashboard() {
   const { user } = useAuth()
   const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const fetchStats = useCallback(async () => {
+  async function fetchStats(source = 'manual') {
+    const startedAt = Date.now()
+    console.debug('[Dashboard] fetchStats:start', { source, startedAt })
     try {
       setLoading(true)
       setError('')
       const response = await getDashboard()
+      console.debug('[Dashboard] fetchStats:success', {
+        source,
+        elapsedMs: Date.now() - startedAt,
+        response,
+      })
       setStats(response?.data || null)
     } catch (err) {
+      console.debug('[Dashboard] fetchStats:error', {
+        source,
+        elapsedMs: Date.now() - startedAt,
+        err,
+      })
       setError(err?.message || 'Erro ao carregar dados do dashboard.')
       setStats(null)
     } finally {
       setLoading(false)
+      console.debug('[Dashboard] fetchStats:finally', {
+        source,
+        elapsedMs: Date.now() - startedAt,
+      })
     }
-  }, [])
+  }
 
+
+  useEffect(() => {
+    console.debug('[Dashboard] state:loading', loading)
+  }, [loading])
+
+  useEffect(() => {
+    console.debug('[Dashboard] state:error', error)
+  }, [error])
+
+  useEffect(() => {
+    console.debug('[Dashboard] state:stats', stats)
+  }, [stats])
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours()

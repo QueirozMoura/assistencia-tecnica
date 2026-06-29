@@ -35,6 +35,7 @@ import ProdutosList    from '../admin/pages/Produtos/ProdutosList'
 import ProdutoForm     from '../admin/pages/Produtos/ProdutoForm'
 import Pedidos         from '../admin/pages/Pedidos/Pedidos'
 import PedidoDetail    from '../admin/pages/Pedidos/PedidoDetail'
+import Clientes        from '../admin/pages/Clientes/Clientes'
 
 export default function AppRoutes() {
   return (
@@ -96,7 +97,7 @@ export default function AppRoutes() {
 
         <Route path="pedidos" element={<Pedidos />} />
         <Route path="pedidos/:id" element={<PedidoDetail />} />
-        <Route path="clientes"   element={<ComingSoon title="Clientes" />} />
+        <Route path="clientes" element={<Clientes />} />
         <Route path="clientes/:id" element={<ComingSoon title="Detalhe do Cliente" />} />
       </Route>
 
