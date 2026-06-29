@@ -1,5 +1,6 @@
 import * as clientAuthService from "../services/clientAuth.service.js";
 import * as pedidoService from "../services/pedido.service.js";
+import * as agendamentoService from "../services/agendamento.service.js";
 
 export async function register(req, res, next) {
   try {
@@ -60,5 +61,12 @@ export async function getMeusPedidos(req, res, next) {
   try {
     const pedidos = await pedidoService.listarMeusPedidos(req.cliente.id);
     return res.status(200).json({ success: true, data: pedidos });
+  } catch (error) { next(error); }
+}
+
+export async function getMeusAgendamentos(req, res, next) {
+  try {
+    const agendamentos = await agendamentoService.listarMeusAgendamentos(req.cliente.id);
+    return res.status(200).json({ success: true, data: agendamentos });
   } catch (error) { next(error); }
 }

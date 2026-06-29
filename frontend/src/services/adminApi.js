@@ -316,3 +316,24 @@ export async function getClientes(params = {}) {
 export async function adminGetClienteById(id) {
   return request(`/clientes/${id}`)
 }
+
+// ─────────────────────────────────────────────
+// AGENDAMENTOS — admin
+// ─────────────────────────────────────────────
+
+export async function adminGetAgendamentos(params = {}) {
+  const qs = new URLSearchParams()
+  if (params.page) qs.set('page', params.page)
+  if (params.limit) qs.set('limit', params.limit)
+  if (params.status) qs.set('status', params.status)
+  if (params.busca) qs.set('busca', params.busca)
+  const query = qs.toString()
+  return request(`/agendamentos${query ? `?${query}` : ''}`)
+}
+
+export async function adminUpdateStatusAgendamento(id, status) {
+  return request(`/agendamentos/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
+}

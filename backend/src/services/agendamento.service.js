@@ -82,8 +82,45 @@ export async function atualizarAgendamento(id, dados) {
   });
 }
 
+const STATUS_TRANSITIONS = {
+  PENDENTE: ["CONFIRMADO", "CANCELADO"],
+  CONFIRMADO: ["EM_ANDAMENTO", "CANCELADO"],
+  EM_ANDAMENTO: ["CONCLUIDO", "CANCELADO"],
+  CONCLUIDO: [],
+  CANCELADO: [],
+};
+
+export async function listarMeusAgendamentos(clienteId) {
+  return prisma.agendamento.findMany({
+    where: { clienteId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      createdAt: true,
+      dataAgendamento: true,
+      equipamento: true,
+      marca: true,
+      modelo: true,
+      problema: true,
+      melhorHorario: true,
+      status: true,
+    },
+  });
+}
+
 export async function atualizarStatusAgendamento(id, status) {
-  await buscarAgendamentoPorId(id);
+  const atual = await buscarAgendamentoPorId(id);
+
+  if (atual.status !== status) {
+    const allowed = STATUS_TRANSITIONS[atual.status] || [];
+    if (!allowed.includes(status)) {
+      throw Object.assign(
+        new Error(`Transição de status inválida: ${atual.status} -> ${status}.`),
+        { statusCode: 400 }
+      );
+    }
+  }
+
   return prisma.agendamento.update({
     where: { id },
     data: { status },

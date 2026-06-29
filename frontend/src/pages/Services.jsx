@@ -47,7 +47,7 @@ export default function Services() {
               Agendar Visita
             </Link>
             <a
-              href="tel:+5511999999999"
+              href="tel:+5511965602135"
               className="flex items-center gap-2 border-2 border-white/30 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all"
             >
               <Phone size={16} />
@@ -208,7 +208,7 @@ export default function Services() {
               Agendar Agora
             </Link>
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5511965602135"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 border-2 border-white/40 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition-all"

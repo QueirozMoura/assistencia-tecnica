@@ -12,6 +12,24 @@ export const agendamentoSchema = z.object({
       "Telefone inválido. Use o formato (11) 99999-9999."
     )
     .trim(),
+  email: z.string().email("E-mail inválido.").trim().optional().nullable(),
+  whatsapp: z
+    .string()
+    .regex(
+      /^(\+55\s?)?(\(?\d{2}\)?\s?)(\d{4,5}[-\s]?\d{4})$/,
+      "WhatsApp inválido. Use o formato (11) 99999-9999."
+    )
+    .trim()
+    .optional()
+    .nullable(),
+  endereco: z.string().trim().optional().nullable(),
+  cep: z
+    .string()
+    .regex(/^\d{5}-?\d{3}$/, "CEP inválido. Use o formato 00000-000.")
+    .trim()
+    .optional()
+    .nullable(),
+  cidade: z.string().trim().optional().nullable(),
   equipamento: z
     .string({ required_error: "Equipamento é obrigatório." })
     .min(2, "Informe o tipo de equipamento.")
@@ -23,6 +41,7 @@ export const agendamentoSchema = z.object({
     .min(10, "Descreva o problema com pelo menos 10 caracteres.")
     .trim(),
   observacoes: z.string().trim().optional().nullable(),
+  melhorHorario: z.string().trim().optional().nullable(),
   dataAgendamento: z
     .string()
     .datetime({ message: "Data de agendamento inválida. Use o formato ISO 8601." })

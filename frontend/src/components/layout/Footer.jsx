@@ -123,21 +123,21 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Phone size={15} className="text-[#0070ea] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-white text-sm font-medium">(11) 9999-9999</p>
+                  <p className="text-white text-sm font-medium">(11) 96560-2135</p>
                   <p className="text-[#8fa8c8] text-xs">WhatsApp disponível</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Mail size={15} className="text-[#0070ea] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-white text-sm">contato@eletrocenter.com.br</p>
+                  <p className="text-white text-sm">jqueiroz555@gmail.com</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin size={15} className="text-[#0070ea] mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-white text-sm">São Paulo, SP</p>
-                  <p className="text-[#8fa8c8] text-xs">Grande São Paulo e ABC</p>
+                  <p className="text-[#8fa8c8] text-xs">São Paulo ZS</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">

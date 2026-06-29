@@ -33,3 +33,11 @@ export const clientCreatePedidoComPagamento = (data) =>
   })
 
 export const clientListMeusPedidos = () => request('/client-auth/meus-pedidos')
+
+export const clientCreateAgendamento = (data) =>
+  request('/agendamentos', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+
+export const clientListMeusAgendamentos = () => request('/client-auth/meus-agendamentos')

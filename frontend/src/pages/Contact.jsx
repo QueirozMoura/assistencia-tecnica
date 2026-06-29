@@ -19,15 +19,15 @@ const contactInfo = [
     lines: ['(11) 9999-9999', 'Resposta rápida'],
     color: 'bg-[#d4f5e2]',
     iconColor: 'text-[#1a6b3c]',
-    href: 'https://wa.me/5511999999999',
+    href: 'https://wa.me/5511965602135',
   },
   {
     icon: Mail,
     title: 'E-mail',
-    lines: ['contato@eletrocenter.com.br', 'Respondemos em até 4h'],
+    lines: ['jqueiroz555@gmail.com', 'Respondemos em até 4h'],
     color: 'bg-[#cce0ff]',
     iconColor: 'text-[#003366]',
-    href: 'mailto:contato@eletrocenter.com.br',
+    href: 'mailto:jqueiroz555@gmail.com',
   },
   {
     icon: MapPin,
@@ -221,7 +221,7 @@ export default function Contact() {
 
             {/* WhatsApp CTA */}
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5511965602135"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 bg-[#25D366] text-white p-5 rounded-2xl hover:bg-[#1ebe5d] transition-all group"

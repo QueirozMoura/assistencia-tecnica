@@ -36,4 +36,7 @@ router.get("/me", clientAuthMiddleware, ctrl.getMe);
 // GET  /api/client-auth/meus-pedidos (protegido)
 router.get("/meus-pedidos", clientAuthMiddleware, ctrl.getMeusPedidos);
 
+// GET  /api/client-auth/meus-agendamentos (protegido)
+router.get("/meus-agendamentos", clientAuthMiddleware, ctrl.getMeusAgendamentos);
+
 export default router;

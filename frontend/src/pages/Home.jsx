@@ -603,11 +603,11 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href="tel:+5511999999999"
+              href="tel:+5511965602135"
               className="flex items-center gap-2 bg-[#003366] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#001e40] transition-all"
             >
               <Phone size={16} />
-              (11) 9999-9999
+              (11) 96560-2135
             </a>
             <Link
               to="/agendamento"

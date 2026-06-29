@@ -33,6 +33,7 @@ import CategoriasList  from '../admin/pages/Categorias/CategoriasList'
 import CategoriaForm   from '../admin/pages/Categorias/CategoriaForm'
 import ProdutosList    from '../admin/pages/Produtos/ProdutosList'
 import ProdutoForm     from '../admin/pages/Produtos/ProdutoForm'
+import AgendamentosAdmin from '../admin/pages/Agendamentos/Agendamentos'
 import Pedidos         from '../admin/pages/Pedidos/Pedidos'
 import PedidoDetail    from '../admin/pages/Pedidos/PedidoDetail'
 import Clientes        from '../admin/pages/Clientes/Clientes'
@@ -99,6 +100,7 @@ export default function AppRoutes() {
         <Route path="pedidos/:id" element={<PedidoDetail />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="clientes/:id" element={<ComingSoon title="Detalhe do Cliente" />} />
+        <Route path="agendamentos" element={<AgendamentosAdmin />} />
       </Route>
 
     </Routes>

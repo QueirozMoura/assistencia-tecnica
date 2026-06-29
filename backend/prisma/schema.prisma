@@ -136,6 +136,13 @@ model Agendamento {
   // Dados do solicitante (caso não seja cliente cadastrado)
   nomeContato     String
   telefoneContato String
+  email           String?
+  whatsapp        String?
+
+  // Endereço para atendimento
+  endereco        String?
+  cep             String?
+  cidade          String?
 
   // Dados do equipamento
   equipamento     String
@@ -143,6 +150,7 @@ model Agendamento {
   modelo          String?
   problema        String
   observacoes     String?
+  melhorHorario   String?
 
   dataAgendamento DateTime?
   status          StatusAgendamento @default(PENDENTE)
