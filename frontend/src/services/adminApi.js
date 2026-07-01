@@ -15,44 +15,13 @@ async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (token) headers['Authorization'] = `Bearer ${token}`
 
-  const url = `${BASE_URL}${path}`
-  const method = options.method || 'GET'
-  const startedAt = Date.now()
-
-  console.debug('[adminApi.request] start', {
-    method,
-    path,
-    url,
-    hasToken: Boolean(token),
-    body: options.body,
-    startedAt,
-  })
-
-  const res = await fetch(url, { ...options, headers })
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
   const responseBody = await res.json().catch(() => ({}))
-
-  console.debug('[adminApi.request] response', {
-    method,
-    path,
-    url,
-    status: res.status,
-    ok: res.ok,
-    elapsedMs: Date.now() - startedAt,
-    responseBody,
-  })
 
   if (!res.ok) {
     const err = new Error(responseBody.message || `Erro ${res.status}`)
     err.status = res.status
     err.body = responseBody
-    console.debug('[adminApi.request] error', {
-      method,
-      path,
-      url,
-      status: res.status,
-      elapsedMs: Date.now() - startedAt,
-      err,
-    })
     throw err
   }
 
@@ -261,21 +230,6 @@ export async function adminGetPedidos(params = {}) {
   if (params.clienteId) qs.set('clienteId', params.clienteId)
   const query = qs.toString()
   return request(`/pedidos${query ? `?${query}` : ''}`)
-}
-
-export async function getPedidos(params = {}) {
-  return adminGetPedidos(params)
-}
-
-/**
- * Busca pedido por ID com itens e cliente.
- */
-export async function adminGetPedidoById(id) {
-  return request(`/pedidos/${id}`)
-}
-
-export async function getPedidoById(id) {
-  return adminGetPedidoById(id)
 }
 
 /**

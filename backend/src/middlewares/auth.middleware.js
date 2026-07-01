@@ -5,14 +5,15 @@ export async function authMiddleware(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Accept different casing / extra spaces (e.g. "bearer <token>")
+    if (!authHeader || !authHeader.trim().toLowerCase().startsWith("bearer ")) {
       return res.status(401).json({
         success: false,
         message: "Token de autenticação não fornecido.",
       });
     }
 
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ").pop().trim();
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {

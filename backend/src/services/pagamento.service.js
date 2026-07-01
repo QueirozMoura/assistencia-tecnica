@@ -228,9 +228,10 @@ async function getMercadoPagoPaymentById(paymentId) {
   let data = null;
   try {
     data = await response.json();
-    console.log("========== RESPONSE MERCADO PAGO ==========");
-    console.log(JSON.stringify(data, null, 2));
-    console.log("===========================================");
+    // Debug logging do Mercado Pago é feito via logger.debug() em desenvolvimento
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug("Resposta Mercado Pago:", { paymentId, status: response.status, dataReceived: !!data });
+    }
   } catch {
     data = null;
   }

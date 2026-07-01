@@ -94,7 +94,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <Phone size={12} />
-              (11) 9999-9999
+              (11) 96560-2135
             </span>
             <span>|</span>
             <span>Seg–Sáb: 8h às 18h</span>

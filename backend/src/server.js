@@ -5,8 +5,26 @@ import prisma from "./config/prisma.js";
 
 const PORT = process.env.PORT || 3000;
 
+/**
+ * Valida variáveis de ambiente críticas no startup
+ */
+function validateEnvironmentVariables() {
+  const requiredVars = ["JWT_SECRET", "JWT_CLIENT_SECRET"];
+  const missingVars = requiredVars.filter((varName) => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    logger.error(
+      `Variáveis de ambiente obrigatórias não configuradas: ${missingVars.join(", ")}`
+    );
+    process.exit(1);
+  }
+
+  logger.info("Variáveis de ambiente validadas com sucesso.");
+}
+
 async function bootstrap() {
   try {
+    validateEnvironmentVariables();
     await prisma.$connect();
     logger.info("Banco de dados conectado com sucesso.");
 
