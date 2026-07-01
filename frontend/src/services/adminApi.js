@@ -291,3 +291,11 @@ export async function adminUpdateStatusAgendamento(id, status) {
     body: JSON.stringify({ status }),
   })
 }
+
+export async function getPedidos(params) {
+  return adminGetPedidos(params)
+}
+
+export async function getPedidoById(id) {
+  return request(`/pedidos/${id}`)
+}
