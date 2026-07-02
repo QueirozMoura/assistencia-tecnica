@@ -1,7 +1,13 @@
 import logger from "../config/logger.js";
 
 export function errorMiddleware(err, req, res, _next) {
-  logger.error(`${err.message}`, { stack: err.stack, path: req.originalUrl });
+  logger.error("Erro capturado pelo middleware", {
+  message: err.message,
+  name: err.name,
+  code: err.code,
+  stack: err.stack,
+  path: req.originalUrl,
+});
 
   // Erros de validação Zod
   if (err.name === "ZodError") {
