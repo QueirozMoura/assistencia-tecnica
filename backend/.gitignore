@@ -7,3 +7,7 @@ node_modules
 # Uploads — ignorar arquivos mas manter estrutura de pastas
 /uploads/produtos/*
 !/uploads/produtos/.gitkeep
+
+
+# Scripts sensíveis (admin, seed, manutenção)
+scripts/
