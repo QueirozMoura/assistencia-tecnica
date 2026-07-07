@@ -1,4 +1,7 @@
 import * as clientAuthService from "../services/clientAuth.service.js";
+import * as clientAuthService from "../services/clientAuth.service.js";
+import * as pedidoService from "../services/pedido.service.js";
+import * as agendamentoService from "../services/agendamento.service.js";
 
 export async function register(req, res, next) {
   try {
