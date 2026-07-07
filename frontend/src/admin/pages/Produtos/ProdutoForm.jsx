@@ -416,6 +416,7 @@ export default function ProdutoForm() {
             ref={fileRef}
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/webp"
+            capture="environment"
             onChange={handleFileChange}
             className="hidden"
           />
