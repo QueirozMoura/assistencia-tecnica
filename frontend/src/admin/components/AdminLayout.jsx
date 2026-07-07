@@ -38,7 +38,7 @@ export default function AdminLayout() {
 
       {/* ── Sidebar ─────────────────────────────────────────────── */}
       {/* Desktop: sempre visível, colapsável */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block fixed top-0 left-0 h-full z-30">
         <AdminSidebar collapsed={collapsed} onToggle={toggleCollapsed} />
       </div>
 

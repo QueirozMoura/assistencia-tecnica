@@ -67,7 +67,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   return (
     <aside
       className={`
-        fixed top-0 left-0 h-full z-30 flex flex-col
+        h-full flex flex-col
         bg-[#001e40] text-white transition-all duration-300
         ${collapsed ? 'w-16' : 'w-60'}
       `}
