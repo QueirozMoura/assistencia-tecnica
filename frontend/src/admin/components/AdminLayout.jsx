@@ -51,7 +51,7 @@ export default function AdminLayout() {
       >
         <AdminSidebar
           collapsed={false}
-          onToggle={() => setMobileOpen((o) => !o)}
+          onToggle={() => setMobileOpen(false)}
         />
       </div>
 
