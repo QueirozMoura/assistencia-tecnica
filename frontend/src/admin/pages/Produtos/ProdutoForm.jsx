@@ -32,6 +32,7 @@ export default function ProdutoForm() {
   const navigate = useNavigate()
   const isEdit   = !!id
   const fileRef  = useRef(null)
+  const cameraRef = useRef(null)
 
   const [form,       setForm]       = useState(EMPTY)
   const [slugManual, setSlugManual] = useState(false)
@@ -104,6 +105,14 @@ export default function ProdutoForm() {
     setErrors((er) => ({ ...er, [field]: null }))
   }
 
+  function openFilePicker() {
+    fileRef.current?.click()
+  }
+
+  function openCameraPicker() {
+    cameraRef.current?.click()
+  }
+
   // ── Upload de imagem ───────────────────────────────────────────
   async function handleFileChange(e) {
     const file = e.target.files?.[0]
@@ -125,8 +134,9 @@ export default function ProdutoForm() {
       setPreviewUrl(form.imagemPrincipal || null)
     } finally {
       setUploading(false)
-      // Limpar input para permitir re-upload do mesmo arquivo
+      // Limpar inputs para permitir re-upload do mesmo arquivo
       if (fileRef.current) fileRef.current.value = ''
+      if (cameraRef.current) cameraRef.current.value = ''
     }
   }
 
@@ -135,6 +145,7 @@ export default function ProdutoForm() {
     setForm((f) => ({ ...f, imagemPrincipal: '' }))
     setUploadError(null)
     if (fileRef.current) fileRef.current.value = ''
+    if (cameraRef.current) cameraRef.current.value = ''
   }
 
   // ── Validação ──────────────────────────────────────────────────
@@ -397,7 +408,7 @@ export default function ProdutoForm() {
             </div>
           ) : (
             <div
-              onClick={() => fileRef.current?.click()}
+              onClick={openFilePicker}
               className="w-full border-2 border-dashed border-[#c3c6d1] rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[#0070ea] hover:bg-[#f7f9ff] transition-all"
             >
               <div className="w-12 h-12 bg-[#f1f4f9] rounded-xl flex items-center justify-center">
@@ -412,8 +423,34 @@ export default function ProdutoForm() {
             </div>
           )}
 
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={openCameraPicker}
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-[#0070ea]/20 bg-[#f7f9ff] px-3 py-2.5 text-sm font-semibold text-[#0070ea] hover:bg-[#eef5ff] transition-colors"
+            >
+              <span aria-hidden="true">📷</span>
+              Tirar foto com câmera
+            </button>
+            <button
+              type="button"
+              onClick={openFilePicker}
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-[#e5e8ee] bg-white px-3 py-2.5 text-sm font-semibold text-[#43474f] hover:bg-[#f7f9ff] transition-colors"
+            >
+              <span aria-hidden="true">🖼️</span>
+              Escolher da galeria/arquivos
+            </button>
+          </div>
+
           <input
             ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <input
+            ref={cameraRef}
             type="file"
             accept="image/*"
             capture="environment"
