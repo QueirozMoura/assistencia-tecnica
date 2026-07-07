@@ -27,12 +27,12 @@ export default function Services() {
   return (
     <div className="bg-[#f7f9ff] min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-16">
+      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-12 sm:py-16">
         <div className="container-max text-center">
           <span className="inline-block bg-white/20 text-[#a7c8ff] text-xs font-semibold px-4 py-1.5 rounded-full mb-4 uppercase tracking-wider">
             Assistência Técnica
           </span>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             Serviços Especializados em Eletrodomésticos
           </h1>
           <p className="text-[#8fa8c8] text-lg max-w-2xl mx-auto mb-8">
@@ -58,7 +58,7 @@ export default function Services() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16">
+      <section className="py-12 sm:py-16">
         <div className="container-max">
           <SectionHeader
             badge="Nossos Serviços"
@@ -150,7 +150,7 @@ export default function Services() {
       </section>
 
       {/* Brands */}
-      <section className="py-14 bg-[#f7f9ff]">
+      <section className="py-12 sm:py-14 bg-[#f7f9ff]">
         <div className="container-max">
           <SectionHeader
             badge="Marcas"
@@ -195,7 +195,7 @@ export default function Services() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-gradient-to-r from-[#003366] to-[#0070ea]">
+      <section className="py-12 sm:py-14 bg-gradient-to-r from-[#003366] to-[#0070ea]">
         <div className="container-max text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Pronto para resolver o problema do seu equipamento?</h2>
           <p className="text-[#a7c8ff] mb-8">Diagnóstico gratuito. Técnico na sua casa em até 24 horas.</p>

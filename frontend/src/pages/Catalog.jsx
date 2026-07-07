@@ -151,10 +151,10 @@ export default function Catalog() {
 
       <div className="container-max py-8">
         {/* Mobile filter toggle */}
-        <div className="flex items-center justify-between mb-5 lg:hidden">
+        <div className="flex flex-col gap-3 mb-5 lg:hidden">
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
-            className="flex items-center gap-2 bg-white border border-[#e5e8ee] px-4 py-2.5 rounded-xl text-sm font-medium text-[#43474f] shadow-sm"
+            className="flex items-center justify-center gap-2 bg-white border border-[#e5e8ee] px-4 py-2.5 rounded-xl text-sm font-medium text-[#43474f] shadow-sm"
           >
             <SlidersHorizontal size={16} />
             Filtros
@@ -163,7 +163,7 @@ export default function Catalog() {
           <select
             value={sortBy}
             onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-            className="bg-white border border-[#e5e8ee] px-3 py-2.5 rounded-xl text-sm text-[#43474f] outline-none"
+            className="w-full bg-white border border-[#e5e8ee] px-3 py-2.5 rounded-xl text-sm text-[#43474f] outline-none"
           >
             <option value="relevancia">Relevância</option>
             <option value="menor-preco">Menor Preço</option>
@@ -174,8 +174,8 @@ export default function Catalog() {
 
         <div className="flex gap-8">
           {/* ── Sidebar ── */}
-          <aside className={`w-64 flex-shrink-0 ${filtersOpen ? 'block' : 'hidden'} lg:block`}>
-            <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sticky top-24">
+          <aside className={`w-full lg:w-64 lg:flex-shrink-0 ${filtersOpen ? 'block' : 'hidden'} lg:block`}>
+            <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-semibold text-[#181c20]">Filtros</h2>
                 {hasFilters && (

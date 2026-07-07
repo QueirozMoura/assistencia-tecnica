@@ -67,9 +67,9 @@ export default function AdminSidebar({ collapsed, onToggle }) {
   return (
     <aside
       className={`
-        h-full flex flex-col
+        h-full flex flex-col overflow-x-hidden
         bg-[#001e40] text-white transition-all duration-300
-        ${collapsed ? 'w-16' : 'w-60'}
+        w-72 max-w-[85vw] sm:w-60 ${collapsed ? 'sm:w-16 w-16' : ''}
       `}
     >
       {/* ── Logo ─────────────────────────────────────────────────── */}
@@ -90,7 +90,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
       </div>
 
       {/* ── Navegação ─────────────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2">
+      <nav className="flex-1 overflow-y-auto py-4 px-2 overscroll-contain">
         {!collapsed && (
           <p className="text-[10px] font-semibold text-[#8fa8c8] uppercase tracking-widest px-3 mb-2">
             Menu
@@ -151,7 +151,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
       {/* ── Botão colapsar (desktop) ──────────────────────────────── */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-20 w-6 h-6 bg-[#0070ea] rounded-full flex items-center justify-center shadow-lg hover:bg-[#0059bb] transition-colors"
+        className="absolute -right-3 top-20 w-6 h-6 bg-[#0070ea] rounded-full hidden sm:flex items-center justify-center shadow-lg hover:bg-[#0059bb] transition-colors"
         title={collapsed ? 'Expandir menu' : 'Recolher menu'}
       >
         <svg

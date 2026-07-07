@@ -89,19 +89,19 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-[#003366] text-white text-xs py-2 hidden md:block">
-        <div className="container-max flex justify-between items-center">
-          <div className="flex items-center gap-4">
+      <div className="bg-[#003366] text-white text-[11px] sm:text-xs py-2 hidden md:block">
+        <div className="container-max flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <span className="flex items-center gap-1">
               <Phone size={12} />
               (11) 96560-2135
             </span>
-            <span>|</span>
+            <span className="hidden sm:inline">|</span>
             <span>Seg–Sáb: 8h às 18h</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <span>Frete grátis para pedidos acima de R$ 299</span>
-            <span>|</span>
+            <span className="hidden sm:inline">|</span>
             <Link to="/agendamento" className="hover:text-blue-200 transition-colors font-medium">
               Agendar Visita Técnica
             </Link>
@@ -117,15 +117,15 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             : 'bg-white border-b border-[#c3c6d1]'
         }`}
       >
-        <div className="container-max flex items-center justify-between h-16 gap-4">
+        <div className="container-max flex items-center justify-between h-16 gap-2 sm:gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-9 h-9 bg-[#003366] rounded-lg flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0 min-w-0">
+            <div className="w-9 h-9 bg-[#003366] rounded-lg flex items-center justify-center flex-shrink-0">
               <Wrench size={18} className="text-white" />
             </div>
-            <div className="leading-tight">
-              <span className="block font-bold text-[#003366] text-lg leading-none">Eletro</span>
-              <span className="block font-bold text-[#0070ea] text-lg leading-none">Center</span>
+            <div className="leading-tight min-w-0">
+              <span className="block font-bold text-[#003366] text-sm sm:text-lg leading-none">Eletro</span>
+              <span className="block font-bold text-[#0070ea] text-sm sm:text-lg leading-none">Center</span>
             </div>
           </Link>
 
@@ -173,9 +173,9 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
           </nav>
 
           {/* Search + Actions */}
-          <div className="flex items-center gap-1 lg:-ml-4">
+          <div className="flex items-center gap-1 sm:gap-2 lg:-ml-4">
             {/* Search Bar (desktop) */}
-            <form onSubmit={handleSearch} className="hidden md:flex items-center bg-[#f1f4f9] rounded-full px-4 py-2 gap-2 w-48 lg:w-64 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white transition-all">
+            <form onSubmit={handleSearch} className="hidden sm:flex items-center bg-[#f1f4f9] rounded-full px-4 py-2 gap-2 w-40 sm:w-48 lg:w-64 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white transition-all">
               <Search size={15} className="text-[#737780] flex-shrink-0" />
               <input
                 type="text"
@@ -311,7 +311,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="lg:hidden bg-white border-t border-[#e5e8ee] px-4 py-4 space-y-1">
+          <div className="lg:hidden bg-white border-t border-[#e5e8ee] px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="flex items-center bg-[#f1f4f9] rounded-full px-4 py-2.5 gap-2 mb-4">
               <Search size={15} className="text-[#737780]" />

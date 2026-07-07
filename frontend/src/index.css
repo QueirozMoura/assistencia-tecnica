@@ -157,11 +157,18 @@ body::-webkit-scrollbar {
 
 /* ── Container ── */
 .container-max {
-  max-width: 1280px;
+  width: min(100%, 1280px);
   margin-left: auto;
   margin-right: auto;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .container-max {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 /* ── Aspect Ratio ── */

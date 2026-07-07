@@ -60,7 +60,7 @@ export default function Contact() {
   return (
     <div className="bg-[#f7f9ff] min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-12">
+      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-10 sm:py-12">
         <div className="container-max">
           <nav className="text-xs text-[#8fa8c8] mb-3 flex items-center gap-1">
             <Link to="/" className="hover:text-white transition-colors">Início</Link>
@@ -72,9 +72,9 @@ export default function Contact() {
         </div>
       </section>
 
-      <div className="container-max py-10">
+      <div className="container-max py-6 sm:py-10">
         {/* Contact Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 sm:mb-10">
           {contactInfo.map((info) => {
             const Icon = info.icon
             const content = (
@@ -98,7 +98,7 @@ export default function Contact() {
           })}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Form */}
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#e5e8ee]">
             <h2 className="font-bold text-[#003366] text-xl mb-6">Envie uma Mensagem</h2>

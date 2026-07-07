@@ -170,7 +170,7 @@ export default function Scheduling() {
   return (
     <div className="bg-[#f7f9ff] min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-12">
+      <section className="bg-gradient-to-br from-[#001e40] to-[#003366] py-10 sm:py-12">
         <div className="container-max">
           <nav className="text-xs text-[#8fa8c8] mb-3 flex items-center gap-1">
             <Link to="/" className="hover:text-white transition-colors">
@@ -189,7 +189,7 @@ export default function Scheduling() {
         </div>
       </section>
 
-      <div className="container-max py-10">
+      <div className="container-max py-6 sm:py-10">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">

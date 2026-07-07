@@ -13,7 +13,7 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] text-white px-4 py-3 rounded-full shadow-lg hover:bg-[#1ebe5d] transition-all hover:scale-105 active:scale-95 group"
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2 bg-[#25D366] text-white px-3 py-3 sm:px-4 rounded-full shadow-lg hover:bg-[#1ebe5d] transition-all hover:scale-105 active:scale-95 group"
     >
       <MessageCircle size={22} className="flex-shrink-0" />
       <span className="text-sm font-semibold hidden sm:block">WhatsApp</span>

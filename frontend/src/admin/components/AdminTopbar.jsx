@@ -26,8 +26,8 @@ export default function AdminTopbar({ sidebarCollapsed, onMenuToggle }) {
     <header
       className={`
         fixed top-0 right-0 z-20 h-16 bg-white border-b border-[#e5e8ee]
-        flex items-center justify-between px-5 transition-all duration-300
-        ${sidebarCollapsed ? 'left-16' : 'left-60'}
+        flex items-center justify-between px-3 sm:px-5 transition-all duration-300
+        left-0 ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-60'}
       `}
     >
       {/* ── Esquerda: botão mobile + título ──────────────────────── */}
@@ -43,14 +43,14 @@ export default function AdminTopbar({ sidebarCollapsed, onMenuToggle }) {
           </svg>
         </button>
 
-        <div>
-          <h1 className="text-base font-bold text-[#181c20] leading-tight">{title}</h1>
+        <div className="min-w-0">
+          <h1 className="text-sm sm:text-base font-bold text-[#181c20] leading-tight truncate">{title}</h1>
           {sub && <p className="text-xs text-[#737780] leading-tight hidden sm:block">{sub}</p>}
         </div>
       </div>
 
       {/* ── Direita: link site + avatar ──────────────────────────── */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Link para o site público */}
         <Link
           to="/"
@@ -73,7 +73,7 @@ export default function AdminTopbar({ sidebarCollapsed, onMenuToggle }) {
           <div className="w-8 h-8 rounded-full bg-[#0070ea] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
             {user?.nome?.charAt(0)?.toUpperCase() ?? 'A'}
           </div>
-          <div className="hidden md:block">
+          <div className="hidden sm:block">
             <p className="text-xs font-semibold text-[#181c20] leading-tight">{user?.nome}</p>
             <p className="text-[10px] text-[#737780] leading-tight">
               <span className="inline-block bg-[#cce0ff] text-[#003366] px-1.5 py-0.5 rounded text-[9px] font-bold">

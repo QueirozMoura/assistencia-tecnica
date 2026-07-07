@@ -27,7 +27,7 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9ff]">
+    <div className="min-h-screen bg-[#f7f9ff] overflow-x-hidden">
       {/* ── Overlay mobile ──────────────────────────────────────── */}
       {mobileOpen && (
         <div
@@ -68,7 +68,7 @@ export default function AdminLayout() {
           ${collapsed ? "lg:pl-16" : "lg:pl-60"}
         `}
       >
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <Outlet />
         </div>
       </main>
