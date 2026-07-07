@@ -415,7 +415,7 @@ export default function ProdutoForm() {
           <input
             ref={fileRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
+            accept="image/*"
             capture="environment"
             onChange={handleFileChange}
             className="hidden"
