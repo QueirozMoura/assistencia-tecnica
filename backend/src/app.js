@@ -67,8 +67,20 @@ const authLimiter = rateLimit({
   },
 });
 
+const clientAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Muitas tentativas de autenticação. Tente novamente em 15 minutos.",
+  },
+});
+
 app.use("/api/", limiter);
 app.use("/api/auth/", authLimiter);
+app.use("/api/client-auth/", clientAuthLimiter);
 
 // ─────────────────────────────────────────────
 // BODY PARSER

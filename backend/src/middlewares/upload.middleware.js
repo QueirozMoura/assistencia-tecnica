@@ -17,9 +17,13 @@ const storage = multer.diskStorage({
 });
 
 // ── Validação de tipo ─────────────────────────────────────────────────────────
+const allowedMimeTypes = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
+const allowedExtensions = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+
 function fileFilter(_req, file, cb) {
-  const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  if (allowed.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimeTypes.has(file.mimetype) && allowedExtensions.has(ext)) {
     cb(null, true);
   } else {
     cb(

@@ -71,6 +71,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Acessibilidade / Focus ── */
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 112, 234, 0.25);
+  border-radius: 0.6rem;
+}
+
+/* ── Interação consistente ── */
+button,
+a {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+button:active,
+a:active {
+  transform: translateY(0.5px);
+}
+
 /* ── Sombra Premium ── */
 .premium-shadow {
   box-shadow: 0px 4px 20px rgba(0, 51, 102, 0.08);

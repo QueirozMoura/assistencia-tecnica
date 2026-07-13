@@ -4,6 +4,10 @@ import prisma from "../config/prisma.js";
 
 const SALT_ROUNDS = 12;
 
+function normalizeEmail(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : value;
+}
+
 function generateToken(usuario) {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET não configurado.");
@@ -16,8 +20,10 @@ function generateToken(usuario) {
 }
 
 export async function login(email, senha) {
+  const emailNormalizado = normalizeEmail(email);
+
   const usuario = await prisma.usuario.findUnique({
-    where: { email },
+    where: { email: emailNormalizado },
     select: {
       id: true,
       nome: true,
@@ -49,8 +55,9 @@ export async function login(email, senha) {
 
 export async function register(dados) {
   const { nome, email, senha, role } = dados;
+  const emailNormalizado = normalizeEmail(email);
 
-  const existe = await prisma.usuario.findUnique({ where: { email } });
+  const existe = await prisma.usuario.findUnique({ where: { email: emailNormalizado } });
   if (existe) {
     throw Object.assign(new Error("E-mail já cadastrado."), { statusCode: 409 });
   }
@@ -58,7 +65,7 @@ export async function register(dados) {
   const senhaHash = await bcrypt.hash(senha, SALT_ROUNDS);
 
   const usuario = await prisma.usuario.create({
-    data: { nome, email, senha: senhaHash, role },
+    data: { nome, email: emailNormalizado, senha: senhaHash, role },
     select: { id: true, nome: true, email: true, role: true, ativo: true, createdAt: true },
   });
 

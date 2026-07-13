@@ -5,11 +5,23 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM   = process.env.RESEND_FROM_EMAIL || "noreply@assistencia.com";
 const APP    = "EletroCenter";
 
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * Envia email de verificação de conta.
  */
 export async function sendVerificationEmail(email, nome, token) {
-  const url = `${process.env.FRONTEND_URL}/verificar-email?token=${token}`;
+  const frontendUrl = process.env.FRONTEND_URL || "https://example.com";
+  const url = `${frontendUrl}/verificar-email?token=${encodeURIComponent(token)}`;
+  const safeNome = escapeHtml(nome);
+  const safeApp = escapeHtml(APP);
 
   try {
     await resend.emails.send({
@@ -18,9 +30,9 @@ export async function sendVerificationEmail(email, nome, token) {
       subject: `${APP} — Verifique seu e-mail`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#f7f9ff;border-radius:16px;">
-          <h2 style="color:#003366;margin-bottom:8px;">Olá, ${nome}!</h2>
+          <h2 style="color:#003366;margin-bottom:8px;">Olá, ${safeNome}!</h2>
           <p style="color:#43474f;line-height:1.6;">
-            Obrigado por se cadastrar na <strong>${APP}</strong>.<br>
+            Obrigado por se cadastrar na <strong>${safeApp}</strong>.<br>
             Clique no botão abaixo para verificar seu e-mail e ativar sua conta.
           </p>
           <a href="${url}" style="display:inline-block;margin:24px 0;background:#0070ea;color:white;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:600;">
@@ -42,7 +54,10 @@ export async function sendVerificationEmail(email, nome, token) {
  * Envia email de recuperação de senha.
  */
 export async function sendPasswordResetEmail(email, nome, token) {
-  const url = `${process.env.FRONTEND_URL}/redefinir-senha?token=${token}`;
+  const frontendUrl = process.env.FRONTEND_URL || "https://example.com";
+  const url = `${frontendUrl}/redefinir-senha?token=${encodeURIComponent(token)}`;
+  const safeNome = escapeHtml(nome);
+  const safeApp = escapeHtml(APP);
 
   try {
     await resend.emails.send({
@@ -53,7 +68,7 @@ export async function sendPasswordResetEmail(email, nome, token) {
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#f7f9ff;border-radius:16px;">
           <h2 style="color:#003366;margin-bottom:8px;">Redefinir senha</h2>
           <p style="color:#43474f;line-height:1.6;">
-            Olá, ${nome}! Recebemos uma solicitação para redefinir a senha da sua conta na <strong>${APP}</strong>.
+            Olá, ${safeNome}! Recebemos uma solicitação para redefinir a senha da sua conta na <strong>${safeApp}</strong>.
           </p>
           <a href="${url}" style="display:inline-block;margin:24px 0;background:#0070ea;color:white;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:600;">
             Redefinir Senha

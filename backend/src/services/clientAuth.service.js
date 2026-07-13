@@ -9,6 +9,10 @@ const SALT_ROUNDS = 12;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function normalizeEmail(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : value;
+}
+
 function generateClientToken(cliente) {
   const secret = process.env.JWT_CLIENT_SECRET;
   if (!secret) throw new Error("JWT_CLIENT_SECRET não configurado.");
@@ -31,7 +35,8 @@ function randomToken() {
 // ── Register ──────────────────────────────────────────────────────────────────
 
 export async function register({ nome, email, telefone, senha }) {
-  const existe = await prisma.cliente.findUnique({ where: { email } });
+  const emailNormalizado = normalizeEmail(email);
+  const existe = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
   if (existe) {
     throw Object.assign(new Error("E-mail já cadastrado."), { statusCode: 409 });
   }
@@ -40,7 +45,7 @@ export async function register({ nome, email, telefone, senha }) {
   const verifyToken = randomToken();
 
   const cliente = await prisma.cliente.create({
-    data: { nome, email, telefone, senha: senhaHash, verifyToken, emailVerificado: false },
+    data: { nome, email: emailNormalizado, telefone, senha: senhaHash, verifyToken, emailVerificado: false },
   });
 
   // Enviar email de verificação (falha silenciosa)
@@ -53,7 +58,8 @@ export async function register({ nome, email, telefone, senha }) {
 // ── Login ─────────────────────────────────────────────────────────────────────
 
 export async function login(email, senha) {
-  const cliente = await prisma.cliente.findUnique({ where: { email } });
+  const emailNormalizado = normalizeEmail(email);
+  const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
 
   if (!cliente || !cliente.senha) {
     throw Object.assign(
@@ -112,9 +118,10 @@ export async function googleAuth({ idToken, code }) {
   }
 
   const { sub: googleId, email, name: nome } = payload;
+  const emailNormalizado = normalizeEmail(email);
 
   let cliente = await prisma.cliente.findFirst({
-    where: { OR: [{ googleId }, { email }] },
+    where: { OR: [{ googleId }, { email: emailNormalizado }] },
   });
 
   if (cliente) {
@@ -128,7 +135,7 @@ export async function googleAuth({ idToken, code }) {
     cliente = await prisma.cliente.create({
       data: {
         nome: nome || email.split("@")[0],
-        email,
+        email: emailNormalizado,
         telefone: "",
         googleId,
         emailVerificado: true,
@@ -162,7 +169,8 @@ export async function verifyEmail(token) {
 // ── Forgot Password ───────────────────────────────────────────────────────────
 
 export async function forgotPassword(email) {
-  const cliente = await prisma.cliente.findUnique({ where: { email } });
+  const emailNormalizado = normalizeEmail(email);
+  const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
@@ -177,7 +185,7 @@ export async function forgotPassword(email) {
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
 
-  await sendPasswordResetEmail(email, cliente.nome, resetToken);
+  await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
 
   return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
 }
