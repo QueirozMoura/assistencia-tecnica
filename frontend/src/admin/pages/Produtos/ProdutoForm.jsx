@@ -46,6 +46,8 @@ export default function ProdutoForm() {
   const [uploading,    setUploading]    = useState(false)
   const [uploadError,  setUploadError]  = useState(null)
   const [previewUrl,   setPreviewUrl]   = useState(null)
+  const [previewBroken, setPreviewBroken] = useState(false)
+  const localPreviewRef = useRef(null)
 
   // ── Carregar categorias ────────────────────────────────────────
   useEffect(() => {
@@ -113,25 +115,50 @@ export default function ProdutoForm() {
     cameraRef.current?.click()
   }
 
+  function revokeLocalPreviewIfAny() {
+    if (localPreviewRef.current && localPreviewRef.current.startsWith('blob:')) {
+      URL.revokeObjectURL(localPreviewRef.current)
+    }
+    localPreviewRef.current = null
+  }
+
+  function normalizeImageUrl(url) {
+    if (!url) return ''
+    if (/^https?:\/\//i.test(url) || /^blob:/i.test(url) || /^data:/i.test(url)) return url
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+    if (url.startsWith('/')) return `${apiBase}${url}`
+    return `${apiBase}/${url}`
+  }
+
   // ── Upload de imagem ───────────────────────────────────────────
   async function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
 
     // Preview local imediato
+    revokeLocalPreviewIfAny()
     const localUrl = URL.createObjectURL(file)
+    localPreviewRef.current = localUrl
     setPreviewUrl(localUrl)
+    setPreviewBroken(false)
     setUploadError(null)
     setUploading(true)
 
     try {
       const res = await adminUploadImagemProduto(file)
       const url = res.data?.url ?? ''
+      const normalizedUrl = normalizeImageUrl(url)
+
       setForm((f) => ({ ...f, imagemPrincipal: url }))
-      setPreviewUrl(url)
+      setPreviewUrl(normalizedUrl || localUrl)
+      setPreviewBroken(false)
+
+      // Se conseguiu subir com sucesso, já não precisamos manter o blob local
+      revokeLocalPreviewIfAny()
     } catch (err) {
       setUploadError(err.message)
-      setPreviewUrl(form.imagemPrincipal || null)
+      setPreviewUrl(localUrl)
+      setPreviewBroken(false)
     } finally {
       setUploading(false)
       // Limpar inputs para permitir re-upload do mesmo arquivo
@@ -141,7 +168,9 @@ export default function ProdutoForm() {
   }
 
   function handleRemoveImage() {
+    revokeLocalPreviewIfAny()
     setPreviewUrl(null)
+    setPreviewBroken(false)
     setForm((f) => ({ ...f, imagemPrincipal: '' }))
     setUploadError(null)
     if (fileRef.current) fileRef.current.value = ''
@@ -202,6 +231,12 @@ export default function ProdutoForm() {
       setSaving(false)
     }
   }
+
+  useEffect(() => {
+    return () => {
+      revokeLocalPreviewIfAny()
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -387,7 +422,19 @@ export default function ProdutoForm() {
           {/* Preview */}
           {previewUrl ? (
             <div className="relative w-40 h-40 rounded-2xl overflow-hidden border border-[#e5e8ee] group">
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display='none' }} />
+              {!previewBroken ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                  onError={() => setPreviewBroken(true)}
+                />
+              ) : (
+                <div className="w-full h-full bg-[#f7f9ff] flex flex-col items-center justify-center text-center px-3">
+                  <p className="text-xs font-semibold text-[#43474f]">Não foi possível carregar o preview</p>
+                  <p className="text-[11px] text-[#737780] mt-1">A imagem foi selecionada, mas a URL não pôde ser renderizada.</p>
+                </div>
+              )}
               {uploading && (
                 <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
                   <div className="w-6 h-6 border-3 border-[#0070ea] border-t-transparent rounded-full animate-spin" />
@@ -471,8 +518,10 @@ export default function ProdutoForm() {
               type="url"
               value={form.imagemPrincipal}
               onChange={(e) => {
-                setForm((f) => ({ ...f, imagemPrincipal: e.target.value }))
-                setPreviewUrl(e.target.value || null)
+                const manualUrl = e.target.value
+                setForm((f) => ({ ...f, imagemPrincipal: manualUrl }))
+                setPreviewUrl(normalizeImageUrl(manualUrl) || null)
+                setPreviewBroken(false)
               }}
               placeholder="https://exemplo.com/imagem.jpg"
               className="w-full border border-[#e5e8ee] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0070ea] focus:ring-2 focus:ring-[#0070ea]/20 transition-all"

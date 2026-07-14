@@ -17,10 +17,21 @@ export async function uploadImagemProduto(req, res, next) {
       });
     }
 
-    // Monta a URL pública baseada no host da requisição
-    const protocol = req.get("x-forwarded-proto") || req.protocol;
-    const host = req.get("host");
-    const url = `${protocol}://${host}/uploads/produtos/${encodeURIComponent(req.file.filename)}`;
+    const imagePath = `/uploads/produtos/${encodeURIComponent(req.file.filename)}`;
+
+    // Em produção, prioriza URL pública explícita do backend (evita host interno/proxy)
+    const publicApiUrl = process.env.PUBLIC_API_URL?.trim();
+    let baseUrl = "";
+
+    if (publicApiUrl) {
+      baseUrl = publicApiUrl.replace(/\/+$/, "");
+    } else {
+      const protocol = req.get("x-forwarded-proto") || req.protocol;
+      const host = req.get("x-forwarded-host") || req.get("host");
+      baseUrl = `${protocol}://${host}`;
+    }
+
+    const url = `${baseUrl}${imagePath}`;
 
     return res.status(201).json({
       success: true,
