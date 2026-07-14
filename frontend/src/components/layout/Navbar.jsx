@@ -173,7 +173,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
           </nav>
 
           {/* Search + Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 lg:-ml-4">
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
             {/* Search Bar (desktop) */}
             <form onSubmit={handleSearch} className="hidden sm:flex items-center bg-[#f1f4f9] rounded-full px-4 py-2 gap-2 w-40 sm:w-48 lg:w-64 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white transition-all">
               <Search size={15} className="text-[#737780] flex-shrink-0" />
@@ -189,7 +189,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             {/* Wishlist */}
             <Link
               to="/catalogo"
-              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366]"
+              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
               title="Lista de Desejos"
             >
               <Heart size={20} />
@@ -203,7 +203,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             {/* Cart */}
             <button
               onClick={onCartOpen}
-              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366]"
+              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
               title="Carrinho"
             >
               <ShoppingCart size={20} />
@@ -293,7 +293,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             {/* CTA Agendar */}
             <Link
               to="/agendamento"
-              className="hidden lg:inline-flex items-center justify-center h-10 gap-2 bg-[#0070ea] text-white px-4 py-2 rounded-lg text-sm leading-5 font-semibold hover:bg-[#0059bb] transition-colors"
+              className="hidden xl:inline-flex items-center justify-center h-10 gap-2 bg-[#0070ea] text-white px-4 py-2 rounded-lg text-sm leading-5 font-semibold hover:bg-[#0059bb] transition-colors whitespace-nowrap flex-shrink-0"
             >
               <Wrench size={14} />
               Agendar
