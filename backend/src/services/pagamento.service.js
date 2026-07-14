@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import logger from "../config/logger.js";
 import prisma from "../config/prisma.js";
+import { notifyAdminPaymentApproved } from "./notification.service.js";
 
 /**
  * Valida assinatura do webhook do Mercado Pago de forma opcional.
@@ -334,6 +335,14 @@ export async function processMercadoPagoWebhook(payload) {
       paymentId: true,
       paymentMethod: true,
       paidAt: true,
+      valorTotal: true,
+      cliente: {
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+        },
+      },
     },
   });
 
@@ -345,6 +354,26 @@ export async function processMercadoPagoWebhook(payload) {
     oldPaymentStatus: pedidoAtual.paymentStatus,
     newPaymentStatus: pedidoAtualizado.paymentStatus,
   });
+
+  const becamePaid =
+    pedidoAtual.paymentStatus !== "PAID" &&
+    pedidoAtualizado.paymentStatus === "PAID" &&
+    pedidoAtualizado.status === "PAGO";
+
+  if (becamePaid) {
+    try {
+      await notifyAdminPaymentApproved({
+        pedido: pedidoAtualizado,
+        payment,
+      });
+    } catch (error) {
+      logger.error("Falha ao executar notificação de pagamento aprovado.", {
+        pedidoId,
+        message: error?.message || "UNKNOWN_ERROR",
+      });
+      // Não interrompe resposta do webhook
+    }
+  }
 
   return {
     ...normalized,

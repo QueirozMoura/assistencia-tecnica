@@ -83,3 +83,76 @@ export async function sendPasswordResetEmail(email, nome, token) {
     logger.error("Erro ao enviar email de reset:", err);
   }
 }
+
+/**
+ * Envia e-mail para administrador quando pagamento de pedido for aprovado.
+ * Retorna objeto com status para facilitar uso por camadas intermediárias.
+ */
+export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+
+  if (!adminEmail) {
+    logger.warn("ADMIN_NOTIFICATION_EMAIL não configurado. Notificação de pagamento não enviada.", {
+      pedidoId: pedido?.id ?? null,
+    });
+    return { skipped: true, reason: "ADMIN_NOTIFICATION_EMAIL_NOT_CONFIGURED" };
+  }
+
+  const pedidoId = pedido?.id ?? "-";
+  const clienteNome = pedido?.cliente?.nome ? escapeHtml(pedido.cliente.nome) : "Não informado";
+  const valorTotal = Number(pedido?.valorTotal ?? 0);
+  const valorTotalFmt = Number.isFinite(valorTotal)
+    ? valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+    : "Não informado";
+
+  const paymentMethod = payment?.payment_method_id || pedido?.paymentMethod || "Não informado";
+  const paidAt =
+    pedido?.paidAt instanceof Date
+      ? pedido.paidAt.toLocaleString("pt-BR")
+      : pedido?.paidAt
+        ? new Date(pedido.paidAt).toLocaleString("pt-BR")
+        : "Não informado";
+
+  const safeApp = escapeHtml(APP);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: adminEmail,
+      subject: `${APP} — Pagamento aprovado (Pedido #${pedidoId})`,
+      html: `
+        <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:28px 22px;background:#f7f9ff;border-radius:16px;">
+          <h2 style="color:#003366;margin:0 0 8px 0;">Pagamento aprovado</h2>
+          <p style="color:#43474f;line-height:1.6;margin:0 0 16px 0;">
+            Um pedido foi confirmado como pago na <strong>${safeApp}</strong>.
+          </p>
+
+          <div style="background:#fff;border:1px solid #e3e8f4;border-radius:12px;padding:14px 16px;">
+            <p style="margin:0 0 8px 0;color:#222;"><strong>Pedido:</strong> #${pedidoId}</p>
+            <p style="margin:0 0 8px 0;color:#222;"><strong>Cliente:</strong> ${clienteNome}</p>
+            <p style="margin:0 0 8px 0;color:#222;"><strong>Valor:</strong> ${valorTotalFmt}</p>
+            <p style="margin:0 0 8px 0;color:#222;"><strong>Status:</strong> Pago</p>
+            <p style="margin:0 0 8px 0;color:#222;"><strong>Método:</strong> ${escapeHtml(paymentMethod)}</p>
+            <p style="margin:0;color:#222;"><strong>Pago em:</strong> ${escapeHtml(paidAt)}</p>
+          </div>
+
+          <p style="color:#737780;font-size:12px;margin-top:14px;">
+            Este e-mail foi enviado automaticamente pelo sistema.
+          </p>
+        </div>
+      `,
+    });
+
+    logger.info("E-mail de notificação de pagamento aprovado enviado ao administrador.", {
+      pedidoId,
+    });
+
+    return { sent: true };
+  } catch (err) {
+    logger.error("Erro ao enviar e-mail de pagamento aprovado para administrador.", {
+      pedidoId,
+      message: err?.message || "UNKNOWN_ERROR",
+    });
+    return { sent: false, reason: "RESEND_SEND_FAILED" };
+  }
+}

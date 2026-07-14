@@ -1,13 +1,7 @@
-# TODO - Checkout endereço no Pedido
-
-- [x] Atualizar Prisma schema com campos de entrega em Pedido
-- [x] Gerar migration sem perda de dados
-- [x] Atualizar validação Zod de pedido
-- [x] Persistir dados de entrega no serviço de pedidos (com e sem pagamento)
-- [x] Atualizar Checkout frontend com validações por campo e UX de erro
-- [x] Atualizar detalhe de pedido no admin para exibir dados de entrega com fallback
-- [ ] Rodar validações finais (Prisma + build frontend) e revisar impactos
-- [ ] Executar testes completos frontend (checkout + admin)
-- [ ] Executar testes completos de endpoints backend (/api/pedidos e /api/pedidos/com-pagamento)
-- [ ] Validar persistência dos dados de entrega no banco
-- [ ] Validar compatibilidade com pedidos antigos (fallback "Não informado")
+- [ ] Revisar fluxo atual de webhook/pagamento e pontos de integração de notificação
+- [ ] Criar camada intermediária backend/src/services/notification.service.js reutilizando email.service.js
+- [ ] Integrar disparo no backend/src/services/pagamento.service.js apenas quando pagamento for confirmado (PAID/PAGO)
+- [ ] Garantir tratamento de erro para não quebrar webhook em falha de e-mail
+- [ ] Adicionar logs adequados sem dados sensíveis
+- [ ] Executar validação de sintaxe/build no backend
+- [ ] Consolidar relatório final com arquivos alterados, fluxo final e melhorias futuras
