@@ -124,8 +124,8 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
               <Wrench size={18} className="text-white" />
             </div>
             <div className="leading-tight min-w-0">
-              <span className="block font-bold text-[#003366] text-sm sm:text-lg leading-none">Eletro</span>
-              <span className="block font-bold text-[#0070ea] text-sm sm:text-lg leading-none">Center</span>
+              <span className="block font-bold text-[#003366] text-sm sm:text-lg leading-none">JFQ</span>
+              <span className="block font-bold text-[#0070ea] text-sm sm:text-lg leading-none">Assistência</span>
             </div>
           </Link>
 
