@@ -7,9 +7,142 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────
-// ENUMS
-// ─────────────────────────────────────────────
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senha     String
+  role      Role     @default(ADMIN)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id        Int       @id @default(autoincrement())
+  nome      String    @unique
+  slug      String    @unique
+  descricao String?
+  imagem    String?
+  ativo     Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  produtos  Produto[]
+
+  @@map("categorias")
+}
+
+model Produto {
+  id               Int           @id @default(autoincrement())
+  nome             String
+  slug             String        @unique
+  descricao        String?
+  preco            Decimal       @db.Decimal(10, 2)
+  precoPromocional Decimal?      @db.Decimal(10, 2)
+  estoque          Int           @default(0)
+  sku              String?       @unique
+  imagemPrincipal  String?
+  imagens          String[]      @default([])
+  destaque         Boolean       @default(false)
+  ativo            Boolean       @default(true)
+  categoriaId      Int
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  itensPedido      ItensPedido[]
+  categoria        Categoria     @relation(fields: [categoriaId], references: [id])
+
+  @@map("produtos")
+}
+
+model Cliente {
+  id               Int           @id @default(autoincrement())
+  nome             String
+  email            String?       @unique
+  telefone         String
+  cpf              String?       @unique
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  senha            String?
+  googleId         String?       @unique
+  emailVerificado  Boolean       @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  verifyToken      String?
+  agendamentos     Agendamento[]
+  pedidos          Pedido[]
+
+  @@map("clientes")
+}
+
+model Agendamento {
+  id              Int               @id @default(autoincrement())
+  clienteId       Int?
+  nomeContato     String
+  telefoneContato String
+  email           String?
+  whatsapp        String?
+  endereco        String?
+  cep             String?
+  cidade          String?
+  equipamento     String
+  marca           String?
+  modelo          String?
+  problema        String
+  observacoes     String?
+  melhorHorario   String?
+  dataAgendamento DateTime?
+  status          StatusAgendamento @default(PENDENTE)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  cliente         Cliente?          @relation(fields: [clienteId], references: [id])
+
+  @@map("agendamentos")
+}
+
+model Pedido {
+  id                Int           @id @default(autoincrement())
+  clienteId         Int
+  valorTotal        Decimal       @db.Decimal(10, 2)
+  status            StatusPedido  @default(PENDENTE)
+  observacoes       String?
+  paymentStatus     String?
+  paymentMethod     String?
+  paymentId         String?
+  preferenceId      String?
+  externalReference String?
+  paidAt            DateTime?
+
+  nomeDestinatario  String?
+  telefoneEntrega   String?
+  cep               String?
+  rua               String?
+  numero            String?
+  complemento       String?
+  bairro            String?
+  cidade            String?
+  estado            String?
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  itens             ItensPedido[]
+  cliente           Cliente       @relation(fields: [clienteId], references: [id])
+
+  @@map("pedidos")
+}
+
+model ItensPedido {
+  id            Int     @id @default(autoincrement())
+  pedidoId      Int
+  produtoId     Int
+  quantidade    Int
+  precoUnitario Decimal @db.Decimal(10, 2)
+  pedido        Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produto       Produto @relation(fields: [produtoId], references: [id])
+
+  @@map("itens_pedido")
+}
 
 enum Role {
   ADMIN
@@ -30,180 +163,4 @@ enum StatusPedido {
   ENVIADO
   ENTREGUE
   CANCELADO
-}
-
-// ─────────────────────────────────────────────
-// USUÁRIOS (painel administrativo)
-// ─────────────────────────────────────────────
-
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  senha     String
-  role      Role     @default(ADMIN)
-  ativo     Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("usuarios")
-}
-
-// ─────────────────────────────────────────────
-// CATEGORIAS
-// ─────────────────────────────────────────────
-
-model Categoria {
-  id        Int       @id @default(autoincrement())
-  nome      String    @unique
-  slug      String    @unique
-  descricao String?
-  imagem    String?
-  ativo     Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  produtos  Produto[]
-
-  @@map("categorias")
-}
-
-// ─────────────────────────────────────────────
-// PRODUTOS
-// ─────────────────────────────────────────────
-
-model Produto {
-  id               Int       @id @default(autoincrement())
-  nome             String
-  slug             String    @unique
-  descricao        String?
-  preco            Decimal   @db.Decimal(10, 2)
-  precoPromocional Decimal?  @db.Decimal(10, 2)
-  estoque          Int       @default(0)
-  sku              String?   @unique
-  imagemPrincipal  String?
-  imagens          String[]  @default([])
-  destaque         Boolean   @default(false)
-  ativo            Boolean   @default(true)
-
-  categoriaId Int
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
-
-  itensPedido ItensPedido[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("produtos")
-}
-
-// ─────────────────────────────────────────────
-// CLIENTES (e-commerce / agendamentos)
-// ─────────────────────────────────────────────
-
-model Cliente {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String?  @unique
-  telefone  String
-  cpf       String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // ── Autenticação de clientes (adicionado — campos opcionais) ──
-  senha            String?           // null = cadastrado via Google
-  googleId         String?   @unique
-  emailVerificado  Boolean   @default(false)
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  verifyToken      String?
-
-  agendamentos Agendamento[]
-  pedidos      Pedido[]
-
-  @@map("clientes")
-}
-
-// ─────────────────────────────────────────────
-// AGENDAMENTOS
-// ─────────────────────────────────────────────
-
-model Agendamento {
-  id              Int               @id @default(autoincrement())
-  clienteId       Int?
-  cliente         Cliente?          @relation(fields: [clienteId], references: [id])
-
-  // Dados do solicitante (caso não seja cliente cadastrado)
-  nomeContato     String
-  telefoneContato String
-  email           String?
-  whatsapp        String?
-
-  // Endereço para atendimento
-  endereco        String?
-  cep             String?
-  cidade          String?
-
-  // Dados do equipamento
-  equipamento     String
-  marca           String?
-  modelo          String?
-  problema        String
-  observacoes     String?
-  melhorHorario   String?
-
-  dataAgendamento DateTime?
-  status          StatusAgendamento @default(PENDENTE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("agendamentos")
-}
-
-// ─────────────────────────────────────────────
-// PEDIDOS
-// ─────────────────────────────────────────────
-
-model Pedido {
-  id          Int          @id @default(autoincrement())
-  clienteId   Int
-  cliente     Cliente      @relation(fields: [clienteId], references: [id])
-
-  valorTotal        Decimal      @db.Decimal(10, 2)
-  status            StatusPedido @default(PENDENTE)
-  observacoes       String?
-
-  // ── Infraestrutura de pagamento (Mercado Pago) — aditivo, sem impacto no fluxo atual ──
-  paymentStatus     String?
-  paymentMethod     String?
-  paymentId         String?
-  preferenceId      String?
-  externalReference String?
-  paidAt            DateTime?
-
-  itens       ItensPedido[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("pedidos")
-}
-
-// ─────────────────────────────────────────────
-// ITENS DO PEDIDO
-// ─────────────────────────────────────────────
-
-model ItensPedido {
-  id             Int     @id @default(autoincrement())
-  pedidoId       Int
-  pedido         Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-
-  produtoId      Int
-  produto        Produto @relation(fields: [produtoId], references: [id])
-
-  quantidade     Int
-  precoUnitario  Decimal @db.Decimal(10, 2)
-
-  @@map("itens_pedido")
 }

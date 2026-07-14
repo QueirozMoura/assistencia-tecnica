@@ -1,9 +1,13 @@
-# TODO - UI Polish Seguro
+# TODO - Checkout endereço no Pedido
 
-- [x] Concluir auditoria visual restante (público, cliente, admin, componentes compartilhados) com foco em consistência visual e responsividade.
-- [x] Consolidar plano de edição por prioridade (Alta/Média/Baixa) e arquivos-alvo.
-- [ ] Aplicar ajustes visuais incrementais sem alterar lógica/rotas/backend.
-- [ ] Revisar estados de hover/focus/active/disabled em componentes principais.
-- [ ] Validar responsividade (320/375/390/414/768/1024/desktop) nas páginas afetadas.
-- [ ] Executar build do frontend e confirmar compilação sem erros.
-- [ ] Entregar relatório final com alterações por prioridade, arquivos modificados e validações.
+- [x] Atualizar Prisma schema com campos de entrega em Pedido
+- [x] Gerar migration sem perda de dados
+- [x] Atualizar validação Zod de pedido
+- [x] Persistir dados de entrega no serviço de pedidos (com e sem pagamento)
+- [x] Atualizar Checkout frontend com validações por campo e UX de erro
+- [x] Atualizar detalhe de pedido no admin para exibir dados de entrega com fallback
+- [ ] Rodar validações finais (Prisma + build frontend) e revisar impactos
+- [ ] Executar testes completos frontend (checkout + admin)
+- [ ] Executar testes completos de endpoints backend (/api/pedidos e /api/pedidos/com-pagamento)
+- [ ] Validar persistência dos dados de entrega no banco
+- [ ] Validar compatibilidade com pedidos antigos (fallback "Não informado")

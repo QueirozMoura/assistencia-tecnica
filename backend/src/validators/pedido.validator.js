@@ -20,6 +20,16 @@ export const pedidoSchema = z.object({
     .array(itemPedidoSchema, { required_error: "Itens do pedido são obrigatórios." })
     .min(1, "O pedido deve ter pelo menos um item."),
   observacoes: z.string().trim().optional().nullable(),
+
+  nomeDestinatario: z.string().trim().min(1, "Nome do destinatário é obrigatório."),
+  telefoneEntrega: z.string().trim().min(1, "Telefone de entrega é obrigatório."),
+  cep: z.string().trim().min(1, "CEP é obrigatório."),
+  rua: z.string().trim().min(1, "Rua é obrigatória."),
+  numero: z.string().trim().min(1, "Número é obrigatório."),
+  complemento: z.string().trim().optional().nullable(),
+  bairro: z.string().trim().min(1, "Bairro é obrigatório."),
+  cidade: z.string().trim().min(1, "Cidade é obrigatória."),
+  estado: z.string().trim().min(1, "Estado é obrigatório."),
 });
 
 export const pedidoStatusSchema = z.object({

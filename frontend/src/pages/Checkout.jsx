@@ -60,20 +60,26 @@ function OrderSummary({ items, subtotal }) {
   )
 }
 
-function CustomerForm({ customer, onChange }) {
+function CustomerForm({ customer, onChange, fieldErrors }) {
+  const getInputClassName = (field) =>
+    `h-11 px-3 rounded-xl border bg-white outline-none ${
+      fieldErrors[field] ? 'border-[#d14343] focus:border-[#d14343]' : 'border-[#c3c6d1] focus:border-[#0070ea]'
+    }`
+
   return (
     <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
       <h2 className="text-lg font-bold text-[#003366] mb-4">Dados do cliente</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5 md:col-span-2">
-          <span className="text-sm font-medium text-[#43474f]">Nome</span>
+          <span className="text-sm font-medium text-[#43474f]">Nome *</span>
           <input
             type="text"
             value={customer.nome}
             onChange={(e) => onChange('nome', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('nome')}
             placeholder="Seu nome completo"
           />
+          {fieldErrors.nome ? <span className="text-xs text-[#d14343]">{fieldErrors.nome}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
@@ -88,56 +94,65 @@ function CustomerForm({ customer, onChange }) {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">Telefone</span>
+          <span className="text-sm font-medium text-[#43474f]">Telefone *</span>
           <input
             type="text"
             value={customer.telefone}
             onChange={(e) => onChange('telefone', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('telefone')}
             placeholder="(00) 00000-0000"
           />
+          {fieldErrors.telefone ? <span className="text-xs text-[#d14343]">{fieldErrors.telefone}</span> : null}
         </label>
       </div>
     </div>
   )
 }
 
-function AddressForm({ address, onChange }) {
+function AddressForm({ address, onChange, fieldErrors }) {
+  const getInputClassName = (field) =>
+    `h-11 px-3 rounded-xl border bg-white outline-none ${
+      fieldErrors[field] ? 'border-[#d14343] focus:border-[#d14343]' : 'border-[#c3c6d1] focus:border-[#0070ea]'
+    }`
+
   return (
     <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
       <h2 className="text-lg font-bold text-[#003366] mb-4">Endereço de entrega</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">CEP</span>
+          <span className="text-sm font-medium text-[#43474f]">CEP *</span>
           <input
             type="text"
             value={address.cep}
             onChange={(e) => onChange('cep', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('cep')}
             placeholder="00000-000"
           />
+          {fieldErrors.cep ? <span className="text-xs text-[#d14343]">{fieldErrors.cep}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">Rua</span>
+          <span className="text-sm font-medium text-[#43474f]">Rua *</span>
           <input
             type="text"
             value={address.rua}
             onChange={(e) => onChange('rua', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('rua')}
             placeholder="Nome da rua"
           />
+          {fieldErrors.rua ? <span className="text-xs text-[#d14343]">{fieldErrors.rua}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">Número</span>
+          <span className="text-sm font-medium text-[#43474f]">Número *</span>
           <input
             type="text"
             value={address.numero}
             onChange={(e) => onChange('numero', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('numero')}
             placeholder="123"
           />
+          {fieldErrors.numero ? <span className="text-xs text-[#d14343]">{fieldErrors.numero}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
@@ -152,36 +167,39 @@ function AddressForm({ address, onChange }) {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">Bairro</span>
+          <span className="text-sm font-medium text-[#43474f]">Bairro *</span>
           <input
             type="text"
             value={address.bairro}
             onChange={(e) => onChange('bairro', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('bairro')}
             placeholder="Seu bairro"
           />
+          {fieldErrors.bairro ? <span className="text-xs text-[#d14343]">{fieldErrors.bairro}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-[#43474f]">Cidade</span>
+          <span className="text-sm font-medium text-[#43474f]">Cidade *</span>
           <input
             type="text"
             value={address.cidade}
             onChange={(e) => onChange('cidade', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('cidade')}
             placeholder="Sua cidade"
           />
+          {fieldErrors.cidade ? <span className="text-xs text-[#d14343]">{fieldErrors.cidade}</span> : null}
         </label>
 
         <label className="flex flex-col gap-1.5 md:col-span-2">
-          <span className="text-sm font-medium text-[#43474f]">Estado</span>
+          <span className="text-sm font-medium text-[#43474f]">Estado *</span>
           <input
             type="text"
             value={address.estado}
             onChange={(e) => onChange('estado', e.target.value)}
-            className="h-11 px-3 rounded-xl border border-[#c3c6d1] bg-white outline-none focus:border-[#0070ea]"
+            className={getInputClassName('estado')}
             placeholder="UF"
           />
+          {fieldErrors.estado ? <span className="text-xs text-[#d14343]">{fieldErrors.estado}</span> : null}
         </label>
       </div>
     </div>
@@ -225,6 +243,7 @@ export default function Checkout() {
   const [observacoes, setObservacoes] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const items = cart?.items ?? []
   const subtotal = useMemo(
@@ -236,10 +255,22 @@ export default function Checkout() {
 
   const handleCustomerChange = (field, value) => {
     setCustomer((prev) => ({ ...prev, [field]: value }))
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
   }
 
   const handleAddressChange = (field, value) => {
     setAddress((prev) => ({ ...prev, [field]: value }))
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
   }
 
   const handleProceed = async () => {
@@ -268,10 +299,54 @@ export default function Checkout() {
       return
     }
 
+    const requiredFieldValues = {
+      nome: customer.nome?.trim() || '',
+      telefone: customer.telefone?.trim() || '',
+      cep: address.cep?.trim() || '',
+      rua: address.rua?.trim() || '',
+      numero: address.numero?.trim() || '',
+      bairro: address.bairro?.trim() || '',
+      cidade: address.cidade?.trim() || '',
+      estado: address.estado?.trim() || '',
+    }
+
+    const requiredFieldMessages = {
+      nome: 'Informe o nome para entrega.',
+      telefone: 'Informe o telefone para entrega.',
+      cep: 'Informe o CEP da entrega.',
+      rua: 'Informe a rua da entrega.',
+      numero: 'Informe o número da entrega.',
+      bairro: 'Informe o bairro da entrega.',
+      cidade: 'Informe a cidade da entrega.',
+      estado: 'Informe o estado (UF) da entrega.',
+    }
+
+    const nextErrors = {}
+    Object.entries(requiredFieldValues).forEach(([field, value]) => {
+      if (!value) nextErrors[field] = requiredFieldMessages[field]
+    })
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors)
+      setErrorMessage('Preencha os campos obrigatórios para continuar.')
+      return
+    }
+
+    setFieldErrors({})
+
     const payload = {
       clienteId: Number(cliente.id),
       itens,
       observacoes: observacoes?.trim() || null,
+      nomeDestinatario: requiredFieldValues.nome,
+      telefoneEntrega: requiredFieldValues.telefone,
+      cep: requiredFieldValues.cep,
+      rua: requiredFieldValues.rua,
+      numero: requiredFieldValues.numero,
+      complemento: address.complemento?.trim() || null,
+      bairro: requiredFieldValues.bairro,
+      cidade: requiredFieldValues.cidade,
+      estado: requiredFieldValues.estado,
     }
 
     setIsSubmitting(true)
@@ -310,8 +385,8 @@ export default function Checkout() {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <section className="xl:col-span-2 space-y-6">
-            <CustomerForm customer={customer} onChange={handleCustomerChange} />
-            <AddressForm address={address} onChange={handleAddressChange} />
+            <CustomerForm customer={customer} onChange={handleCustomerChange} fieldErrors={fieldErrors} />
+            <AddressForm address={address} onChange={handleAddressChange} fieldErrors={fieldErrors} />
 
             <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
               <h2 className="text-lg font-bold text-[#003366] mb-4">Observações</h2>

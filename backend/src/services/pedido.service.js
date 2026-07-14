@@ -61,7 +61,20 @@ export async function buscarPedidoPorId(id) {
 }
 
 export async function criarPedido(dados) {
-  const { clienteId, itens, observacoes } = dados;
+  const {
+    clienteId,
+    itens,
+    observacoes,
+    nomeDestinatario,
+    telefoneEntrega,
+    cep,
+    rua,
+    numero,
+    complemento,
+    bairro,
+    cidade,
+    estado,
+  } = dados;
 
   if (!Array.isArray(itens) || itens.length === 0) {
     throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
@@ -115,6 +128,15 @@ export async function criarPedido(dados) {
         clienteId,
         valorTotal,
         observacoes,
+        nomeDestinatario,
+        telefoneEntrega,
+        cep,
+        rua,
+        numero,
+        complemento,
+        bairro,
+        cidade,
+        estado,
         itens: { create: itensComPreco },
       },
       include: {
@@ -142,7 +164,20 @@ export async function criarPedido(dados) {
 }
 
 export async function criarPedidoComPagamento(dados) {
-  const { clienteId, itens, observacoes } = dados;
+  const {
+    clienteId,
+    itens,
+    observacoes,
+    nomeDestinatario,
+    telefoneEntrega,
+    cep,
+    rua,
+    numero,
+    complemento,
+    bairro,
+    cidade,
+    estado,
+  } = dados;
 
   if (!Array.isArray(itens) || itens.length === 0) {
     throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
@@ -194,6 +229,15 @@ export async function criarPedidoComPagamento(dados) {
         clienteId,
         valorTotal,
         observacoes,
+        nomeDestinatario,
+        telefoneEntrega,
+        cep,
+        rua,
+        numero,
+        complemento,
+        bairro,
+        cidade,
+        estado,
         status: "PENDENTE",
         paymentStatus: "PENDING",
         itens: {

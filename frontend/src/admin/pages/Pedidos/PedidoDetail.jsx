@@ -12,6 +12,12 @@ function formatDateTime(date) {
   return new Date(date).toLocaleString('pt-BR')
 }
 
+function formatFallback(value) {
+  if (value === null || value === undefined) return 'Não informado'
+  const text = String(value).trim()
+  return text ? text : 'Não informado'
+}
+
 export default function PedidoDetail() {
   const { id } = useParams()
   const [pedido, setPedido] = useState(null)
@@ -120,6 +126,24 @@ export default function PedidoDetail() {
                   <strong>{pedido?.itens?.length || 0}</strong>
                 </p>
               </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#e5e8ee] bg-white p-5">
+            <h2 className="mb-3 text-sm font-semibold text-[#111827]">Dados da entrega</h2>
+            <div className="grid grid-cols-1 gap-2 text-sm text-[#334155] md:grid-cols-2">
+              <p><span className="font-semibold">Nome:</span> {formatFallback(pedido?.nomeDestinatario)}</p>
+              <p><span className="font-semibold">Telefone:</span> {formatFallback(pedido?.telefoneEntrega)}</p>
+              <p><span className="font-semibold">CEP:</span> {formatFallback(pedido?.cep)}</p>
+              <p><span className="font-semibold">Rua:</span> {formatFallback(pedido?.rua)}</p>
+              <p><span className="font-semibold">Número:</span> {formatFallback(pedido?.numero)}</p>
+              <p><span className="font-semibold">Complemento:</span> {formatFallback(pedido?.complemento)}</p>
+              <p><span className="font-semibold">Bairro:</span> {formatFallback(pedido?.bairro)}</p>
+              <p><span className="font-semibold">Cidade:</span> {formatFallback(pedido?.cidade)}</p>
+              <p><span className="font-semibold">Estado:</span> {formatFallback(pedido?.estado)}</p>
+              <p className="md:col-span-2">
+                <span className="font-semibold">Observações:</span> {formatFallback(pedido?.observacoes)}
+              </p>
             </div>
           </div>
 

@@ -1,0 +1,16 @@
+﻿{
+  "clienteId": 1,
+  "itens": [
+    { "produtoId": 1, "quantidade": 1 }
+  ],
+  "observacoes": "teste",
+  "nomeDestinatario": "Joao",
+  "telefoneEntrega": "11999999999",
+  "cep": "01001-000",
+  "rua": "Rua A",
+  "numero": "123",
+  "complemento": "Apto 1",
+  "bairro": "Centro",
+  "cidade": "Sao Paulo",
+  "estado": "SP"
+}
