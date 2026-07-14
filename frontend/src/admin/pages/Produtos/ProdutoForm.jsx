@@ -75,7 +75,7 @@ export default function ProdutoForm() {
           destaque:         p.destaque         ?? false,
           ativo:            p.ativo            ?? true,
         })
-        if (p.imagemPrincipal) setPreviewUrl(p.imagemPrincipal)
+        if (p.imagemPrincipal) setPreviewUrl(normalizeImageUrl(p.imagemPrincipal) || null)
         setSlugManual(true)
       })
       .catch((err) => setApiError(err.message))
@@ -153,8 +153,10 @@ export default function ProdutoForm() {
       setPreviewUrl(normalizedUrl || localUrl)
       setPreviewBroken(false)
 
-      // Se conseguiu subir com sucesso, já não precisamos manter o blob local
-      revokeLocalPreviewIfAny()
+      // Só revoga blob local quando a URL remota for de fato utilizável
+      if (normalizedUrl && !/^blob:/i.test(normalizedUrl)) {
+        revokeLocalPreviewIfAny()
+      }
     } catch (err) {
       setUploadError(err.message)
       setPreviewUrl(localUrl)
