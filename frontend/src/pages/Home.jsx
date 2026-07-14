@@ -144,11 +144,12 @@ export default function Home() {
               </span>
 
               <h1 className="mt-5 text-4xl font-bold leading-tight text-[#003366] sm:text-[2.7rem] lg:text-5xl">
-                Seu e-commerce de
+                Cuidando dos seus
                 <span className="block text-[#0070ea]">
-                  Eletrodomésticos e Assistência
+                  Eletrodomésticos do
+
                 </span>
-                com padrão premium
+                Jeito Certo
               </h1>
 
               <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#43474f] sm:text-lg lg:mx-0">
