@@ -12,8 +12,14 @@ import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
 import logger from "./config/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const backendRootDir = path.resolve(__dirname, "..");
+const uploadsDir = path.resolve(backendRootDir, "uploads");
 
 const app = express();
+
+// Necessário em ambientes com proxy reverso (ex.: Render)
+// para IP/header forwarding e compatibilidade com express-rate-limit
+app.set("trust proxy", 1);
 
 // ─────────────────────────────────────────────
 // SEGURANÇA — Headers HTTP
@@ -93,7 +99,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // ─────────────────────────────────────────────
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "../../uploads"), {
+  express.static(uploadsDir, {
     maxAge: "7d",
     etag: true,
   })
