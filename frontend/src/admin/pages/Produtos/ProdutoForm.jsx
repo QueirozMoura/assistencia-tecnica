@@ -123,11 +123,18 @@ export default function ProdutoForm() {
   }
 
   function normalizeImageUrl(url) {
-    if (!url) return ''
-    if (/^https?:\/\//i.test(url) || /^blob:/i.test(url) || /^data:/i.test(url)) return url
+    if (!url) {
+      console.log('[ProdutoForm][normalizeImageUrl] input vazio', { url })
+      return ''
+    }
+    if (/^https?:\/\//i.test(url) || /^blob:/i.test(url) || /^data:/i.test(url)) {
+      console.log('[ProdutoForm][normalizeImageUrl] url absoluta/blob/data', { input: url, output: url })
+      return url
+    }
     const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
-    if (url.startsWith('/')) return `${apiBase}${url}`
-    return `${apiBase}/${url}`
+    const normalized = url.startsWith('/') ? `${apiBase}${url}` : `${apiBase}/${url}`
+    console.log('[ProdutoForm][normalizeImageUrl] url relativa normalizada', { input: url, apiBase, output: normalized })
+    return normalized
   }
 
   // ── Upload de imagem ───────────────────────────────────────────
@@ -139,7 +146,10 @@ export default function ProdutoForm() {
     revokeLocalPreviewIfAny()
     const localUrl = URL.createObjectURL(file)
     localPreviewRef.current = localUrl
+    console.log('[ProdutoForm][handleFileChange] preview local criado', { localUrl, fileName: file.name, fileType: file.type, fileSize: file.size })
+    console.log('[ProdutoForm][setPreviewUrl] origem=handleFileChange(local)', { nextPreviewUrl: localUrl })
     setPreviewUrl(localUrl)
+    console.log('[ProdutoForm][setPreviewBroken] origem=handleFileChange(local) -> false', { currentPreviewUrl: localUrl })
     setPreviewBroken(false)
     setUploadError(null)
     setUploading(true)
@@ -149,17 +159,40 @@ export default function ProdutoForm() {
       const url = res.data?.url ?? ''
       const normalizedUrl = normalizeImageUrl(url)
 
+      console.log('[ProdutoForm][handleFileChange] upload sucesso', {
+        responseUrl: url,
+        normalizedUrl,
+        localUrl,
+      })
+
       setForm((f) => ({ ...f, imagemPrincipal: url }))
+      console.log('[ProdutoForm][setPreviewUrl] origem=handleFileChange(upload-sucesso)', {
+        nextPreviewUrl: normalizedUrl || localUrl,
+        responseUrl: url,
+      })
       setPreviewUrl(normalizedUrl || localUrl)
+      console.log('[ProdutoForm][setPreviewBroken] origem=handleFileChange(upload-sucesso) -> false', {
+        currentPreviewUrl: normalizedUrl || localUrl,
+      })
       setPreviewBroken(false)
 
       // Só revoga blob local quando a URL remota for de fato utilizável
       if (normalizedUrl && !/^blob:/i.test(normalizedUrl)) {
+        console.log('[ProdutoForm][handleFileChange] revogando blob local após url remota válida', {
+          normalizedUrl,
+          localUrl,
+        })
         revokeLocalPreviewIfAny()
       }
     } catch (err) {
+      console.log('[ProdutoForm][handleFileChange] upload erro', {
+        error: err?.message,
+        localUrl,
+      })
       setUploadError(err.message)
+      console.log('[ProdutoForm][setPreviewUrl] origem=handleFileChange(upload-erro)', { nextPreviewUrl: localUrl })
       setPreviewUrl(localUrl)
+      console.log('[ProdutoForm][setPreviewBroken] origem=handleFileChange(upload-erro) -> false', { currentPreviewUrl: localUrl })
       setPreviewBroken(false)
     } finally {
       setUploading(false)
@@ -170,8 +203,14 @@ export default function ProdutoForm() {
   }
 
   function handleRemoveImage() {
+    console.log('[ProdutoForm][handleRemoveImage] removendo imagem atual', {
+      previewUrl,
+      imagemPrincipal: form.imagemPrincipal,
+    })
     revokeLocalPreviewIfAny()
+    console.log('[ProdutoForm][setPreviewUrl] origem=handleRemoveImage', { nextPreviewUrl: null })
     setPreviewUrl(null)
+    console.log('[ProdutoForm][setPreviewBroken] origem=handleRemoveImage -> false', { currentPreviewUrl: null })
     setPreviewBroken(false)
     setForm((f) => ({ ...f, imagemPrincipal: '' }))
     setUploadError(null)
@@ -235,7 +274,16 @@ export default function ProdutoForm() {
   }
 
   useEffect(() => {
+    console.log('[ProdutoForm][effect] preview state changed', {
+      previewUrl,
+      previewBroken,
+      imagemPrincipal: form.imagemPrincipal,
+    })
+  }, [previewUrl, previewBroken, form.imagemPrincipal])
+
+  useEffect(() => {
     return () => {
+      console.log('[ProdutoForm][cleanup] unmount revokeLocalPreviewIfAny')
       revokeLocalPreviewIfAny()
     }
   }, [])
@@ -429,7 +477,24 @@ export default function ProdutoForm() {
                   src={previewUrl}
                   alt="Preview"
                   className="w-full h-full object-cover"
-                  onError={() => setPreviewBroken(true)}
+                  onLoad={(e) => {
+                    console.log('[ProdutoForm][img:onLoad]', {
+                      propSrc: previewUrl,
+                      currentSrc: e.currentTarget.currentSrc,
+                      srcAttr: e.currentTarget.getAttribute('src'),
+                    })
+                  }}
+                  onError={(e) => {
+                    console.log('[ProdutoForm][img:onError] disparado', {
+                      propSrc: previewUrl,
+                      currentSrc: e.currentTarget.currentSrc,
+                      srcAttr: e.currentTarget.getAttribute('src'),
+                    })
+                    console.log('[ProdutoForm][setPreviewBroken] origem=img:onError -> true', {
+                      currentPreviewUrl: previewUrl,
+                    })
+                    setPreviewBroken(true)
+                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-[#f7f9ff] flex flex-col items-center justify-center text-center px-3">
@@ -521,8 +586,17 @@ export default function ProdutoForm() {
               value={form.imagemPrincipal}
               onChange={(e) => {
                 const manualUrl = e.target.value
+                const normalizedManualUrl = normalizeImageUrl(manualUrl) || null
+                console.log('[ProdutoForm][manual-url:onChange]', {
+                  manualUrl,
+                  normalizedManualUrl,
+                })
                 setForm((f) => ({ ...f, imagemPrincipal: manualUrl }))
-                setPreviewUrl(normalizeImageUrl(manualUrl) || null)
+                console.log('[ProdutoForm][setPreviewUrl] origem=manual-url:onChange', { nextPreviewUrl: normalizedManualUrl })
+                setPreviewUrl(normalizedManualUrl)
+                console.log('[ProdutoForm][setPreviewBroken] origem=manual-url:onChange -> false', {
+                  currentPreviewUrl: normalizedManualUrl,
+                })
                 setPreviewBroken(false)
               }}
               placeholder="https://exemplo.com/imagem.jpg"
