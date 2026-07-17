@@ -1,8 +1,25 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import logger from "../config/logger.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM   = process.env.RESEND_FROM_EMAIL || "noreply@assistencia.com";
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+transporter.verify()
+  .then(() => {
+    logger.info("Servidor SMTP conectado com sucesso.");
+  })
+  .catch((err) => {
+    logger.error("Erro ao conectar ao servidor SMTP:", err);
+  });
+
+const FROM = process.env.SMTP_USER;
 const APP    = "EletroCenter";
 
 function escapeHtml(value = "") {
@@ -24,7 +41,7 @@ export async function sendVerificationEmail(email, nome, token) {
   const safeApp = escapeHtml(APP);
 
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from:    FROM,
       to:      email,
       subject: `${APP} — Verifique seu e-mail`,
@@ -60,7 +77,7 @@ export async function sendPasswordResetEmail(email, nome, token) {
   const safeApp = escapeHtml(APP);
 
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from:    FROM,
       to:      email,
       subject: `${APP} — Redefinição de senha`,
@@ -116,7 +133,7 @@ export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
   const safeApp = escapeHtml(APP);
 
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from: FROM,
       to: adminEmail,
       subject: `${APP} — Pagamento aprovado (Pedido #${pedidoId})`,
@@ -153,6 +170,6 @@ export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
       pedidoId,
       message: err?.message || "UNKNOWN_ERROR",
     });
-    return { sent: false, reason: "RESEND_SEND_FAILED" };
+    return { sent: false, reason: "EMAIL_SEND_FAILED" };
   }
 }
