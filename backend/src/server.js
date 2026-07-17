@@ -43,6 +43,8 @@ async function bootstrap() {
   try {
     await prisma.$connect();
     logger.info("Banco de dados conectado com sucesso.");
+
+
   } catch (error) {
     logger.error("⚠️ Falha na conexão com banco (servidor continuará rodando):", error);
   }

@@ -1,10 +1,11 @@
 import logger from "../config/logger.js";
 import { Resend } from "resend";
+import { sendTelegramMessage } from "./telegram.service.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "noreply@assistencia.com";
 
-const APP    = "EletroCenter";
+const APP = "EletroCenter";
 
 function escapeHtml(value = "") {
   return String(value)
@@ -26,8 +27,8 @@ export async function sendVerificationEmail(email, nome, token) {
 
   try {
     await resend.emails.send({
-      from:    FROM,
-      to:      email,
+      from: FROM,
+      to: email,
       subject: `${APP} — Verifique seu e-mail`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#f7f9ff;border-radius:16px;">
@@ -62,8 +63,8 @@ export async function sendPasswordResetEmail(email, nome, token) {
 
   try {
     await resend.emails.send({
-      from:    FROM,
-      to:      email,
+      from: FROM,
+      to: email,
       subject: `${APP} — Redefinição de senha`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#f7f9ff;border-radius:16px;">
@@ -93,20 +94,26 @@ export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
   const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
 
   if (!adminEmail) {
-    logger.warn("ADMIN_NOTIFICATION_EMAIL não configurado. Notificação de pagamento não enviada.", {
-      pedidoId: pedido?.id ?? null,
-    });
+    logger.warn(
+      "ADMIN_NOTIFICATION_EMAIL não configurado. Notificação de pagamento não enviada.",
+      {
+        pedidoId: pedido?.id ?? null,
+      },
+    );
     return { skipped: true, reason: "ADMIN_NOTIFICATION_EMAIL_NOT_CONFIGURED" };
   }
 
   const pedidoId = pedido?.id ?? "-";
-  const clienteNome = pedido?.cliente?.nome ? escapeHtml(pedido.cliente.nome) : "Não informado";
+  const clienteNome = pedido?.cliente?.nome
+    ? escapeHtml(pedido.cliente.nome)
+    : "Não informado";
   const valorTotal = Number(pedido?.valorTotal ?? 0);
   const valorTotalFmt = Number.isFinite(valorTotal)
     ? valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
     : "Não informado";
 
-  const paymentMethod = payment?.payment_method_id || pedido?.paymentMethod || "Não informado";
+  const paymentMethod =
+    payment?.payment_method_id || pedido?.paymentMethod || "Não informado";
   const paidAt =
     pedido?.paidAt instanceof Date
       ? pedido.paidAt.toLocaleString("pt-BR")
@@ -144,16 +151,35 @@ export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
       `,
     });
 
-    logger.info("E-mail de notificação de pagamento aprovado enviado ao administrador.", {
-      pedidoId,
-    });
+    logger.info(
+      "E-mail de notificação de pagamento aprovado enviado ao administrador.",
+      {
+        pedidoId,
+      },
+    );
+
+    try {
+      await sendTelegramMessage(
+        `💰 PAGAMENTO APROVADO!\n\n` +
+          `🧾 Pedido: #${pedidoId}\n` +
+          `👤 Cliente: ${clienteNome}\n` +
+          `💵 Valor: ${valorTotalFmt}\n` +
+          `💳 Método: ${paymentMethod}\n` +
+          `🕒 ${paidAt}`,
+      );
+    } catch (telegramError) {
+      logger.error("Erro ao enviar notificação Telegram:", telegramError);
+    }
 
     return { sent: true };
   } catch (err) {
-    logger.error("Erro ao enviar e-mail de pagamento aprovado para administrador.", {
-      pedidoId,
-      message: err?.message || "UNKNOWN_ERROR",
-    });
+    logger.error(
+      "Erro ao enviar e-mail de pagamento aprovado para administrador.",
+      {
+        pedidoId,
+        message: err?.message || "UNKNOWN_ERROR",
+      },
+    );
     return { sent: false, reason: "EMAIL_SEND_FAILED" };
   }
 }
