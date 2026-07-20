@@ -23,7 +23,9 @@ export default function PagamentoSucesso() {
         setLoading(true);
         setErro("");
 
-        const response = await fetch(`/api/pedidos/sucesso/${id}`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/pedidos/sucesso/${id}`,
+        );
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar os dados do pedido.");
