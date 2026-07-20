@@ -10,6 +10,9 @@ const router = Router();
 // GET /api/pedidos — ADMIN
 router.get("/", authMiddleware, adminMiddleware, pedidoController.listarPedidos);
 
+// GET /api/pedidos/sucesso/:id — público (pós pagamento)
+router.get("/sucesso/:id", pedidoController.buscarPedidoSucesso);
+
 // GET /api/pedidos/:id — ADMIN
 router.get("/:id", authMiddleware, adminMiddleware, pedidoController.buscarPedidoPorId);
 

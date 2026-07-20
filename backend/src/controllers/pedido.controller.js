@@ -63,7 +63,31 @@ export async function deletarPedido(req, res, next) {
       return res.status(400).json({ success: false, message: "ID inválido." });
     }
     await pedidoService.deletarPedido(id);
-    return res.status(200).json({ success: true, message: "Pedido excluído com sucesso." });
+    return res
+      .status(200)
+      .json({ success: true, message: "Pedido excluído com sucesso." });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function buscarPedidoSucesso(req, res, next) {
+  try {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido.",
+      });
+    }
+
+    const pedido = await pedidoService.buscarPedidoPorId(id);
+
+    return res.status(200).json({
+      success: true,
+      data: pedido,
+    });
   } catch (error) {
     next(error);
   }
