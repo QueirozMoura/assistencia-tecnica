@@ -74,7 +74,9 @@ export async function createMercadoPagoPreference({
         }
       : undefined,
     back_urls: {
-      success: successUrl || "https://assistencia-tecnica-mauve.vercel.app/pagamento/sucesso",
+      success:
+        successUrl ||
+        `https://assistencia-tecnica-mauve.vercel.app/pagamento/sucesso?pedidoId=${pedido.id}`,
       failure: failureUrl || "https://example.com/pagamento/falha",
       pending: pendingUrl || "https://example.com/pagamento/pendente",
     },
