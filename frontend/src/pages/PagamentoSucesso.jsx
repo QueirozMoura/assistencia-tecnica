@@ -32,7 +32,7 @@ export default function PagamentoSucesso() {
         const data = await response.json();
 
         if (!ativo) return;
-        setPedido(data);
+        setPedido(data.data);
       } catch {
         if (!ativo) return;
         setErro("Não foi possível carregar os dados do pedido.");
