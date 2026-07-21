@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function PagamentoSucesso() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("pedidoId");
   const [pedido, setPedido] = useState(null);
@@ -102,29 +103,38 @@ export default function PagamentoSucesso() {
       "Entregue",
     ];
 
-    const statusRaw = String(
-      pedido?.status ?? pedido?.paymentStatus ?? "",
-    ).toUpperCase();
+    const statusPedido = String(pedido?.status ?? "").toUpperCase();
+    const statusPagamento = String(pedido?.paymentStatus ?? "").toUpperCase();
+
+    const statusRaw =
+      statusPedido ||
+      (statusPagamento === "PAID"
+        ? "PAGO"
+        : statusPagamento === "PENDING"
+          ? "PENDENTE"
+          : statusPagamento === "CANCELLED"
+            ? "CANCELADO"
+            : "");
 
     if (statusRaw === "CANCELADO") {
-      return { etapas, etapaAtual: 0, cancelado: true };
-    }
-
-    if (statusRaw === "ENTREGUE") {
-      return { etapas, etapaAtual: etapas.length, cancelado: false };
+      return { etapas, etapaAtual: 0, cancelado: true, concluidoAte: -1 };
     }
 
     const mapaStatus = {
       PENDENTE: 1,
       PAGO: 2,
-      PREPARANDO: 2,
-      ENVIADO: 3,
+      PREPARANDO: 3,
+      ENVIADO: 4,
+      ENTREGUE: 5,
     };
+
+    const etapaAtual = mapaStatus[statusRaw] ?? 1;
 
     return {
       etapas,
-      etapaAtual: mapaStatus[statusRaw] ?? 1,
+      etapaAtual,
       cancelado: false,
+      concluidoAte: etapaAtual === 5 ? etapas.length - 1 : etapaAtual - 1,
     };
   }, [pedido]);
 
@@ -183,15 +193,15 @@ export default function PagamentoSucesso() {
               <div className="min-w-[640px]">
                 <div className="grid grid-cols-5 items-center">
                   {timeline.etapas.map((etapa, index) => {
-                    const concluido = timeline.etapaAtual > index;
-                    const atual = timeline.etapaAtual === index;
+                    const concluido = index <= timeline.concluidoAte;
+                    const atual = !concluido && timeline.etapaAtual === index;
 
                     return (
                       <div key={etapa} className="relative flex justify-center">
                         {index < timeline.etapas.length - 1 && (
                           <span
                             className={`absolute top-4 left-1/2 w-full h-[3px] ${
-                              timeline.etapaAtual > index + 1
+                              index < timeline.concluidoAte
                                 ? "bg-[#22c55e]"
                                 : "bg-[#d1d5db]"
                             }`}
@@ -217,8 +227,8 @@ export default function PagamentoSucesso() {
 
                 <div className="grid grid-cols-5 mt-3 text-xs sm:text-sm">
                   {timeline.etapas.map((etapa, index) => {
-                    const concluido = timeline.etapaAtual > index;
-                    const atual = timeline.etapaAtual === index;
+                    const concluido = index <= timeline.concluidoAte;
+                    const atual = !concluido && timeline.etapaAtual === index;
 
                     return (
                       <p
@@ -400,12 +410,14 @@ export default function PagamentoSucesso() {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="button"
+            onClick={() => navigate("/meus-pedidos")}
             className="w-full sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 transition-colors"
           >
             Ver meus pedidos
           </button>
           <button
             type="button"
+            onClick={() => navigate("/produtos")}
             className="w-full sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] transition-colors"
           >
             Continuar comprando
