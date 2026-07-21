@@ -204,8 +204,8 @@ export default function PagamentoSucesso() {
                             concluido
                               ? "bg-[#22c55e] border-[#22c55e] text-white"
                               : atual
-                                ? "bg-white border-[#f59e0b] text-[#7a4f00]"
-                                : "bg-white border-[#d1d5db] text-[#9ca3af]"
+                                ? "bg-[#0070ea] border-[#0070ea] text-white shadow-[0_0_0_4px_rgba(0,112,234,0.18)]"
+                                : "bg-[#f3f4f6] border-[#d1d5db] text-[#9ca3af]"
                           }`}
                         >
                           {concluido ? "✓" : index + 1}
@@ -227,7 +227,7 @@ export default function PagamentoSucesso() {
                           concluido
                             ? "text-[#1a6b3c] font-semibold"
                             : atual
-                              ? "text-[#7a4f00] font-semibold"
+                              ? "text-[#003366] font-semibold"
                               : "text-[#737780]"
                         }`}
                       >
