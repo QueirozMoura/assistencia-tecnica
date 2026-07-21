@@ -8,6 +8,8 @@ export default function PagamentoSucesso() {
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [loadingPedidos, setLoadingPedidos] = useState(false);
+  const [loadingCatalogo, setLoadingCatalogo] = useState(false);
 
   useEffect(() => {
     let ativo = true;
@@ -134,6 +136,24 @@ export default function PagamentoSucesso() {
       concluidoAte: etapaAtual === 5 ? etapas.length - 1 : etapaAtual - 1,
     };
   }, [pedido]);
+
+  const handleMeusPedidosClick = () => {
+    if (loadingPedidos) return;
+    setLoadingPedidos(true);
+
+    setTimeout(() => {
+      navigate("/meus-pedidos");
+    }, 300);
+  };
+
+  const handleCatalogoClick = () => {
+    if (loadingCatalogo) return;
+    setLoadingCatalogo(true);
+
+    setTimeout(() => {
+      navigate("/catalogo");
+    }, 300);
+  };
 
   return (
     <div className="bg-[#f7f9ff] min-h-screen py-10">
@@ -407,17 +427,37 @@ export default function PagamentoSucesso() {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="button"
-            onClick={() => navigate("/meus-pedidos")}
-            className="w-full sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 transition-colors"
+            onClick={handleMeusPedidosClick}
+            disabled={loadingPedidos}
+            className="w-full sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
-            Ver meus pedidos
+            <span className="inline-flex items-center justify-center gap-2">
+              {loadingPedidos && (
+                <span
+                  className="w-3.5 h-3.5 rounded-full border-2 border-[#9ca3af] border-t-transparent animate-spin"
+                  aria-hidden="true"
+                />
+              )}
+              {loadingPedidos ? "Abrindo pedidos..." : "Ver meus pedidos"}
+            </span>
           </button>
           <button
             type="button"
-            onClick={() => navigate("/catalogo")}
-            className="w-full sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] transition-colors"
+            onClick={handleCatalogoClick}
+            disabled={loadingCatalogo}
+            className="w-full sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
-            Continuar comprando
+            <span className="inline-flex items-center justify-center gap-2">
+              {loadingCatalogo && (
+                <span
+                  className="w-3.5 h-3.5 rounded-full border-2 border-white/80 border-t-transparent animate-spin"
+                  aria-hidden="true"
+                />
+              )}
+              {loadingCatalogo
+                ? "Abrindo catálogo..."
+                : "Continuar comprando"}
+            </span>
           </button>
         </div>
       </div>
