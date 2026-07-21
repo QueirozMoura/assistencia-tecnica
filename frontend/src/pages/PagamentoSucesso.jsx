@@ -253,27 +253,141 @@ export default function PagamentoSucesso() {
           ) : erro ? (
             <p className="text-sm text-[#b42318]">{erro}</p>
           ) : (
-            <div className="space-y-2 text-sm text-[#43474f]">
-              <p>
-                <span className="font-semibold text-[#003366]">Pedido:</span>{" "}
-                {resumo.numero}
-              </p>
-              <p>
-                <span className="font-semibold text-[#003366]">Cliente:</span>{" "}
-                {resumo.cliente}
-              </p>
-              <p>
-                <span className="font-semibold text-[#003366]">Valor:</span>{" "}
-                {resumo.valor}
-              </p>
-              <p>
-                <span className="font-semibold text-[#003366]">Pagamento:</span>{" "}
-                {resumo.pagamento}
-              </p>
-              <p>
-                <span className="font-semibold text-[#003366]">Data:</span>{" "}
-                {resumo.data}
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm text-[#43474f]">
+              <div className="sm:col-span-2 rounded-xl border border-[#d9e6fb] bg-[#f4f8ff] p-4 sm:p-5">
+                <div className="flex items-center gap-2 text-[#0059bb] mb-2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M4 7.5h16M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Número do pedido
+                  </span>
+                </div>
+                <p className="text-2xl sm:text-3xl font-black tracking-tight text-[#003366]">
+                  {resumo.numero}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
+                <div className="flex items-center gap-2 text-[#5b6475] mb-1.5">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Cliente
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-[#003366] break-words">
+                  {resumo.cliente}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-[#d6eedd] bg-[#f4fcf6] p-4">
+                <div className="flex items-center gap-2 text-[#1a6b3c] mb-1.5">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 7.5h18M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9 14h6"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Valor total
+                  </span>
+                </div>
+                <p className="text-2xl font-extrabold tracking-tight text-[#1a6b3c]">
+                  {resumo.valor}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
+                <div className="flex items-center gap-2 text-[#5b6475] mb-2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M20 7 9 18l-5-5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Pagamento
+                  </span>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#bbf7d0] bg-[#dcfce7] px-3 py-1 text-sm font-semibold text-[#166534]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" aria-hidden="true" />
+                  {resumo.pagamento}
+                </span>
+              </div>
+
+              <div className="rounded-xl border border-[#e5e8ee] bg-white p-4 sm:col-span-2">
+                <div className="flex items-center gap-2 text-[#5b6475] mb-1.5">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M8 2v3M16 2v3M3 10h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Data
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-[#003366]">{resumo.data}</p>
+              </div>
             </div>
           )}
         </div>
