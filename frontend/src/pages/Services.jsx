@@ -51,7 +51,7 @@ export default function Services() {
               className="flex items-center gap-2 border-2 border-white/30 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-all"
             >
               <Phone size={16} />
-              (11) 9999-9999
+              (11) 96560-2135
             </a>
           </div>
         </div>

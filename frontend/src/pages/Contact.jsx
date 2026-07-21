@@ -9,14 +9,14 @@ const contactInfo = [
   {
     icon: Phone,
     title: 'Telefone',
-    lines: ['(11) 9999-9999', '(11) 3333-3333'],
+    lines: ['(11) 96560-2135', '(11) 96560-2135'],
     color: 'bg-[#cce0ff]',
     iconColor: 'text-[#003366]',
   },
   {
     icon: MessageSquare,
     title: 'WhatsApp',
-    lines: ['(11) 9999-9999', 'Resposta rápida'],
+    lines: ['(11) 96560-2135', 'Resposta rápida'],
     color: 'bg-[#d4f5e2]',
     iconColor: 'text-[#1a6b3c]',
     href: 'https://wa.me/5511965602135',
@@ -126,7 +126,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#43474f] mb-1.5">Telefone</label>
-                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="(11) 9999-9999" className={inputClass} />
+                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="(11) 96560-2135" className={inputClass} />
                   </div>
                 </div>
                 <div>

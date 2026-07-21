@@ -229,7 +229,7 @@ export default function Scheduling() {
                       name="telefoneContato"
                       value={form.telefoneContato}
                       onChange={handleChange}
-                      placeholder="(11) 9999-9999"
+                      placeholder="(11) 96560-2135"
                       className={inputClass("telefoneContato")}
                     />
                     {errors.telefoneContato && (
@@ -246,7 +246,7 @@ export default function Scheduling() {
                       name="whatsapp"
                       value={form.whatsapp}
                       onChange={handleChange}
-                      placeholder="(11) 9999-9999"
+                      placeholder="(11) 96560-2135"
                       className={inputClass("whatsapp")}
                     />
                   </div>
