@@ -62,21 +62,21 @@ export default function PagamentoSucesso() {
       };
     }
 
-    const numero = pedido.numero ?? pedido.id ?? id ?? "00000";
+    const numero = pedido.id ?? id ?? "00000";
     const cliente =
       pedido.cliente?.nome ?? pedido.nomeCliente ?? pedido.cliente ?? "—";
     const valorBruto = pedido.valorTotal ?? pedido.valor ?? pedido.total;
-    const valor =
-      typeof valorBruto === "number"
-        ? valorBruto.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })
-        : (valorBruto ?? "R$ 0,00");
+    const valor = valorBruto
+      ? Number(valorBruto).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })
+      : "R$ 0,00";
     const pagamento = pedido.statusPagamento ?? pedido.pagamento ?? "Aprovado";
 
     let dataFormatada = "—";
-    const dataRaw = pedido.criadoEm ?? pedido.dataCriacao ?? pedido.data;
+    const dataRaw =
+      pedido.createdAt ?? pedido.criadoEm ?? pedido.dataCriacao ?? pedido.data;
     if (dataRaw) {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
