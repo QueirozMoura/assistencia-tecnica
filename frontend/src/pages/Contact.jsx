@@ -188,8 +188,8 @@ export default function Contact() {
               </div>
               <div className="p-5">
                 <h3 className="font-semibold text-[#003366] mb-1">Nossa Localização</h3>
-                <p className="text-sm text-[#43474f]">Rua das Flores, 123 — São Paulo, SP</p>
-                <p className="text-xs text-[#737780] mt-1">CEP: 01234-567</p>
+                <p className="text-sm text-[#43474f]">Rua Areias Alvas, 190 — São Paulo, SP</p>
+                <p className="text-xs text-[#737780] mt-1"></p>
                 <a
                   href="https://maps.google.com"
                   target="_blank"
