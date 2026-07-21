@@ -48,6 +48,17 @@ function getPaymentStatusStyle(status) {
   return map[normalizeStatus(status)] || `${base} border-[#e2e8f0] bg-[#f8fafc] text-[#475569]`
 }
 
+function getPaymentStatusLabel(status) {
+  const map = {
+    PAID: 'Pago',
+    PENDING: 'Aguardando pagamento',
+    REJECTED: 'Pagamento recusado',
+    REFUNDED: 'Reembolsado',
+    UNKNOWN: 'Desconhecido',
+  }
+  return map[normalizeStatus(status)] || 'Desconhecido'
+}
+
 function StatCard({ title, value, tone = 'blue' }) {
   const toneMap = {
     blue: {
