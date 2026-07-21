@@ -23,9 +23,10 @@ export default function PagamentoSucesso() {
         setLoading(true);
         setErro("");
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/pedidos/sucesso/${id}`,
-        );
+        const API_URL =
+          import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
+        const response = await fetch(`${API_URL}/pedidos/sucesso/${id}`);
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar os dados do pedido.");
@@ -359,7 +360,10 @@ export default function PagamentoSucesso() {
                   </span>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#bbf7d0] bg-[#dcfce7] px-3 py-1 text-sm font-semibold text-[#166534]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" aria-hidden="true" />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"
+                    aria-hidden="true"
+                  />
                   {resumo.pagamento}
                 </span>
               </div>
@@ -385,7 +389,9 @@ export default function PagamentoSucesso() {
                     Data
                   </span>
                 </div>
-                <p className="text-base font-semibold text-[#003366]">{resumo.data}</p>
+                <p className="text-base font-semibold text-[#003366]">
+                  {resumo.data}
+                </p>
               </div>
             </div>
           )}
