@@ -75,8 +75,7 @@ export default function PagamentoSucesso() {
     const pagamento = pedido.statusPagamento ?? pedido.pagamento ?? "Aprovado";
 
     let dataFormatada = "—";
-    const dataRaw =
-      pedido.createdAt ?? pedido.criadoEm ?? pedido.dataCriacao ?? pedido.data;
+    const dataRaw = pedido.paidAt ?? pedido.createdAt ?? pedido.updatedAt;
     if (dataRaw) {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
