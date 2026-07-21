@@ -417,7 +417,7 @@ export default function PagamentoSucesso() {
           </button>
           <button
             type="button"
-            onClick={() => navigate("/produtos")}
+            onClick={() => navigate("/catalogo")}
             className="w-full sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] transition-colors"
           >
             Continuar comprando
