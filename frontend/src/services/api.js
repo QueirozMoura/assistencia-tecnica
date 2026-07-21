@@ -102,3 +102,6 @@ export async function getProdutosRelacionados(id, limit = 4) {
 export async function getCategorias() {
   return request('/categorias?ativo=true')
 }
+
+
+
