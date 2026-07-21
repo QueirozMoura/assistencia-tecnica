@@ -106,17 +106,7 @@ export default function PagamentoSucesso() {
     const statusPedido = String(pedido?.status ?? "").toUpperCase();
     const statusPagamento = String(pedido?.paymentStatus ?? "").toUpperCase();
 
-    const statusRaw =
-      statusPedido ||
-      (statusPagamento === "PAID"
-        ? "PAGO"
-        : statusPagamento === "PENDING"
-          ? "PENDENTE"
-          : statusPagamento === "CANCELLED"
-            ? "CANCELADO"
-            : "");
-
-    if (statusRaw === "CANCELADO") {
+    if (statusPedido === "CANCELADO") {
       return { etapas, etapaAtual: 0, cancelado: true, concluidoAte: -1 };
     }
 
@@ -128,7 +118,14 @@ export default function PagamentoSucesso() {
       ENTREGUE: 5,
     };
 
-    const etapaAtual = mapaStatus[statusRaw] ?? 1;
+    let etapaAtual = mapaStatus[statusPedido] ?? 1;
+
+    if (
+      statusPedido === "PENDENTE" &&
+      statusPagamento === "PAID"
+    ) {
+      etapaAtual = 2;
+    }
 
     return {
       etapas,
