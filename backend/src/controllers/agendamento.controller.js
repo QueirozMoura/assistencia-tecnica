@@ -26,7 +26,12 @@ export async function buscarAgendamentoPorId(req, res, next) {
 
 export async function criarAgendamento(req, res, next) {
   try {
-    const agendamento = await agendamentoService.criarAgendamento(req.body);
+    const dadosAgendamento = {
+      ...req.body,
+      clienteId: req.cliente?.id ?? null,
+    };
+
+    const agendamento = await agendamentoService.criarAgendamento(dadosAgendamento);
     return res.status(201).json({ success: true, data: agendamento });
   } catch (error) {
     next(error);

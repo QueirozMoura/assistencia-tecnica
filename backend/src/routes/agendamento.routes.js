@@ -3,6 +3,7 @@ import * as agendamentoController from "../controllers/agendamento.controller.js
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { tecnicoMiddleware } from "../middlewares/tecnico.middleware.js";
 import { adminMiddleware } from "../middlewares/admin.middleware.js";
+import { optionalClientAuthMiddleware } from "../middlewares/clientAuth.middleware.js";
 import { validate } from "../middlewares/validation.middleware.js";
 import {
   agendamentoSchema,
@@ -18,8 +19,13 @@ router.get("/", authMiddleware, tecnicoMiddleware, agendamentoController.listarA
 // GET /api/agendamentos/:id — ADMIN ou TECNICO
 router.get("/:id", authMiddleware, tecnicoMiddleware, agendamentoController.buscarAgendamentoPorId);
 
-// POST /api/agendamentos — público (cliente agenda pelo site)
-router.post("/", validate(agendamentoSchema), agendamentoController.criarAgendamento);
+// POST /api/agendamentos — público (cliente agenda pelo site) com autenticação opcional
+router.post(
+  "/",
+  optionalClientAuthMiddleware,
+  validate(agendamentoSchema),
+  agendamentoController.criarAgendamento
+);
 
 // PUT /api/agendamentos/:id — ADMIN ou TECNICO
 router.put(
