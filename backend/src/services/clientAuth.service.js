@@ -187,22 +187,27 @@ export async function forgotPassword(email) {
 
   const resetToken  = randomToken();
   console.log("Token de recuperação gerado.");
+  console.log("RESET TOKEN GERADO COM SUCESSO");
 
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
   console.log("Antes do prisma.update de recuperação de senha");
   console.log("resetToken gerado:", !!resetToken);
   console.log("resetTokenExpiry:", resetExpiry);
+  console.log("ANTES DO UPDATE DO PRISMA");
   await prisma.cliente.update({
     where: { id: cliente.id },
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
   console.log("Depois do prisma.update de recuperação de senha");
+  console.log("UPDATE DO PRISMA FINALIZADO");
 
   console.log("Token salvo no banco com sucesso.");
   console.log("Antes de chamar sendPasswordResetEmail");
+  console.log("CHAMANDO SEND PASSWORD RESET EMAIL");
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
   console.log("Depois de chamar sendPasswordResetEmail");
+  console.log("SEND PASSWORD RESET EMAIL FINALIZADO");
 
   return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
 }
