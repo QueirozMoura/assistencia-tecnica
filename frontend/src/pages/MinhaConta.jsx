@@ -1,14 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useClientAuth } from '../hooks/useClientAuth'
-import { clientGetMe } from '../services/clientApi'
+import { clientCreatePassword, clientGetMe } from '../services/clientApi'
 
 export default function MinhaConta() {
-  const { cliente, logout } = useClientAuth()
+  const { cliente, logout, refreshCliente } = useClientAuth()
   const navigate = useNavigate()
 
   const [dados,   setDados]   = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showCreatePwd, setShowCreatePwd] = useState(false)
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmarSenha, setConfirmarSenha] = useState('')
+  const [pwdSubmitting, setPwdSubmitting] = useState(false)
+  const [pwdError, setPwdError] = useState('')
+  const [pwdSuccess, setPwdSuccess] = useState('')
 
   useEffect(() => {
     clientGetMe()
@@ -22,7 +28,45 @@ export default function MinhaConta() {
     navigate('/', { replace: true })
   }
 
+  async function handleCreatePassword(e) {
+    e.preventDefault()
+    setPwdError('')
+    setPwdSuccess('')
+
+    if (!novaSenha || !confirmarSenha) {
+      setPwdError('Preencha e confirme a nova senha.')
+      return
+    }
+
+    if (novaSenha.length < 6) {
+      setPwdError('Senha deve ter no mínimo 6 caracteres.')
+      return
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setPwdError('As senhas não coincidem.')
+      return
+    }
+
+    try {
+      setPwdSubmitting(true)
+      await clientCreatePassword({ novaSenha })
+      const atualizado = await clientGetMe()
+      setDados(atualizado.data)
+      await refreshCliente?.()
+      setPwdSuccess('Senha criada com sucesso.')
+      setShowCreatePwd(false)
+      setNovaSenha('')
+      setConfirmarSenha('')
+    } catch (error) {
+      setPwdError(error.message || 'Não foi possível criar a senha.')
+    } finally {
+      setPwdSubmitting(false)
+    }
+  }
+
   const info = dados ?? cliente
+  const shouldShowCreatePassword = !!info?.googleId && !info?.temSenha
 
   return (
     <div className="bg-[#f7f9ff] min-h-screen py-10">
@@ -89,6 +133,79 @@ export default function MinhaConta() {
                 ))}
               </div>
             </div>
+
+            {shouldShowCreatePassword && (
+              <div className="bg-white rounded-2xl border border-[#e5e8ee] p-6 space-y-3">
+                <h3 className="font-semibold text-[#181c20]">Senha</h3>
+                <p className="text-sm text-[#737780]">Você entrou pelo Google e ainda não possui uma senha.</p>
+
+                {pwdSuccess && (
+                  <p className="text-sm font-medium text-[#1a6b3c] bg-[#d4f5e2] border border-[#bfe9d1] rounded-xl px-3 py-2">{pwdSuccess}</p>
+                )}
+                {pwdError && (
+                  <p className="text-sm font-medium text-[#ba1a1a] bg-[#ffe8e8] border border-[#ffc9c9] rounded-xl px-3 py-2">{pwdError}</p>
+                )}
+
+                {!showCreatePwd ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowCreatePwd(true)}
+                    className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors"
+                  >
+                    criar senha
+                  </button>
+                ) : (
+                  <form onSubmit={handleCreatePassword} className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-semibold text-[#181c20] mb-1.5">Nova senha</label>
+                      <input
+                        type="password"
+                        value={novaSenha}
+                        onChange={(e) => setNovaSenha(e.target.value)}
+                        autoComplete="new-password"
+                        className="w-full h-11 px-3 rounded-xl border border-[#e5e8ee] bg-white text-[#181c20] focus:outline-none focus:ring-2 focus:ring-[#0070ea]"
+                        disabled={pwdSubmitting}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-[#181c20] mb-1.5">Confirmar senha</label>
+                      <input
+                        type="password"
+                        value={confirmarSenha}
+                        onChange={(e) => setConfirmarSenha(e.target.value)}
+                        autoComplete="new-password"
+                        className="w-full h-11 px-3 rounded-xl border border-[#e5e8ee] bg-white text-[#181c20] focus:outline-none focus:ring-2 focus:ring-[#0070ea]"
+                        disabled={pwdSubmitting}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        disabled={pwdSubmitting}
+                        className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors disabled:opacity-70"
+                      >
+                        {pwdSubmitting ? 'Salvando...' : 'Salvar senha'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowCreatePwd(false)
+                          setNovaSenha('')
+                          setConfirmarSenha('')
+                          setPwdError('')
+                        }}
+                        className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-[#d0d4db] text-[#181c20] text-sm font-semibold hover:bg-[#f7f9ff] transition-colors"
+                        disabled={pwdSubmitting}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
 
             {/* Atalhos */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

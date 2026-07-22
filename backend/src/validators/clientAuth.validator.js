@@ -62,3 +62,9 @@ export const googleAuthSchema = z
     message: "Envie idToken ou code para autenticação Google.",
     path: ["idToken"],
   });
+
+export const createPasswordSchema = z.object({
+  novaSenha: z
+    .string({ required_error: "Nova senha é obrigatória." })
+    .min(6, "Senha deve ter no mínimo 6 caracteres."),
+});

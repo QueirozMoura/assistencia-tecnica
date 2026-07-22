@@ -276,6 +276,28 @@ export async function resetPassword(token, novaSenha) {
   return { message: "Senha redefinida com sucesso." };
 }
 
+export async function createPassword(clienteId, novaSenha) {
+  const cliente = await prisma.cliente.findUnique({
+    where: { id: clienteId },
+    select: { id: true },
+  });
+
+  if (!cliente) {
+    throw Object.assign(new Error("Cliente não encontrado."), {
+      statusCode: 404,
+    });
+  }
+
+  const senhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS);
+
+  await prisma.cliente.update({
+    where: { id: cliente.id },
+    data: { senha: senhaHash },
+  });
+
+  return { message: "Senha criada com sucesso." };
+}
+
 // ── Get Me ────────────────────────────────────────────────────────────────────
 
 export async function getMe(id) {
@@ -287,6 +309,8 @@ export async function getMe(id) {
       email: true,
       telefone: true,
       cpf: true,
+      googleId: true,
+      senha: true,
       emailVerificado: true,
       createdAt: true,
       _count: { select: { pedidos: true, agendamentos: true } },
@@ -299,5 +323,9 @@ export async function getMe(id) {
     });
   }
 
-  return cliente;
+  const { senha, ...clienteSemSenha } = cliente;
+  return {
+    ...clienteSemSenha,
+    temSenha: !!senha,
+  };
 }

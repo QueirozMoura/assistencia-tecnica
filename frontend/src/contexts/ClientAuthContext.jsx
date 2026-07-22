@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react'
+import { clientGetMe } from '../services/clientApi'
 
 const STORAGE_KEY_TOKEN = 'client_token'
 const STORAGE_KEY_CLIENT = 'client_user'
@@ -64,6 +65,16 @@ export function ClientAuthProvider({ children }) {
     setCliente(newCliente)
   }, [])
 
+  const refreshCliente = useCallback(async () => {
+    if (!token) return null
+    const res = await clientGetMe()
+    setCliente(res.data)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(STORAGE_KEY_CLIENT, JSON.stringify(res.data))
+    }
+    return res.data
+  }, [token])
+
   const logout = useCallback(() => {
     clearStoredClientAuth()
     setToken(null)
@@ -73,7 +84,7 @@ export function ClientAuthProvider({ children }) {
   const isAuthenticated = !!token && !!cliente
 
   return (
-    <ClientAuthContext.Provider value={{ cliente, token, loading, isAuthenticated, login, logout }}>
+    <ClientAuthContext.Provider value={{ cliente, token, loading, isAuthenticated, login, logout, refreshCliente }}>
       {children}
     </ClientAuthContext.Provider>
   )

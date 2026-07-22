@@ -70,3 +70,11 @@ export async function getMeusAgendamentos(req, res, next) {
     return res.status(200).json({ success: true, data: agendamentos });
   } catch (error) { next(error); }
 }
+
+export async function createPassword(req, res, next) {
+  try {
+    const { novaSenha } = req.body;
+    const result = await clientAuthService.createPassword(req.cliente.id, novaSenha);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) { next(error); }
+}

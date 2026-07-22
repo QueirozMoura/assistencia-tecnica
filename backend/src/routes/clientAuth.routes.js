@@ -33,6 +33,9 @@ router.post("/reset-password", validate(resetPasswordSchema), ctrl.resetPassword
 // GET  /api/client-auth/me  (protegido)
 router.get("/me", clientAuthMiddleware, ctrl.getMe);
 
+// POST /api/client-auth/create-password (protegido)
+router.post("/create-password", clientAuthMiddleware, validate(createPasswordSchema), ctrl.createPassword);
+
 // GET  /api/client-auth/meus-pedidos (protegido)
 router.get("/meus-pedidos", clientAuthMiddleware, ctrl.getMeusPedidos);
 

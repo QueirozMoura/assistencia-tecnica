@@ -26,6 +26,7 @@ export const clientForgotPwd   = (email)         => request('/client-auth/forgot
 export const clientResetPwd    = (data)          => request('/client-auth/reset-password', { method: 'POST', body: JSON.stringify(data) })
 export const clientVerifyEmail = (token)         => request(`/client-auth/verify-email?token=${token}`)
 export const clientGetMe       = ()              => request('/client-auth/me')
+export const clientCreatePassword = (data)       => request('/client-auth/create-password', { method: 'POST', body: JSON.stringify(data) })
 export const clientCreatePedidoComPagamento = (data) =>
   request('/pedidos/com-pagamento', {
     method: 'POST',
