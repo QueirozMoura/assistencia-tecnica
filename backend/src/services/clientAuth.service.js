@@ -190,10 +190,14 @@ export async function forgotPassword(email) {
 
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
+  console.log("Antes do prisma.update de recuperação de senha");
+  console.log("resetToken gerado:", !!resetToken);
+  console.log("resetTokenExpiry:", resetExpiry);
   await prisma.cliente.update({
     where: { id: cliente.id },
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
+  console.log("Depois do prisma.update de recuperação de senha");
 
   console.log("Token salvo no banco com sucesso.");
   console.log("Antes de chamar sendPasswordResetEmail");
