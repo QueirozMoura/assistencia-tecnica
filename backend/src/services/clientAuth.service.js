@@ -172,22 +172,29 @@ export async function forgotPassword(email) {
   const emailNormalizado = normalizeEmail(email);
 
   const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
+  console.log("CLIENTE BUSCADO");
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
     return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
   }
 
+  console.log("ANTES DO RESET TOKEN");
   const resetToken = randomToken();
+  console.log("RESET TOKEN GERADO");
 
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
+  console.log("ANTES DO UPDATE PRISMA");
   await prisma.cliente.update({
     where: { id: cliente.id },
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
+  console.log("UPDATE PRISMA OK");
 
+  console.log("ANTES DO RESEND");
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
+  console.log("RESEND FINALIZADO");
 
   return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
 }
