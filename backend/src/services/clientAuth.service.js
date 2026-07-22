@@ -208,8 +208,15 @@ export async function forgotPassword(email) {
   const cliente = await prisma.cliente.findUnique({
     where: { email: emailNormalizado },
   });
+  console.log("CLIENTE COMPLETO:", {
+    id: cliente?.id,
+    nome: cliente?.nome,
+    email: cliente?.email,
+    senhaExiste: !!cliente?.senha,
+    googleId: cliente?.googleId,
+    emailVerificado: cliente?.emailVerificado
+  });
   console.log("CLIENTE BUSCADO");
-  console.log("TEM SENHA:", !!cliente?.senha);
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
