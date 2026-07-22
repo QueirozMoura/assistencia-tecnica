@@ -195,9 +195,10 @@ export async function forgotPassword(email) {
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
 
-  console.log("Chamando sendPasswordResetEmail...");
+  console.log("Token salvo no banco com sucesso.");
+  console.log("Antes de chamar sendPasswordResetEmail");
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
-  console.log("sendPasswordResetEmail finalizado.");
+  console.log("Depois de chamar sendPasswordResetEmail");
 
   return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
 }
