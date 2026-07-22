@@ -44,6 +44,17 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Agendamentos',
+    to: '/admin/agendamentos',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="3" width="14" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M6 1.5v3M12 1.5v3M2 7h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M6 10h2M10 10h2M6 13h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
     label: 'Clientes',
     to: '/admin/clientes',
     icon: (
