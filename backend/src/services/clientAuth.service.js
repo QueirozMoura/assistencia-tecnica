@@ -170,7 +170,15 @@ export async function verifyEmail(token) {
 
 export async function forgotPassword(email) {
   const emailNormalizado = normalizeEmail(email);
+  console.log("=== forgotPassword ===");
+  console.log("Email recebido:", emailNormalizado);
+
   const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
+  console.log("Cliente encontrado:", !!cliente);
+
+  if (cliente) {
+    console.log("Cliente ID:", cliente.id);
+  }
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
@@ -178,6 +186,8 @@ export async function forgotPassword(email) {
   }
 
   const resetToken  = randomToken();
+  console.log("Token de recuperação gerado.");
+
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
   await prisma.cliente.update({
@@ -185,7 +195,9 @@ export async function forgotPassword(email) {
     data:  { resetToken, resetTokenExpiry: resetExpiry },
   });
 
+  console.log("Chamando sendPasswordResetEmail...");
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
+  console.log("sendPasswordResetEmail finalizado.");
 
   return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
 }

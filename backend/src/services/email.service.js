@@ -65,13 +65,16 @@ export async function sendVerificationEmail(email, nome, token) {
  * Envia email de recuperação de senha.
  */
 export async function sendPasswordResetEmail(email, nome, token) {
+  console.log("Entrou em sendPasswordResetEmail");
+
   const frontendUrl = process.env.FRONTEND_URL || "https://example.com";
   const url = `${frontendUrl}/redefinir-senha?token=${encodeURIComponent(token)}`;
   const safeNome = escapeHtml(nome);
   const safeApp = escapeHtml(APP);
 
   try {
-    await resend.emails.send({
+    console.log("Enviando email via Resend...");
+    const response = await resend.emails.send({
       from: FROM,
       to: email,
       subject: `${APP} — Redefinição de senha`,
@@ -90,6 +93,7 @@ export async function sendPasswordResetEmail(email, nome, token) {
         </div>
       `,
     });
+    console.log("Resposta do Resend:", response);
   } catch (err) {
     console.error("RESEND ERROR:", err);
 
