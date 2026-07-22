@@ -29,7 +29,13 @@ function safeCliente(c) {
 }
 
 function randomToken() {
-  return crypto.randomBytes(32).toString("hex");
+  console.log("ENTROU NA FUNÇÃO randomToken");
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  console.log("TOKEN GERADO COM SUCESSO");
+
+  return token;
 }
 
 // ── Register ──────────────────────────────────────────────────────────────────
