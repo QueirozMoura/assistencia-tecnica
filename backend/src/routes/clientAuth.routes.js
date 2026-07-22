@@ -8,6 +8,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   googleAuthSchema,
+  createPasswordSchema,
 } from "../validators/clientAuth.validator.js";
 
 const router = Router();
