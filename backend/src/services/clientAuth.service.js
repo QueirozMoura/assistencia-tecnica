@@ -175,6 +175,7 @@ export async function verifyEmail(token) {
 // ── Forgot Password ───────────────────────────────────────────────────────────
 
 export async function forgotPassword(email) {
+  console.log("VERSAO NOVA DO FORGOT PASSWORD");
   const emailNormalizado = normalizeEmail(email);
   console.log("=== forgotPassword ===");
   console.log("Email recebido:", emailNormalizado);
