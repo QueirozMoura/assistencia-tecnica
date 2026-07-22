@@ -285,6 +285,10 @@ export async function adminGetAgendamentos(params = {}) {
   return request(`/agendamentos${query ? `?${query}` : ''}`)
 }
 
+export async function adminGetAgendamentoById(id) {
+  return request(`/agendamentos/${id}`)
+}
+
 export async function adminUpdateStatusAgendamento(id, status) {
   return request(`/agendamentos/${id}/status`, {
     method: 'PATCH',
