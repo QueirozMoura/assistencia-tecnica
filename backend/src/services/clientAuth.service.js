@@ -180,12 +180,19 @@ export async function forgotPassword(email) {
     console.log("Cliente ID:", cliente.id);
   }
 
+  console.log("ANTES DE GERAR RESET TOKEN");
+
+  const teste = Date.now();
+
+  console.log("TIMESTAMP:", teste);
+
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
     return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
   }
 
   console.log("ANTES DO RANDOM TOKEN");
+  console.log("EXECUTANDO RANDOM TOKEN AGORA");
   const resetToken = randomToken();
   console.log("DEPOIS DO RANDOM TOKEN");
   console.log("Token de recuperação gerado.");
