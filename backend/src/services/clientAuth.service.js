@@ -185,7 +185,9 @@ export async function forgotPassword(email) {
     return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
   }
 
-  const resetToken  = randomToken();
+  console.log("ANTES DO RANDOM TOKEN");
+  const resetToken = randomToken();
+  console.log("DEPOIS DO RANDOM TOKEN");
   console.log("Token de recuperação gerado.");
   console.log("RESET TOKEN GERADO COM SUCESSO");
 
