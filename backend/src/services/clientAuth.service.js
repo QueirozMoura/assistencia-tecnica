@@ -3,7 +3,10 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import prisma from "../config/prisma.js";
-import { sendVerificationEmail, sendPasswordResetEmail } from "./email.service.js";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} from "./email.service.js";
 
 const SALT_ROUNDS = 12;
 
@@ -19,12 +22,19 @@ function generateClientToken(cliente) {
   return jwt.sign(
     { id: cliente.id, email: cliente.email, type: "client" },
     secret,
-    { expiresIn: process.env.JWT_CLIENT_EXPIRES_IN || "7d" }
+    { expiresIn: process.env.JWT_CLIENT_EXPIRES_IN || "7d" },
   );
 }
 
 function safeCliente(c) {
-  const { senha, resetToken, resetTokenExpiry, verifyToken, googleId, ...safe } = c;
+  const {
+    senha,
+    resetToken,
+    resetTokenExpiry,
+    verifyToken,
+    googleId,
+    ...safe
+  } = c;
   return safe;
 }
 
@@ -36,16 +46,27 @@ function randomToken() {
 
 export async function register({ nome, email, telefone, senha }) {
   const emailNormalizado = normalizeEmail(email);
-  const existe = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
+  const existe = await prisma.cliente.findUnique({
+    where: { email: emailNormalizado },
+  });
   if (existe) {
-    throw Object.assign(new Error("E-mail já cadastrado."), { statusCode: 409 });
+    throw Object.assign(new Error("E-mail já cadastrado."), {
+      statusCode: 409,
+    });
   }
 
-  const senhaHash  = await bcrypt.hash(senha, SALT_ROUNDS);
+  const senhaHash = await bcrypt.hash(senha, SALT_ROUNDS);
   const verifyToken = randomToken();
 
   const cliente = await prisma.cliente.create({
-    data: { nome, email: emailNormalizado, telefone, senha: senhaHash, verifyToken, emailVerificado: false },
+    data: {
+      nome,
+      email: emailNormalizado,
+      telefone,
+      senha: senhaHash,
+      verifyToken,
+      emailVerificado: false,
+    },
   });
 
   // Enviar email de verificação (falha silenciosa)
@@ -59,18 +80,21 @@ export async function register({ nome, email, telefone, senha }) {
 
 export async function login(email, senha) {
   const emailNormalizado = normalizeEmail(email);
-  const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
+  const cliente = await prisma.cliente.findUnique({
+    where: { email: emailNormalizado },
+  });
 
   if (!cliente || !cliente.senha) {
-    throw Object.assign(
-      new Error("Credenciais inválidas."),
-      { statusCode: 401 }
-    );
+    throw Object.assign(new Error("Credenciais inválidas."), {
+      statusCode: 401,
+    });
   }
 
   const senhaValida = await bcrypt.compare(senha, cliente.senha);
   if (!senhaValida) {
-    throw Object.assign(new Error("Credenciais inválidas."), { statusCode: 401 });
+    throw Object.assign(new Error("Credenciais inválidas."), {
+      statusCode: 401,
+    });
   }
 
   const token = generateClientToken(cliente);
@@ -82,13 +106,15 @@ export async function login(email, senha) {
 export async function googleAuth({ idToken, code }) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
-    throw Object.assign(new Error("GOOGLE_CLIENT_ID não configurado."), { statusCode: 500 });
+    throw Object.assign(new Error("GOOGLE_CLIENT_ID não configurado."), {
+      statusCode: 500,
+    });
   }
 
   const oAuth2Client = new OAuth2Client(
     clientId,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.GOOGLE_REDIRECT_URI,
   );
 
   let tokenToVerify = idToken;
@@ -100,7 +126,9 @@ export async function googleAuth({ idToken, code }) {
   }
 
   if (!tokenToVerify) {
-    throw Object.assign(new Error("Token do Google inválido."), { statusCode: 400 });
+    throw Object.assign(new Error("Token do Google inválido."), {
+      statusCode: 400,
+    });
   }
 
   let payload;
@@ -111,10 +139,14 @@ export async function googleAuth({ idToken, code }) {
     });
     payload = ticket.getPayload();
   } catch (_error) {
-    throw Object.assign(new Error("Token do Google inválido."), { statusCode: 401 });
+    throw Object.assign(new Error("Token do Google inválido."), {
+      statusCode: 401,
+    });
   }
   if (!payload?.sub || !payload?.email) {
-    throw Object.assign(new Error("Dados do usuário Google inválidos."), { statusCode: 400 });
+    throw Object.assign(new Error("Dados do usuário Google inválidos."), {
+      statusCode: 400,
+    });
   }
 
   const { sub: googleId, email, name: nome } = payload;
@@ -155,12 +187,14 @@ export async function verifyEmail(token) {
   });
 
   if (!cliente) {
-    throw Object.assign(new Error("Token de verificação inválido."), { statusCode: 400 });
+    throw Object.assign(new Error("Token de verificação inválido."), {
+      statusCode: 400,
+    });
   }
 
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data:  { emailVerificado: true, verifyToken: null },
+    data: { emailVerificado: true, verifyToken: null },
   });
 
   return { message: "E-mail verificado com sucesso." };
@@ -171,12 +205,18 @@ export async function verifyEmail(token) {
 export async function forgotPassword(email) {
   const emailNormalizado = normalizeEmail(email);
 
-  const cliente = await prisma.cliente.findUnique({ where: { email: emailNormalizado } });
+  const cliente = await prisma.cliente.findUnique({
+    where: { email: emailNormalizado },
+  });
   console.log("CLIENTE BUSCADO");
+  console.log("TEM SENHA:", !!cliente?.senha);
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
-    return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
+    return {
+      message:
+        "Se o e-mail estiver cadastrado, você receberá as instruções em breve.",
+    };
   }
 
   console.log("ANTES DO RESET TOKEN");
@@ -188,7 +228,7 @@ export async function forgotPassword(email) {
   console.log("ANTES DO UPDATE PRISMA");
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data:  { resetToken, resetTokenExpiry: resetExpiry },
+    data: { resetToken, resetTokenExpiry: resetExpiry },
   });
   console.log("UPDATE PRISMA OK");
 
@@ -196,7 +236,10 @@ export async function forgotPassword(email) {
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
   console.log("RESEND FINALIZADO");
 
-  return { message: "Se o e-mail estiver cadastrado, você receberá as instruções em breve." };
+  return {
+    message:
+      "Se o e-mail estiver cadastrado, você receberá as instruções em breve.",
+  };
 }
 
 // ── Reset Password ────────────────────────────────────────────────────────────
@@ -204,7 +247,7 @@ export async function forgotPassword(email) {
 export async function resetPassword(token, novaSenha) {
   const cliente = await prisma.cliente.findFirst({
     where: {
-      resetToken:       token,
+      resetToken: token,
       resetTokenExpiry: { gt: new Date() },
     },
   });
@@ -212,7 +255,7 @@ export async function resetPassword(token, novaSenha) {
   if (!cliente) {
     throw Object.assign(
       new Error("Token inválido ou expirado. Solicite um novo link."),
-      { statusCode: 400 }
+      { statusCode: 400 },
     );
   }
 
@@ -220,7 +263,7 @@ export async function resetPassword(token, novaSenha) {
 
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data:  { senha: senhaHash, resetToken: null, resetTokenExpiry: null },
+    data: { senha: senhaHash, resetToken: null, resetTokenExpiry: null },
   });
 
   return { message: "Senha redefinida com sucesso." };
@@ -232,14 +275,21 @@ export async function getMe(id) {
   const cliente = await prisma.cliente.findUnique({
     where: { id },
     select: {
-      id: true, nome: true, email: true, telefone: true,
-      cpf: true, emailVerificado: true, createdAt: true,
+      id: true,
+      nome: true,
+      email: true,
+      telefone: true,
+      cpf: true,
+      emailVerificado: true,
+      createdAt: true,
       _count: { select: { pedidos: true, agendamentos: true } },
     },
   });
 
   if (!cliente) {
-    throw Object.assign(new Error("Cliente não encontrado."), { statusCode: 404 });
+    throw Object.assign(new Error("Cliente não encontrado."), {
+      statusCode: 404,
+    });
   }
 
   return cliente;
