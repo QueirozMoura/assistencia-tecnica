@@ -47,7 +47,16 @@ export async function sendVerificationEmail(email, nome, token) {
       `,
     });
   } catch (err) {
-    logger.error("Erro ao enviar email de verificação:", err);
+    console.error("RESEND ERROR:", err);
+
+    logger.error("Erro ao enviar email de verificação", {
+      message: err?.message,
+      name: err?.name,
+      statusCode: err?.statusCode,
+      response: err?.response,
+      cause: err?.cause,
+      stack: err?.stack,
+    });
     // Não lança — não bloqueia o cadastro
   }
 }
@@ -82,7 +91,16 @@ export async function sendPasswordResetEmail(email, nome, token) {
       `,
     });
   } catch (err) {
-    logger.error("Erro ao enviar email de reset:", err);
+    console.error("RESEND ERROR:", err);
+
+    logger.error("Erro ao enviar email de reset", {
+      message: err?.message,
+      name: err?.name,
+      statusCode: err?.statusCode,
+      response: err?.response,
+      cause: err?.cause,
+      stack: err?.stack,
+    });
   }
 }
 
@@ -173,13 +191,17 @@ export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
 
     return { sent: true };
   } catch (err) {
-    logger.error(
-      "Erro ao enviar e-mail de pagamento aprovado para administrador.",
-      {
-        pedidoId,
-        message: err?.message || "UNKNOWN_ERROR",
-      },
-    );
+    console.error("RESEND ERROR:", err);
+
+    logger.error("Erro ao enviar e-mail de pagamento aprovado para administrador.", {
+      pedidoId,
+      message: err?.message,
+      name: err?.name,
+      statusCode: err?.statusCode,
+      response: err?.response,
+      cause: err?.cause,
+      stack: err?.stack,
+    });
     return { sent: false, reason: "EMAIL_SEND_FAILED" };
   }
 }
