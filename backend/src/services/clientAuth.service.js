@@ -199,7 +199,11 @@ export async function forgotPassword(email) {
 
   console.log("ANTES DO RANDOM TOKEN");
   console.log("EXECUTANDO RANDOM TOKEN AGORA");
-  const resetToken = randomToken();
+  console.log("CHEGOU ANTES DO RESET TOKEN");
+
+  const resetToken = "teste-token-123";
+
+  console.log("RESET TOKEN FIXO CRIADO:", resetToken);
   console.log("DEPOIS DO RANDOM TOKEN");
   console.log("Token de recuperação gerado.");
   console.log("RESET TOKEN GERADO COM SUCESSO");
