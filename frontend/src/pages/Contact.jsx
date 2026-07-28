@@ -32,7 +32,7 @@ const contactInfo = [
   {
     icon: MapPin,
     title: 'Endereço',
-    lines: ['Rua das Flores, 123', 'São Paulo, SP — 01234-567'],
+    lines: ['Rua Areias Alvas, 190', 'São Paulo, SP — 01234-567'],
     color: 'bg-[#ffecd1]',
     iconColor: 'text-[#7a4f00]',
   },
