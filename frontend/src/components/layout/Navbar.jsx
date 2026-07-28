@@ -100,7 +100,7 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
             <span>Seg–Sáb: 8h às 18h</span>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-            <span>Frete grátis para pedidos acima de R$ 299</span>
+            <span>Frete grátis para pedidos acima de R$ 799</span>
             <span className="hidden sm:inline">|</span>
             <Link to="/agendamento" className="hover:text-blue-200 transition-colors font-medium">
               Agendar Visita Técnica
