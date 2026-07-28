@@ -22,6 +22,7 @@ import MeusPedidos        from '../pages/MeusPedidos'
 import MeusAgendamentos   from '../pages/MeusAgendamentos'
 import Checkout           from '../pages/Checkout'
 import PagamentoSucesso   from '../pages/PagamentoSucesso'
+import PedidoDetalhes     from '../pages/PedidoDetalhes'
 
 // ── Admin: auth + layout ──────────────────────────────────────────────────────
 import PrivateRoute  from '../components/admin/PrivateRoute'
@@ -63,6 +64,7 @@ export default function AppRoutes() {
         {/* Área do cliente — protegidas */}
         <Route path="/minha-conta"        element={<ClientPrivateRoute><MinhaConta /></ClientPrivateRoute>} />
         <Route path="/meus-pedidos"       element={<ClientPrivateRoute><MeusPedidos /></ClientPrivateRoute>} />
+        <Route path="/meus-pedidos/:id"   element={<ClientPrivateRoute><PedidoDetalhes /></ClientPrivateRoute>} />
         <Route path="/meus-agendamentos"  element={<ClientPrivateRoute><MeusAgendamentos /></ClientPrivateRoute>} />
         <Route path="/checkout"           element={<ClientPrivateRoute><Checkout /></ClientPrivateRoute>} />
         <Route path="/pagamento/sucesso"  element={<PagamentoSucesso />} />

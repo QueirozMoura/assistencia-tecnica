@@ -261,12 +261,12 @@ export default function MeusPedidos() {
                         <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0070ea]">{formatMoney(pedido.valorTotal)}</p>
                       </div>
 
-                      <button
-                        type="button"
+                      <Link
+                        to={`/meus-pedidos/${pedido.id}`}
                         className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-[#0070ea] text-white px-5 h-11 text-sm font-semibold hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300"
                       >
                         Ver detalhes
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </article>
