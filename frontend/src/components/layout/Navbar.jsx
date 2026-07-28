@@ -356,9 +356,9 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
               </div>
             ))}
 
-            <div className="pt-3 border-t border-[#e5e8ee]">
+            <div className="pt-4 border-t border-[#e5e8ee] space-y-3">
               {!isAuthenticated ? (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
