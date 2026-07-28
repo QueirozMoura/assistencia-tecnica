@@ -34,7 +34,7 @@ export const pedidoSchema = z.object({
 
 export const pedidoStatusSchema = z.object({
   status: z.enum(
-    ["PENDENTE", "PAGO", "ENVIADO", "ENTREGUE", "CANCELADO"],
+    ["PENDENTE", "PAGO", "PREPARANDO", "ENVIADO", "ENTREGUE", "CANCELADO"],
     { required_error: "Status é obrigatório." }
   ),
 });
@@ -42,6 +42,6 @@ export const pedidoStatusSchema = z.object({
 export const pedidoQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
   limit: z.coerce.number().int().positive().max(100).optional().default(20),
-  status: z.enum(["PENDENTE", "PAGO", "ENVIADO", "ENTREGUE", "CANCELADO"]).optional(),
+  status: z.enum(["PENDENTE", "PAGO", "PREPARANDO", "ENVIADO", "ENTREGUE", "CANCELADO"]).optional(),
   clienteId: z.coerce.number().int().positive().optional(),
 });

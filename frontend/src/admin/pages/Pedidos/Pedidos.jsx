@@ -7,7 +7,7 @@ import EmptyState from '../../../components/ui/EmptyState'
 import { getPedidos } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
 
-const STATUS_FILTERS = ['TODOS', 'PENDENTE', 'PAGO', 'ENVIADO', 'CANCELADO']
+const STATUS_FILTERS = ['TODOS', 'PENDENTE', 'PAGO', 'PREPARANDO', 'ENVIADO', 'ENTREGUE', 'CANCELADO']
 
 function formatDateBR(date) {
   if (!date) return '—'

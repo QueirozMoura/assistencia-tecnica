@@ -1,7 +1,9 @@
 const STATUS_STYLES = {
   PENDENTE: 'bg-amber-100 text-amber-700 border-amber-200',
   PAGO: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  PREPARANDO: 'bg-sky-100 text-sky-700 border-sky-200',
   ENVIADO: 'bg-blue-100 text-blue-700 border-blue-200',
+  ENTREGUE: 'bg-green-100 text-green-700 border-green-200',
   CANCELADO: 'bg-red-100 text-red-700 border-red-200',
 }
 

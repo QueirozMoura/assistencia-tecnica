@@ -78,6 +78,7 @@ export default function PedidoDetail() {
             >
               <option value="PENDENTE">PENDENTE</option>
               <option value="PAGO">PAGO</option>
+              <option value="PREPARANDO">PREPARANDO</option>
               <option value="ENVIADO">ENVIADO</option>
               <option value="ENTREGUE">ENTREGUE</option>
               <option value="CANCELADO">CANCELADO</option>

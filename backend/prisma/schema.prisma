@@ -160,6 +160,7 @@ enum StatusAgendamento {
 enum StatusPedido {
   PENDENTE
   PAGO
+  PREPARANDO
   ENVIADO
   ENTREGUE
   CANCELADO

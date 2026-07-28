@@ -194,6 +194,7 @@ export default function Dashboard() {
               <div className="space-y-2">
                 <DashboardStatusRow label="Pendente" value={stats?.pedidos?.porStatus?.PENDENTE ?? 0} />
                 <DashboardStatusRow label="Pago" value={stats?.pedidos?.porStatus?.PAGO ?? 0} />
+                <DashboardStatusRow label="Preparando" value={stats?.pedidos?.porStatus?.PREPARANDO ?? 0} />
                 <DashboardStatusRow label="Enviado" value={stats?.pedidos?.porStatus?.ENVIADO ?? 0} />
                 <DashboardStatusRow label="Entregue" value={stats?.pedidos?.porStatus?.ENTREGUE ?? 0} />
                 <DashboardStatusRow label="Cancelado" value={stats?.pedidos?.porStatus?.CANCELADO ?? 0} />

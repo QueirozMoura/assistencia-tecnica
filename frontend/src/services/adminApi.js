@@ -235,7 +235,7 @@ export async function adminGetPedidos(params = {}) {
 /**
  * Atualiza o status de um pedido.
  * @param {number} id
- * @param {string} status — 'PENDENTE' | 'PAGO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO'
+ * @param {string} status — 'PENDENTE' | 'PAGO' | 'PREPARANDO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO'
  */
 export async function adminUpdateStatusPedido(id, status) {
   return request(`/pedidos/${id}/status`, {
