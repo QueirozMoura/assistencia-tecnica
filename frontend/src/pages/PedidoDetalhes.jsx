@@ -25,25 +25,25 @@ function formatMoney(value) {
 }
 
 function getPedidoStatusStyle(status) {
-  const base = 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide'
+  const base = 'inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em]'
   const map = {
-    PENDENTE: `${base} border-[#fde68a] bg-[#fef9c3] text-[#854d0e]`,
-    PAGO: `${base} border-[#bbf7d0] bg-[#dcfce7] text-[#166534]`,
-    PREPARANDO: `${base} border-[#bfdbfe] bg-[#dbeafe] text-[#1d4ed8]`,
-    ENVIADO: `${base} border-[#ddd6fe] bg-[#ede9fe] text-[#6d28d9]`,
-    ENTREGUE: `${base} border-[#86efac] bg-[#dcfce7] text-[#14532d]`,
-    CANCELADO: `${base} border-[#fecaca] bg-[#fee2e2] text-[#991b1b]`,
+    PENDENTE: `${base} border-[#facc15] bg-[#fef9c3] text-[#854d0e]`,
+    PAGO: `${base} border-[#22c55e] bg-[#dcfce7] text-[#166534]`,
+    PREPARANDO: `${base} border-[#60a5fa] bg-[#dbeafe] text-[#1d4ed8]`,
+    ENVIADO: `${base} border-[#a78bfa] bg-[#ede9fe] text-[#6d28d9]`,
+    ENTREGUE: `${base} border-[#16a34a] bg-[#dcfce7] text-[#14532d]`,
+    CANCELADO: `${base} border-[#ef4444] bg-[#fee2e2] text-[#991b1b]`,
   }
   return map[normalizeStatus(status)] || `${base} border-[#e2e8f0] bg-[#f8fafc] text-[#475569]`
 }
 
 function getPaymentStatusStyle(status) {
-  const base = 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide'
+  const base = 'inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em]'
   const map = {
-    PAID: `${base} border-[#bbf7d0] bg-[#dcfce7] text-[#166534]`,
-    PENDING: `${base} border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]`,
-    REJECTED: `${base} border-[#fecaca] bg-[#fee2e2] text-[#991b1b]`,
-    REFUNDED: `${base} border-[#e5e7eb] bg-[#f3f4f6] text-[#4b5563]`,
+    PAID: `${base} border-[#22c55e] bg-[#dcfce7] text-[#166534]`,
+    PENDING: `${base} border-[#facc15] bg-[#fef9c3] text-[#854d0e]`,
+    REJECTED: `${base} border-[#ef4444] bg-[#fee2e2] text-[#991b1b]`,
+    REFUNDED: `${base} border-[#94a3b8] bg-[#f1f5f9] text-[#475569]`,
   }
   return map[normalizeStatus(status)] || `${base} border-[#e2e8f0] bg-[#f8fafc] text-[#475569]`
 }
@@ -110,6 +110,12 @@ function getTimeline(pedido) {
   }
 }
 
+function getProdutoImage(item) {
+  const direct = item?.imagem || item?.image || item?.foto || item?.thumbnail || item?.urlImagem || item?.imageUrl
+  const nested = item?.produto?.imagem || item?.produto?.image || item?.produto?.foto || item?.produto?.thumbnail
+  return direct || nested || ''
+}
+
 function normalizeItens(pedido) {
   const itens = pedido?.itens || pedido?.items || []
   if (!Array.isArray(itens)) return []
@@ -126,8 +132,34 @@ function normalizeItens(pedido) {
       quantidade,
       valorUnitario,
       subtotal,
+      imagem: getProdutoImage(item),
     }
   })
+}
+
+function DetailCard({ label, value, highlight = false, badge = false }) {
+  return (
+    <div
+      className={`rounded-2xl border p-4 sm:p-5 shadow-sm transition-all ${
+        highlight
+          ? 'border-[#bfdbfe] bg-gradient-to-br from-[#f0f7ff] to-[#e0efff]'
+          : 'border-[#e5e8ee] bg-white'
+      }`}
+    >
+      <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.08em] text-[#5b6472] mb-2">{label}</p>
+      {badge ? (
+        value
+      ) : (
+        <p
+          className={`font-semibold break-words ${
+            highlight ? 'text-2xl sm:text-[1.75rem] font-extrabold tracking-tight text-[#0070ea]' : 'text-base text-[#003366]'
+          }`}
+        >
+          {value}
+        </p>
+      )}
+    </div>
+  )
 }
 
 export default function PedidoDetalhes() {
@@ -180,92 +212,98 @@ export default function PedidoDetalhes() {
     }
   }, [id])
 
+  const statusPedido = normalizeStatus(pedido?.status)
+  const statusPagamento = normalizeStatus(pedido?.paymentStatus)
+  const formaPagamento = pedido?.paymentMethod || pedido?.formaPagamento || ''
+  const clienteNome =
+    pedido?.cliente?.nome ||
+    pedido?.clienteNome ||
+    pedido?.user?.name ||
+    pedido?.usuario?.nome ||
+    pedido?.nomeCliente ||
+    'Não informado'
+
   const timeline = useMemo(() => getTimeline(pedido), [pedido])
   const itens = useMemo(() => normalizeItens(pedido), [pedido])
 
-  const clienteNome =
-    pedido?.cliente?.nome ||
-    pedido?.nomeCliente ||
-    pedido?.cliente ||
-    '—'
-
-  const statusPedido = normalizeStatus(pedido?.status) || '—'
-  const statusPagamento = normalizeStatus(pedido?.paymentStatus) || 'UNKNOWN'
-  const formaPagamento =
-    pedido?.formaPagamento || pedido?.paymentMethod || pedido?.metodoPagamento
-
   return (
-    <div className="bg-[#f7f9ff] min-h-screen py-8 sm:py-10">
-      <div className="container-max max-w-5xl mx-auto px-4">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#003366]">Detalhes do pedido</h1>
-          <Link
-            to="/meus-pedidos"
-            className="inline-flex items-center justify-center rounded-xl border border-[#c3c6d1] px-4 h-10 text-sm font-semibold text-[#43474f] hover:bg-gray-50 transition-colors"
-          >
-            Voltar
-          </Link>
-        </div>
-
-        {loading && (
-          <div className="bg-white rounded-2xl border border-[#e5e8ee] p-8 text-center">
-            <div className="w-10 h-10 mx-auto rounded-full border-4 border-[#0070ea] border-t-transparent animate-spin" />
-            <p className="text-sm text-[#737780] mt-3">Carregando pedido...</p>
+    <div className="min-h-screen bg-[#f3f6fb] pb-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+        {loading ? (
+          <div className="rounded-2xl border border-[#e5e8ee] bg-white p-6 shadow-sm">
+            <p className="text-sm text-[#475569]">Carregando detalhes do pedido...</p>
           </div>
-        )}
-
-        {!loading && error && (
-          <div className="bg-white rounded-2xl border border-[#e5e8ee] p-8 text-center">
-            <h2 className="text-lg font-bold text-[#003366] mb-2">Não foi possível carregar o pedido</h2>
-            <p className="text-sm text-[#737780]">{error}</p>
+        ) : error ? (
+          <div className="rounded-2xl border border-[#fecaca] bg-[#fff1f2] p-6 shadow-sm">
+            <p className="text-sm font-semibold text-[#b42318]">{error}</p>
+            <div className="mt-4">
+              <Link
+                to="/meus-pedidos"
+                className="inline-flex items-center justify-center rounded-xl border border-[#fca5a5] bg-white px-4 py-2 text-sm font-semibold text-[#b42318] hover:bg-[#fff5f5]"
+              >
+                Voltar para meus pedidos
+              </Link>
+            </div>
           </div>
-        )}
-
-        {!loading && !error && pedido && (
-          <div className="space-y-5">
-            <section className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Número do pedido</p>
-                  <p className="text-lg font-bold text-[#003366]">#{pedido.id}</p>
+        ) : !pedido ? (
+          <div className="rounded-2xl border border-[#e5e8ee] bg-white p-6 shadow-sm">
+            <p className="text-sm text-[#475569]">Pedido não encontrado.</p>
+            <div className="mt-4">
+              <Link
+                to="/meus-pedidos"
+                className="inline-flex items-center justify-center rounded-xl border border-[#dbe4f0] px-4 py-2 text-sm font-semibold text-[#003366] hover:bg-[#f8fafc]"
+              >
+                Voltar para meus pedidos
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <section className="rounded-2xl border border-[#dbe4f0] bg-gradient-to-r from-white via-[#f8fbff] to-[#eef6ff] p-5 sm:p-6 shadow-sm">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#5b6472]">Área do cliente</p>
+                  <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#003366]">Detalhes do pedido</h1>
+                  <p className="mt-2 text-sm sm:text-base text-[#334155]">
+                    Acompanhe o status e os itens da sua compra em tempo real.
+                  </p>
+                  <div className="mt-4 inline-flex items-center rounded-xl border border-[#bfdbfe] bg-white px-3 py-2 text-sm font-semibold text-[#1d4ed8] shadow-sm">
+                    Pedido #{pedido.id}
+                  </div>
                 </div>
 
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Data da compra</p>
-                  <p className="text-base font-semibold text-[#003366]">{formatDate(pedido.createdAt)}</p>
-                </div>
-
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Nome do cliente</p>
-                  <p className="text-base font-semibold text-[#003366] break-words">{clienteNome}</p>
-                </div>
-
-                <div className="rounded-xl border border-[#d6e7ff] bg-[#f2f8ff] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Valor total</p>
-                  <p className="text-2xl font-extrabold tracking-tight text-[#0070ea]">{formatMoney(pedido.valorTotal)}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-2">Status do pedido</p>
-                  <span className={getPedidoStatusStyle(statusPedido)}>{statusPedido}</span>
-                </div>
-
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-2">Status do pagamento</p>
-                  <span className={getPaymentStatusStyle(statusPagamento)}>{getPaymentStatusLabel(statusPagamento)}</span>
-                </div>
-
-                <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Forma de pagamento</p>
-                  <p className="text-base font-semibold text-[#003366]">{getPaymentMethodLabel(formaPagamento)}</p>
+                <div className="md:self-start">
+                  <Link
+                    to="/meus-pedidos"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#c7d9ee] bg-white px-4 py-2 text-sm font-semibold text-[#003366] shadow-sm transition-colors hover:bg-[#f5f9ff]"
+                  >
+                    Voltar
+                  </Link>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sm:p-6">
-              <h2 className="text-lg font-bold text-[#003366] mb-4">Acompanhamento</h2>
+            <section className="rounded-2xl border border-[#e5e8ee] bg-white p-5 sm:p-6 shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <DetailCard label="Número do pedido" value={`#${pedido.id}`} />
+                <DetailCard label="Data da compra" value={formatDate(pedido.createdAt)} />
+                <DetailCard label="Nome do cliente" value={clienteNome} />
+                <DetailCard label="Valor total" value={formatMoney(pedido.valorTotal)} highlight />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+                <DetailCard label="Status do pedido" value={<span className={getPedidoStatusStyle(statusPedido)}>{statusPedido}</span>} badge />
+                <DetailCard
+                  label="Status do pagamento"
+                  value={<span className={getPaymentStatusStyle(statusPagamento)}>{getPaymentStatusLabel(statusPagamento)}</span>}
+                  badge
+                />
+                <DetailCard label="Forma de pagamento" value={getPaymentMethodLabel(formaPagamento)} />
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-[#e5e8ee] bg-white p-5 sm:p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-[#003366] mb-5">Acompanhamento</h2>
 
               {timeline.cancelado ? (
                 <div className="rounded-xl border border-[#fecaca] bg-[#fff1f2] p-4">
@@ -279,35 +317,29 @@ export default function PedidoDetalhes() {
                     const isCurrent = index === timeline.etapaAtual - 1
 
                     return (
-                      <li key={etapa} className="flex gap-3">
+                      <li key={etapa} className="relative flex gap-4 rounded-xl border border-[#eef2f7] bg-[#fbfdff] px-3 py-3 sm:px-4">
                         <div className="flex flex-col items-center">
                           <span
-                            className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold ${
+                            className={`z-10 h-8 w-8 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-colors ${
                               isConcluded
                                 ? 'border-[#16a34a] bg-[#dcfce7] text-[#166534]'
                                 : isCurrent
-                                  ? 'border-[#2563eb] bg-[#dbeafe] text-[#1d4ed8]'
+                                  ? 'border-[#2563eb] bg-[#dbeafe] text-[#1d4ed8] shadow-[0_0_0_4px_rgba(37,99,235,0.12)]'
                                   : 'border-[#cbd5e1] bg-white text-[#64748b]'
                             }`}
                           >
                             {index + 1}
                           </span>
                           {index < timeline.etapas.length - 1 && (
-                            <span
-                              className={`w-[2px] h-7 mt-1 ${
-                                index < timeline.concluidoAte ? 'bg-[#16a34a]' : 'bg-[#e2e8f0]'
-                              }`}
-                            />
+                            <span className={`mt-1 h-10 w-[3px] rounded-full ${index < timeline.concluidoAte ? 'bg-[#22c55e]' : 'bg-[#dbe4f0]'}`} />
                           )}
                         </div>
 
                         <div className="pt-0.5">
-                          <p className={`text-sm font-semibold ${isCurrent ? 'text-[#1d4ed8]' : 'text-[#003366]'}`}>
-                            {etapa}
+                          <p className={`text-sm sm:text-base font-semibold ${isCurrent ? 'text-[#1d4ed8]' : 'text-[#0f172a]'}`}>{etapa}</p>
+                          <p className="mt-1 text-xs text-[#64748b]">
+                            {isCurrent ? 'Etapa atual do seu pedido' : isConcluded ? 'Etapa concluída' : 'Aguardando avanço'}
                           </p>
-                          {isCurrent && (
-                            <p className="text-xs text-[#5b6472] mt-0.5">Etapa atual</p>
-                          )}
                         </div>
                       </li>
                     )
@@ -316,34 +348,80 @@ export default function PedidoDetalhes() {
               )}
             </section>
 
-            <section className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sm:p-6">
+            <section className="rounded-2xl border border-[#e5e8ee] bg-white p-5 sm:p-6 shadow-sm">
               <h2 className="text-lg font-bold text-[#003366] mb-4">Produtos do pedido</h2>
 
               {itens.length === 0 ? (
                 <p className="text-sm text-[#737780]">Nenhum item encontrado para este pedido.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[560px] border-collapse">
-                    <thead>
-                      <tr className="text-left text-xs font-semibold uppercase tracking-wide text-[#5b6472] border-b border-[#e5e8ee]">
-                        <th className="py-3 pr-3">Produto</th>
-                        <th className="py-3 pr-3">Quantidade</th>
-                        <th className="py-3 pr-3">Valor unitário</th>
-                        <th className="py-3">Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itens.map((item) => (
-                        <tr key={item.id} className="border-b border-[#f1f5f9] last:border-b-0">
-                          <td className="py-3 pr-3 text-sm font-semibold text-[#0f172a]">{item.nome}</td>
-                          <td className="py-3 pr-3 text-sm text-[#334155]">{item.quantidade}</td>
-                          <td className="py-3 pr-3 text-sm text-[#334155]">{formatMoney(item.valorUnitario)}</td>
-                          <td className="py-3 text-sm font-semibold text-[#003366]">{formatMoney(item.subtotal)}</td>
+                <>
+                  <div className="hidden md:block overflow-x-auto rounded-xl border border-[#e8edf4]">
+                    <table className="w-full min-w-[620px] border-collapse bg-white">
+                      <thead>
+                        <tr className="text-left text-xs font-semibold uppercase tracking-wide text-[#5b6472] border-b border-[#e5e8ee] bg-[#f8fbff]">
+                          <th className="py-3 px-4">Produto</th>
+                          <th className="py-3 px-4">Quantidade</th>
+                          <th className="py-3 px-4">Valor unitário</th>
+                          <th className="py-3 px-4">Subtotal</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {itens.map((item) => (
+                          <tr key={item.id} className="border-b border-[#f1f5f9] last:border-b-0 hover:bg-[#f9fbff] transition-colors">
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-[#e2e8f0] bg-[#f8fafc]">
+                                  {item.imagem ? (
+                                    <img src={item.imagem} alt={item.nome} className="h-full w-full object-cover" />
+                                  ) : (
+                                    <div className="h-full w-full flex items-center justify-center text-[10px] font-semibold uppercase text-[#94a3b8]">Sem imagem</div>
+                                  )}
+                                </div>
+                                <p className="text-sm font-semibold text-[#0f172a]">{item.nome}</p>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-sm text-[#334155]">{item.quantidade}</td>
+                            <td className="py-3 px-4 text-sm text-[#334155]">{formatMoney(item.valorUnitario)}</td>
+                            <td className="py-3 px-4 text-sm font-semibold text-[#003366]">{formatMoney(item.subtotal)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="md:hidden space-y-3">
+                    {itens.map((item) => (
+                      <article key={item.id} className="rounded-xl border border-[#e8edf4] bg-[#fbfdff] p-4 shadow-sm">
+                        <div className="flex gap-3">
+                          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[#e2e8f0] bg-white">
+                            {item.imagem ? (
+                              <img src={item.imagem} alt={item.nome} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-[10px] font-semibold uppercase text-[#94a3b8]">Sem imagem</div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-[#0f172a] break-words">{item.nome}</p>
+                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                              <div className="rounded-lg bg-white border border-[#e2e8f0] p-2">
+                                <p className="text-[#64748b]">Quantidade</p>
+                                <p className="font-semibold text-[#0f172a]">{item.quantidade}</p>
+                              </div>
+                              <div className="rounded-lg bg-white border border-[#e2e8f0] p-2">
+                                <p className="text-[#64748b]">Valor unitário</p>
+                                <p className="font-semibold text-[#0f172a]">{formatMoney(item.valorUnitario)}</p>
+                              </div>
+                              <div className="col-span-2 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] p-2">
+                                <p className="text-[#475569]">Subtotal</p>
+                                <p className="font-bold text-[#1d4ed8]">{formatMoney(item.subtotal)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </>
               )}
             </section>
           </div>
