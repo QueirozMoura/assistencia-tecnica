@@ -80,9 +80,9 @@ model Agendamento {
   id              Int               @id @default(autoincrement())
   clienteId       Int?
   nomeContato     String
-  telefoneContato String
+  telefoneContato String?
   email           String?
-  whatsapp        String?
+  whatsapp        String
   endereco        String?
   cep             String?
   cidade          String?

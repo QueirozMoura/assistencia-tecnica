@@ -81,8 +81,7 @@ export default function Scheduling() {
   const validate = () => {
     const e = {};
     if (!form.nomeContato.trim()) e.nomeContato = "Nome obrigatório";
-    if (!form.telefoneContato.trim())
-      e.telefoneContato = "Telefone obrigatório";
+    if (!form.whatsapp.trim()) e.whatsapp = "WhatsApp obrigatório";
     if (!form.email.trim()) e.email = "E-mail obrigatório";
     if (!form.endereco.trim()) e.endereco = "Endereço obrigatório";
     if (!form.cidade.trim()) e.cidade = "Cidade obrigatória";
@@ -223,7 +222,7 @@ export default function Scheduling() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#43474f] mb-1.5">
-                      Telefone *
+                      Telefone
                     </label>
                     <input
                       name="telefoneContato"
@@ -240,7 +239,7 @@ export default function Scheduling() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#43474f] mb-1.5">
-                      WhatsApp
+                      WhatsApp *
                     </label>
                     <input
                       name="whatsapp"
@@ -249,6 +248,11 @@ export default function Scheduling() {
                       placeholder="(11) 96560-2135"
                       className={inputClass("whatsapp")}
                     />
+                    {errors.whatsapp && (
+                      <p className="text-xs text-[#ba1a1a] mt-1">
+                        {errors.whatsapp}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#43474f] mb-1.5">

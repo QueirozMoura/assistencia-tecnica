@@ -6,22 +6,23 @@ export const agendamentoSchema = z.object({
     .min(2, "Nome deve ter no mínimo 2 caracteres.")
     .trim(),
   telefoneContato: z
-    .string({ required_error: "Telefone é obrigatório." })
-    .regex(
-      /^(\+55\s?)?(\(?\d{2}\)?\s?)(\d{4,5}[-\s]?\d{4})$/,
+    .string()
+    .trim()
+    .optional()
+    .nullable()
+    .refine(
+      (value) => !value || /^(\+55\s?)?(\(?\d{2}\)?\s?)(\d{4,5}[-\s]?\d{4})$/.test(value),
       "Telefone inválido. Use o formato (11) 99999-9999."
-    )
-    .trim(),
+    ),
   email: z.string().email("E-mail inválido.").trim().optional().nullable(),
   whatsapp: z
-    .string()
+    .string({ required_error: "WhatsApp é obrigatório." })
+    .trim()
+    .min(1, "WhatsApp é obrigatório.")
     .regex(
       /^(\+55\s?)?(\(?\d{2}\)?\s?)(\d{4,5}[-\s]?\d{4})$/,
       "WhatsApp inválido. Use o formato (11) 99999-9999."
-    )
-    .trim()
-    .optional()
-    .nullable(),
+    ),
   endereco: z.string().trim().optional().nullable(),
   cep: z
     .string()
