@@ -299,9 +299,36 @@ export async function listarMeusPedidos(clienteId) {
     select: {
       id: true,
       createdAt: true,
-      status: true,
       valorTotal: true,
+      status: true,
       paymentStatus: true,
+      paymentMethod: true,
+      paidAt: true,
+      cliente: {
+        select: {
+          nome: true,
+          email: true,
+          telefone: true,
+        },
+      },
+      itens: {
+        select: {
+          id: true,
+          quantidade: true,
+          precoUnitario: true,
+          produto: {
+            select: {
+              nome: true,
+              imagemPrincipal: true,
+              categoria: {
+                select: {
+                  nome: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 }
