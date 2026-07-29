@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Package, ShoppingBag } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function PagamentoSucesso() {
@@ -424,19 +425,21 @@ export default function PagamentoSucesso() {
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-3 px-1 sm:px-0">
+        <div className="flex flex-col items-center sm:items-stretch sm:flex-row gap-4 sm:gap-3 px-1 sm:px-0">
           <button
             type="button"
             onClick={handleMeusPedidosClick}
             disabled={loadingPedidos}
-            className="w-full min-w-0 sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            className="w-[88%] max-w-sm min-w-0 sm:w-auto flex-1 h-12 sm:h-11 px-4 rounded-2xl sm:rounded-xl border border-[#c3c6d1] bg-white text-[#43474f] font-semibold shadow-[0_8px_20px_rgba(15,23,42,0.08)] sm:shadow-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
-            <span className="inline-flex items-center justify-center gap-2">
-              {loadingPedidos && (
+            <span className="inline-flex items-center justify-center gap-2.5">
+              {loadingPedidos ? (
                 <span
                   className="w-3.5 h-3.5 rounded-full border-2 border-[#9ca3af] border-t-transparent animate-spin"
                   aria-hidden="true"
                 />
+              ) : (
+                <Package size={16} strokeWidth={2.2} aria-hidden="true" />
               )}
               {loadingPedidos ? "Abrindo pedidos..." : "Ver meus pedidos"}
             </span>
@@ -445,14 +448,16 @@ export default function PagamentoSucesso() {
             type="button"
             onClick={handleCatalogoClick}
             disabled={loadingCatalogo}
-            className="w-full min-w-0 sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            className="w-[88%] max-w-sm min-w-0 sm:w-auto flex-1 h-12 sm:h-11 px-4 rounded-2xl sm:rounded-xl bg-[#0070ea] text-white font-semibold shadow-[0_10px_24px_rgba(0,112,234,0.32)] sm:shadow-[0_8px_18px_rgba(0,89,187,0.25)] hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
-            <span className="inline-flex items-center justify-center gap-2">
-              {loadingCatalogo && (
+            <span className="inline-flex items-center justify-center gap-2.5">
+              {loadingCatalogo ? (
                 <span
                   className="w-3.5 h-3.5 rounded-full border-2 border-white/80 border-t-transparent animate-spin"
                   aria-hidden="true"
                 />
+              ) : (
+                <ShoppingBag size={16} strokeWidth={2.2} aria-hidden="true" />
               )}
               {loadingCatalogo
                 ? "Abrindo catálogo..."
