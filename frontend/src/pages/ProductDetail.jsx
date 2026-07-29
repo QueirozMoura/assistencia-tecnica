@@ -286,7 +286,7 @@ export default function ProductDetail() {
                 </button>
               </div>
               <button
-                onClick={() => inStock && cart.addItem && cart.addItem({ ...product, qty })}
+                onClick={() => inStock && cart.addItem && cart.addItem(product, qty)}
                 disabled={!inStock}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
                   inStock

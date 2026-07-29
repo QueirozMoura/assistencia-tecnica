@@ -23,12 +23,20 @@ export function useCart() {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
   }, [items])
 
-  const addItem = useCallback((product) => {
+  const normalizeQuantity = (quantity) => {
+    const parsed = Number(quantity)
+    if (!Number.isFinite(parsed) || parsed <= 0) return 1
+    return parsed
+  }
+
+  const addItem = useCallback((product, quantity = 1) => {
+    const safeQuantity = normalizeQuantity(quantity)
+
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id)
       if (existing) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === product.id ? { ...i, quantity: Number(i.quantity || 0) + safeQuantity } : i
         )
       }
 
@@ -37,7 +45,7 @@ export function useCart() {
         {
           ...product,
           price: getItemPrice(product),
-          quantity: 1,
+          quantity: safeQuantity,
         },
       ]
     })
