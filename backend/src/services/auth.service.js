@@ -49,9 +49,10 @@ export async function login(email, senha) {
   }
 
   const token = generateToken(usuario);
+  const { token: refreshToken, expiresAt: refreshTokenExpiresAt } = await createRefreshToken(usuario.id);
   const { senha: _, ...usuarioSemSenha } = usuario;
 
-  return { token, usuario: usuarioSemSenha };
+  return { token, usuario: usuarioSemSenha, refreshToken, refreshTokenExpiresAt };
 }
 
 export async function register(dados) {
