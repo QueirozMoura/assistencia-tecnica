@@ -2,13 +2,17 @@ import multer from "multer";
 import path from "path";
 import { randomUUID } from "crypto";
 import { fileURLToPath } from "url";
+import { promises as fs } from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadTempDir = path.join(__dirname, "../../uploads/produtos");
 
-// ── Destino: backend/uploads/produtos/ ───────────────────────────────────────
+// ── Destino temporário: backend/uploads/produtos/ ────────────────────────────
 const storage = multer.diskStorage({
   destination(_req, _file, cb) {
-    cb(null, path.join(__dirname, "../../uploads/produtos"));
+    fs.mkdir(uploadTempDir, { recursive: true })
+      .then(() => cb(null, uploadTempDir))
+      .catch((error) => cb(error));
   },
   filename(_req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();

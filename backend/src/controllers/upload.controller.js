@@ -1,14 +1,16 @@
+import { unlink } from "fs/promises";
+import { uploadImagemProdutoCloudinary } from "../services/cloudinary-upload.service.js";
+
 /**
  * POST /api/upload/produto
  *
- * Recebe um arquivo via multipart/form-data (campo "imagem").
- * Salva em backend/uploads/produtos/<uuid>.<ext>
- * Retorna a URL pública para uso no campo imagemPrincipal do produto.
- *
- * Estrutura preparada para futura migração para cloud (S3/Cloudinary):
- * basta substituir a lógica deste controller — o restante do sistema não muda.
+ * Recebe um arquivo via multipart/form-data (campo "imagem") usando Multer.
+ * Envia a imagem para o Cloudinary e retorna a URL pública para uso em imagemPrincipal.
+ * Remove o arquivo temporário local após o processamento (sucesso/erro).
  */
 export async function uploadImagemProduto(req, res, next) {
+  const arquivoTemporario = req.file?.path;
+
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -17,26 +19,12 @@ export async function uploadImagemProduto(req, res, next) {
       });
     }
 
-    const imagePath = `/uploads/produtos/${encodeURIComponent(req.file.filename)}`;
-
-    // Em produção, prioriza URL pública explícita do backend (evita host interno/proxy)
-    const publicApiUrl = process.env.PUBLIC_API_URL?.trim();
-    let baseUrl = "";
-
-    if (publicApiUrl) {
-      baseUrl = publicApiUrl.replace(/\/+$/, "");
-    } else {
-      const protocol = req.get("x-forwarded-proto") || req.protocol;
-      const host = req.get("x-forwarded-host") || req.get("host");
-      baseUrl = `${protocol}://${host}`;
-    }
-
-    const url = `${baseUrl}${imagePath}`;
+    const upload = await uploadImagemProdutoCloudinary(req.file.path);
 
     return res.status(201).json({
       success: true,
       data: {
-        url,
+        url: upload.url,
         filename: req.file.filename,
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
@@ -45,5 +33,9 @@ export async function uploadImagemProduto(req, res, next) {
     });
   } catch (error) {
     next(error);
+  } finally {
+    if (arquivoTemporario) {
+      await unlink(arquivoTemporario).catch(() => null);
+    }
   }
 }
