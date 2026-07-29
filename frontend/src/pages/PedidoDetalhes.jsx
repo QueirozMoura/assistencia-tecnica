@@ -111,8 +111,10 @@ function getTimeline(pedido) {
 }
 
 function getProdutoImage(item) {
-  const direct = item?.imagem || item?.image || item?.foto || item?.thumbnail || item?.urlImagem || item?.imageUrl
-  const nested = item?.produto?.imagem || item?.produto?.image || item?.produto?.foto || item?.produto?.thumbnail
+  const direct =
+    item?.imagemPrincipal || item?.imagem || item?.image || item?.foto || item?.thumbnail || item?.urlImagem || item?.imageUrl
+  const nested =
+    item?.produto?.imagemPrincipal || item?.produto?.imagem || item?.produto?.image || item?.produto?.foto || item?.produto?.thumbnail
   return direct || nested || ''
 }
 
