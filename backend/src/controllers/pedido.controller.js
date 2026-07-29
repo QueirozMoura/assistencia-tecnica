@@ -73,16 +73,16 @@ export async function deletarPedido(req, res, next) {
 
 export async function buscarPedidoSucesso(req, res, next) {
   try {
-    const id = parseInt(req.params.id);
+    const token = req.query.token;
 
-    if (isNaN(id)) {
+    if (!token || typeof token !== "string") {
       return res.status(400).json({
         success: false,
-        message: "ID inválido.",
+        message: "Token de acesso inválido.",
       });
     }
 
-    const pedido = await pedidoService.buscarPedidoPorId(id);
+    const pedido = await pedidoService.buscarPedidoSucessoPorToken(token);
 
     return res.status(200).json({
       success: true,

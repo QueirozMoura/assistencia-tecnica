@@ -10,6 +10,7 @@ import router from "./routes/index.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
 import logger from "./config/logger.js";
+import { sanitizeUrl } from "./utils/logSanitizer.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const backendRootDir = path.resolve(__dirname, "..");
@@ -113,7 +114,8 @@ app.use(
 // REQUEST LOGGER
 // ─────────────────────────────────────────────
 app.use((req, _res, next) => {
-  logger.info(`${req.method} ${req.originalUrl} — IP: ${req.ip}`);
+  const safeUrl = sanitizeUrl(req.originalUrl);
+  logger.info(`${req.method} ${safeUrl} — IP: ${req.ip}`);
   next();
 });
 

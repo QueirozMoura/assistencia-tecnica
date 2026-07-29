@@ -4,14 +4,15 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { adminMiddleware } from "../middlewares/admin.middleware.js";
 import { validate } from "../middlewares/validation.middleware.js";
 import { pedidoSchema, pedidoStatusSchema } from "../validators/pedido.validator.js";
+import { pedidoSucessoSensitiveLimiter } from "../middlewares/sensitiveRateLimit.middleware.js";
 
 const router = Router();
 
 // GET /api/pedidos — ADMIN
 router.get("/", authMiddleware, adminMiddleware, pedidoController.listarPedidos);
 
-// GET /api/pedidos/sucesso/:id — público (pós pagamento)
-router.get("/sucesso/:id", pedidoController.buscarPedidoSucesso);
+// GET /api/pedidos/sucesso?token=... — público (pós pagamento seguro)
+router.get("/sucesso", pedidoSucessoSensitiveLimiter, pedidoController.buscarPedidoSucesso);
 
 // GET /api/pedidos/:id — ADMIN
 router.get("/:id", authMiddleware, adminMiddleware, pedidoController.buscarPedidoPorId);

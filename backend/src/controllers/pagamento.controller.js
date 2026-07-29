@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import * as pedidoService from "../services/pedido.service.js";
 import { createMercadoPagoPreference, processMercadoPagoWebhook } from "../services/pagamento.service.js";
 
 export async function criarPreferencia(req, res, next) {
@@ -8,21 +9,13 @@ export async function criarPreferencia(req, res, next) {
       return res.status(400).json({ success: false, message: "ID de pedido inválido." });
     }
 
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: pedidoId },
-      include: {
-        cliente: { select: { id: true, nome: true, email: true } },
-        itens: {
-          include: {
-            produto: { select: { id: true, nome: true } },
-          },
-        },
-      },
-    });
+    const checkoutToken = req.body?.checkoutToken || req.query?.token;
 
-    if (!pedido) {
-      return res.status(404).json({ success: false, message: "Pedido não encontrado." });
-    }
+    const { pedido } = await pedidoService.validarAcessoPagamentoPedido({
+      pedidoId,
+      clienteId: req.cliente?.id ?? null,
+      checkoutToken: typeof checkoutToken === "string" ? checkoutToken : null,
+    });
 
     const itens = pedido.itens.map((item) => ({
       produtoId: item.produtoId,

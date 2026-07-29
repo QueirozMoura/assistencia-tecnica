@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
+import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
 
 export async function listarPedidos(query) {
   const { page = 1, limit = 20, status, clienteId } = query;
@@ -163,6 +164,41 @@ export async function criarPedido(dados) {
   return pedido;
 }
 
+function maskAddress(pedido) {
+  if (!pedido) return null;
+
+  const cep = pedido.cep ? `${String(pedido.cep).slice(0, 5)}***` : null;
+  const rua = pedido.rua ? `${String(pedido.rua).slice(0, 6)}***` : null;
+  const numero = pedido.numero ? "***" : null;
+
+  return {
+    cep,
+    rua,
+    numero,
+    bairro: pedido.bairro || null,
+    cidade: pedido.cidade || null,
+    estado: pedido.estado || null,
+  };
+}
+
+function buildPedidoPublicSafeDto(pedido) {
+  return {
+    numeroPedido: pedido.id,
+    status: pedido.status,
+    valorTotal: Number(pedido.valorTotal),
+    dataPedido: pedido.createdAt,
+    itens: (pedido.itens || []).map((item) => ({
+      id: item.id,
+      produtoId: item.produtoId,
+      nome: item.produto?.nome || `Produto #${item.produtoId}`,
+      quantidade: item.quantidade,
+      precoUnitario: Number(item.precoUnitario),
+      subtotal: Number(item.precoUnitario) * item.quantidade,
+    })),
+    endereco: maskAddress(pedido),
+  };
+}
+
 export async function criarPedidoComPagamento(dados) {
   const {
     clienteId,
@@ -281,15 +317,64 @@ export async function criarPedidoComPagamento(dados) {
       },
     });
 
+    const checkoutAccess = await createCheckoutAccessToken({
+      pedidoId: pedidoAtualizado.id,
+      tx,
+    });
+
     return {
       pedido: pedidoAtualizado,
       preference_id: preferencia.preferenceId,
       init_point: preferencia.initPoint,
       sandbox_init_point: preferencia.sandboxInitPoint,
+      checkoutAccessToken: checkoutAccess.token,
+      checkoutAccessTokenExpiresAt: checkoutAccess.expiresAt,
     };
   });
 
   return resultado;
+}
+
+export async function buscarPedidoSucessoPorToken(token) {
+  const validated = await validateCheckoutAccessToken({ token, consume: true, tx: prisma });
+
+  if (!validated.valid || !validated.pedido) {
+    throw Object.assign(new Error("Não foi possível consultar o pedido."), { statusCode: 404 });
+  }
+
+  return buildPedidoPublicSafeDto(validated.pedido);
+}
+
+export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null, checkoutToken = null }) {
+  const pedido = await prisma.pedido.findUnique({
+    where: { id: pedidoId },
+    include: {
+      cliente: { select: { id: true, nome: true, email: true } },
+      itens: {
+        include: {
+          produto: { select: { id: true, nome: true } },
+        },
+      },
+    },
+  });
+
+  if (!pedido) {
+    throw Object.assign(new Error("Não foi possível iniciar o pagamento."), { statusCode: 404 });
+  }
+
+  if (clienteId && pedido.clienteId === clienteId) {
+    return { pedido, authorizedBy: "OWNER" };
+  }
+
+  if (checkoutToken) {
+    const validated = await validateCheckoutAccessToken({ token: checkoutToken, pedidoId, consume: false, tx: prisma });
+
+    if (validated.valid) {
+      return { pedido, authorizedBy: "TOKEN" };
+    }
+  }
+
+  throw Object.assign(new Error("Não autorizado para este pedido."), { statusCode: 403 });
 }
 
 export async function listarMeusPedidos(clienteId) {

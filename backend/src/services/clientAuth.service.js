@@ -29,9 +29,10 @@ function generateClientToken(cliente) {
 function safeCliente(c) {
   const {
     senha,
-    resetToken,
+    resetTokenHash,
     resetTokenExpiry,
-    verifyToken,
+    verifyTokenHash,
+    verifyTokenExpiry,
     googleId,
     ...safe
   } = c;
@@ -40,6 +41,10 @@ function safeCliente(c) {
 
 function randomToken() {
   return crypto.randomBytes(32).toString("hex");
+}
+
+function hashToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 // ── Register ──────────────────────────────────────────────────────────────────
@@ -57,6 +62,8 @@ export async function register({ nome, email, telefone, senha }) {
 
   const senhaHash = await bcrypt.hash(senha, SALT_ROUNDS);
   const verifyToken = randomToken();
+  const verifyTokenHash = hashToken(verifyToken);
+  const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
 
   const cliente = await prisma.cliente.create({
     data: {
@@ -64,7 +71,8 @@ export async function register({ nome, email, telefone, senha }) {
       email: emailNormalizado,
       telefone,
       senha: senhaHash,
-      verifyToken,
+      verifyTokenHash,
+      verifyTokenExpiry,
       emailVerificado: false,
     },
   });
@@ -182,19 +190,28 @@ export async function googleAuth({ idToken, code }) {
 // ── Verify Email ──────────────────────────────────────────────────────────────
 
 export async function verifyEmail(token) {
+  const verifyTokenHash = hashToken(token);
+
   const cliente = await prisma.cliente.findFirst({
-    where: { verifyToken: token },
+    where: {
+      verifyTokenHash,
+      verifyTokenExpiry: { gt: new Date() },
+    },
   });
 
   if (!cliente) {
-    throw Object.assign(new Error("Token de verificação inválido."), {
+    throw Object.assign(new Error("Token de verificação inválido ou expirado."), {
       statusCode: 400,
     });
   }
 
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data: { emailVerificado: true, verifyToken: null },
+    data: {
+      emailVerificado: true,
+      verifyTokenHash: null,
+      verifyTokenExpiry: null,
+    },
   });
 
   return { message: "E-mail verificado com sucesso." };
@@ -208,15 +225,6 @@ export async function forgotPassword(email) {
   const cliente = await prisma.cliente.findUnique({
     where: { email: emailNormalizado },
   });
-  console.log("CLIENTE COMPLETO:", {
-    id: cliente?.id,
-    nome: cliente?.nome,
-    email: cliente?.email,
-    senhaExiste: !!cliente?.senha,
-    googleId: cliente?.googleId,
-    emailVerificado: cliente?.emailVerificado
-  });
-  console.log("CLIENTE BUSCADO");
 
   // Resposta genérica — não revela se o email existe
   if (!cliente || !cliente.senha) {
@@ -226,22 +234,16 @@ export async function forgotPassword(email) {
     };
   }
 
-  console.log("ANTES DO RESET TOKEN");
   const resetToken = randomToken();
-  console.log("RESET TOKEN GERADO");
-
+  const resetTokenHash = hashToken(resetToken);
   const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-  console.log("ANTES DO UPDATE PRISMA");
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data: { resetToken, resetTokenExpiry: resetExpiry },
+    data: { resetTokenHash, resetTokenExpiry: resetExpiry },
   });
-  console.log("UPDATE PRISMA OK");
 
-  console.log("ANTES DO RESEND");
   await sendPasswordResetEmail(emailNormalizado, cliente.nome, resetToken);
-  console.log("RESEND FINALIZADO");
 
   return {
     message:
@@ -252,9 +254,11 @@ export async function forgotPassword(email) {
 // ── Reset Password ────────────────────────────────────────────────────────────
 
 export async function resetPassword(token, novaSenha) {
+  const resetTokenHash = hashToken(token);
+
   const cliente = await prisma.cliente.findFirst({
     where: {
-      resetToken: token,
+      resetTokenHash,
       resetTokenExpiry: { gt: new Date() },
     },
   });
@@ -270,7 +274,7 @@ export async function resetPassword(token, novaSenha) {
 
   await prisma.cliente.update({
     where: { id: cliente.id },
-    data: { senha: senhaHash, resetToken: null, resetTokenExpiry: null },
+    data: { senha: senhaHash, resetTokenHash: null, resetTokenExpiry: null },
   });
 
   return { message: "Senha redefinida com sucesso." };

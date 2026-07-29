@@ -3,6 +3,12 @@ import * as ctrl from "../controllers/clientAuth.controller.js";
 import { clientAuthMiddleware } from "../middlewares/clientAuth.middleware.js";
 import { validate } from "../middlewares/validation.middleware.js";
 import {
+  clientLoginLimiter,
+  forgotPasswordLimiter,
+  resetPasswordLimiter,
+  verifyEmailLimiter,
+} from "../middlewares/authRateLimit.middleware.js";
+import {
   clientRegisterSchema,
   clientLoginSchema,
   forgotPasswordSchema,
@@ -17,19 +23,19 @@ const router = Router();
 router.post("/register", validate(clientRegisterSchema), ctrl.register);
 
 // POST /api/client-auth/login
-router.post("/login", validate(clientLoginSchema), ctrl.login);
+router.post("/login", clientLoginLimiter, validate(clientLoginSchema), ctrl.login);
 
 // POST /api/client-auth/google
 router.post("/google", validate(googleAuthSchema), ctrl.googleAuth);
 
 // GET  /api/client-auth/verify-email?token=...
-router.get("/verify-email", ctrl.verifyEmail);
+router.get("/verify-email", verifyEmailLimiter, ctrl.verifyEmail);
 
 // POST /api/client-auth/forgot-password
-router.post("/forgot-password", validate(forgotPasswordSchema), ctrl.forgotPassword);
+router.post("/forgot-password", forgotPasswordLimiter, validate(forgotPasswordSchema), ctrl.forgotPassword);
 
 // POST /api/client-auth/reset-password
-router.post("/reset-password", validate(resetPasswordSchema), ctrl.resetPassword);
+router.post("/reset-password", resetPasswordLimiter, validate(resetPasswordSchema), ctrl.resetPassword);
 
 // GET  /api/client-auth/me  (protegido)
 router.get("/me", clientAuthMiddleware, ctrl.getMe);

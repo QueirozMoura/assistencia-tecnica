@@ -354,13 +354,19 @@ export default function Checkout() {
     try {
       const response = await clientCreatePedidoComPagamento(payload)
 
-      const hasRequiredFields = Boolean(response?.pedido && response?.preference_id && response?.init_point)
+      const hasRequiredFields = Boolean(
+        response?.pedido &&
+          response?.preference_id &&
+          response?.init_point &&
+          response?.checkoutAccessToken
+      )
 
       if (!hasRequiredFields) {
         setErrorMessage('Não foi possível iniciar o pagamento agora. Tente novamente em instantes.')
         return
       }
 
+      sessionStorage.setItem('checkout_access_token', response.checkoutAccessToken)
       window.location.href = response.init_point
     } catch (error) {
       setErrorMessage(error?.message || 'Erro ao iniciar pagamento. Tente novamente.')

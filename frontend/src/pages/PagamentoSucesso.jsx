@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 export default function PagamentoSucesso() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("pedidoId");
+  const checkoutToken = searchParams.get("token") || sessionStorage.getItem("checkout_access_token");
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
@@ -16,9 +16,9 @@ export default function PagamentoSucesso() {
     let ativo = true;
 
     async function carregarPedido() {
-      if (!id) {
+      if (!checkoutToken) {
         if (!ativo) return;
-        setErro("Pedido não informado.");
+        setErro("Acesso ao pedido expirado ou inválido.");
         setLoading(false);
         return;
       }
@@ -30,7 +30,7 @@ export default function PagamentoSucesso() {
         const API_URL =
           import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-        const response = await fetch(`${API_URL}/pedidos/sucesso/${id}`);
+        const response = await fetch(`${API_URL}/pedidos/sucesso?token=${encodeURIComponent(checkoutToken)}`);
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar os dados do pedido.");
@@ -40,6 +40,7 @@ export default function PagamentoSucesso() {
 
         if (!ativo) return;
         setPedido(data.data);
+        sessionStorage.removeItem("checkout_access_token");
       } catch {
         if (!ativo) return;
         setErro("Não foi possível carregar os dados do pedido.");
@@ -54,7 +55,7 @@ export default function PagamentoSucesso() {
     return () => {
       ativo = false;
     };
-  }, [id]);
+  }, [checkoutToken]);
 
   const resumo = useMemo(() => {
     if (!pedido) {
