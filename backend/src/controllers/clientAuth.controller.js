@@ -1,6 +1,7 @@
 import * as clientAuthService from "../services/clientAuth.service.js";
 import * as pedidoService from "../services/pedido.service.js";
 import * as agendamentoService from "../services/agendamento.service.js";
+import { toAgendamentoResponseDto } from "../dtos/agendamento.dto.js";
 
 export async function register(req, res, next) {
   try {
@@ -67,7 +68,7 @@ export async function getMeusPedidos(req, res, next) {
 export async function getMeusAgendamentos(req, res, next) {
   try {
     const agendamentos = await agendamentoService.listarMeusAgendamentos(req.cliente.id);
-    return res.status(200).json({ success: true, data: agendamentos });
+    return res.status(200).json({ success: true, data: (agendamentos || []).map(toAgendamentoResponseDto) });
   } catch (error) { next(error); }
 }
 

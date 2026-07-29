@@ -1,6 +1,13 @@
 import prisma from "../config/prisma.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
 import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
+import {
+  toPedidoAdminDetailDto,
+  toPedidoAdminListDto,
+  toPedidoCheckoutDto,
+  toPedidoClienteDto,
+  toPedidoSucessoDto,
+} from "../dtos/pedido.dto.js";
 
 export async function listarPedidos(query) {
   const { page = 1, limit = 20, status, clienteId } = query;
@@ -29,7 +36,7 @@ export async function listarPedidos(query) {
   ]);
 
   return {
-    data: pedidos,
+    data: pedidos.map(toPedidoAdminListDto),
     meta: {
       total,
       page,
@@ -58,7 +65,7 @@ export async function buscarPedidoPorId(id) {
     throw Object.assign(new Error("Pedido não encontrado."), { statusCode: 404 });
   }
 
-  return pedido;
+  return toPedidoAdminDetailDto(pedido);
 }
 
 export async function criarPedido(dados) {
@@ -162,41 +169,6 @@ export async function criarPedido(dados) {
   });
 
   return pedido;
-}
-
-function maskAddress(pedido) {
-  if (!pedido) return null;
-
-  const cep = pedido.cep ? `${String(pedido.cep).slice(0, 5)}***` : null;
-  const rua = pedido.rua ? `${String(pedido.rua).slice(0, 6)}***` : null;
-  const numero = pedido.numero ? "***" : null;
-
-  return {
-    cep,
-    rua,
-    numero,
-    bairro: pedido.bairro || null,
-    cidade: pedido.cidade || null,
-    estado: pedido.estado || null,
-  };
-}
-
-function buildPedidoPublicSafeDto(pedido) {
-  return {
-    numeroPedido: pedido.id,
-    status: pedido.status,
-    valorTotal: Number(pedido.valorTotal),
-    dataPedido: pedido.createdAt,
-    itens: (pedido.itens || []).map((item) => ({
-      id: item.id,
-      produtoId: item.produtoId,
-      nome: item.produto?.nome || `Produto #${item.produtoId}`,
-      quantidade: item.quantidade,
-      precoUnitario: Number(item.precoUnitario),
-      subtotal: Number(item.precoUnitario) * item.quantidade,
-    })),
-    endereco: maskAddress(pedido),
-  };
 }
 
 export async function criarPedidoComPagamento(dados) {
@@ -332,7 +304,7 @@ export async function criarPedidoComPagamento(dados) {
     };
   });
 
-  return resultado;
+  return toPedidoCheckoutDto(resultado);
 }
 
 export async function buscarPedidoSucessoPorToken(token) {
@@ -342,7 +314,7 @@ export async function buscarPedidoSucessoPorToken(token) {
     throw Object.assign(new Error("Não foi possível consultar o pedido."), { statusCode: 404 });
   }
 
-  return buildPedidoPublicSafeDto(validated.pedido);
+  return toPedidoSucessoDto(validated.pedido);
 }
 
 export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null, checkoutToken = null }) {
@@ -378,7 +350,7 @@ export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null,
 }
 
 export async function listarMeusPedidos(clienteId) {
-  return prisma.pedido.findMany({
+  const pedidos = await prisma.pedido.findMany({
     where: { clienteId },
     orderBy: { createdAt: "desc" },
     select: {
@@ -389,13 +361,6 @@ export async function listarMeusPedidos(clienteId) {
       paymentStatus: true,
       paymentMethod: true,
       paidAt: true,
-      cliente: {
-        select: {
-          nome: true,
-          email: true,
-          telefone: true,
-        },
-      },
       itens: {
         select: {
           id: true,
@@ -416,6 +381,8 @@ export async function listarMeusPedidos(clienteId) {
       },
     },
   });
+
+  return pedidos.map(toPedidoClienteDto);
 }
 
 export async function atualizarStatusPedido(id, status) {
@@ -438,11 +405,25 @@ export async function atualizarStatusPedido(id, status) {
         });
       }
     });
-
-    return prisma.pedido.findUnique({ where: { id } });
+  } else {
+    await prisma.pedido.update({ where: { id }, data: { status } });
   }
 
-  return prisma.pedido.update({ where: { id }, data: { status } });
+  const pedidoAtualizado = await prisma.pedido.findUnique({
+    where: { id },
+    include: {
+      cliente: { select: { id: true, nome: true, email: true, telefone: true } },
+      itens: {
+        include: {
+          produto: {
+            select: { id: true, nome: true, slug: true, imagemPrincipal: true, preco: true },
+          },
+        },
+      },
+    },
+  });
+
+  return toPedidoAdminDetailDto(pedidoAtualizado);
 }
 
 export async function deletarPedido(id) {
