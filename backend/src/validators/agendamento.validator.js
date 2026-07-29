@@ -49,8 +49,7 @@ export const agendamentoSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => (val ? new Date(val) : null)),
-  clienteId: z.number().int().positive().optional().nullable(),
-});
+}).strict();
 
 export const agendamentoUpdateSchema = agendamentoSchema.partial();
 
@@ -59,7 +58,7 @@ export const agendamentoStatusSchema = z.object({
     ["PENDENTE", "CONFIRMADO", "EM_ANDAMENTO", "CONCLUIDO", "CANCELADO"],
     { required_error: "Status é obrigatório." }
   ),
-});
+}).strict();
 
 export const agendamentoQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),

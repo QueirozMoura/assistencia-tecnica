@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Usuario {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  senha     String
-  role      Role     @default(ADMIN)
-  ativo     Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  nome          String
+  email         String         @unique
+  senha         String
+  role          Role           @default(ADMIN)
+  ativo         Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
 
   @@map("usuarios")
 }
@@ -148,6 +149,22 @@ model CheckoutAccessToken {
   @@index([pedidoId])
   @@index([expiresAt])
   @@map("checkout_access_tokens")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  usuarioId Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("refresh_tokens")
 }
 
 model ItensPedido {

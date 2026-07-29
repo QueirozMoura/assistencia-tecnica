@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.js";
+import { createRefreshToken } from "./refreshToken.service.js";
 
 const SALT_ROUNDS = 12;
 
