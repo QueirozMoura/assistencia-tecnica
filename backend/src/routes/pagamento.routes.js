@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as pagamentoController from "../controllers/pagamento.controller.js";
 import { optionalClientAuthMiddleware } from "../middlewares/clientAuth.middleware.js";
+import { criarPreferenciaSensitiveLimiter } from "../middlewares/sensitiveRateLimit.middleware.js";
 
 const router = Router();
 

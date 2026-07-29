@@ -1,8 +1,10 @@
-import cloudinary from "../config/cloudinary.js";
+import { getCloudinaryClientOrThrow } from "../config/cloudinary.js";
 
 const CLOUDINARY_FOLDER = "assistencia-tecnica/produtos";
 
 export async function uploadImagemProdutoCloudinary(filePath) {
+  const cloudinary = getCloudinaryClientOrThrow();
+
   const result = await cloudinary.uploader.upload(filePath, {
     folder: CLOUDINARY_FOLDER,
     resource_type: "image",
