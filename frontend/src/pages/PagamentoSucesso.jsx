@@ -424,12 +424,12 @@ export default function PagamentoSucesso() {
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-3 px-1 sm:px-0">
           <button
             type="button"
             onClick={handleMeusPedidosClick}
             disabled={loadingPedidos}
-            className="w-full sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            className="w-full min-w-0 sm:w-auto flex-1 h-11 rounded-xl border border-[#c3c6d1] text-[#43474f] font-semibold hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
             <span className="inline-flex items-center justify-center gap-2">
               {loadingPedidos && (
@@ -445,7 +445,7 @@ export default function PagamentoSucesso() {
             type="button"
             onClick={handleCatalogoClick}
             disabled={loadingCatalogo}
-            className="w-full sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            className="w-full min-w-0 sm:w-auto flex-1 h-11 rounded-xl bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,89,187,0.25)] active:scale-[0.98] transition-all duration-300 disabled:opacity-85 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
             <span className="inline-flex items-center justify-center gap-2">
               {loadingCatalogo && (
