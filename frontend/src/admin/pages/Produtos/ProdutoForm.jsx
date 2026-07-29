@@ -567,17 +567,16 @@ export default function ProdutoForm() {
                             />
                           ) : null}
                         </div>
-                        {isPrincipal ? (
+                        {isPrincipal && (
                           <p className="text-[11px] font-semibold text-[#0070ea]">Principal ⭐</p>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(index)}
-                            className="w-full rounded-lg border border-[#ffdad6] bg-[#fff2f0] px-2 py-1.5 text-[11px] font-semibold text-[#ba1a1a] hover:bg-[#ffe7e3] transition-colors"
-                          >
-                            Remover
-                          </button>
                         )}
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(index)}
+                          className="w-full rounded-lg border border-[#ffdad6] bg-[#fff2f0] px-2 py-1.5 text-[11px] font-semibold text-[#ba1a1a] hover:bg-[#ffe7e3] transition-colors"
+                        >
+                          Remover
+                        </button>
                       </div>
                     )
                   })}
