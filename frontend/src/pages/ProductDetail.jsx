@@ -227,15 +227,15 @@ export default function ProductDetail() {
             )}
 
             {/* Price */}
-            <div className="bg-[#f7f9ff] rounded-xl p-4 mb-5">
+            <div className="bg-[#f7f9ff] rounded-xl p-4 sm:p-5 mb-4 sm:mb-5 border border-[#e5e8ee]">
               {precoPromo != null && precoPromo < preco && (
-                <p className="text-sm text-[#737780] line-through">{formatPrice(preco)}</p>
+                <p className="text-xs sm:text-sm text-[#737780] line-through">{formatPrice(preco)}</p>
               )}
-              <p className="text-3xl font-bold text-[#003366]">
+              <p className="text-2xl sm:text-3xl font-bold text-[#003366] leading-tight">
                 {formatPrice(precoPromo != null && precoPromo < preco ? precoPromo : preco)}
               </p>
               {parcelas != null && parcelas > 1 && (
-                <p className="text-sm text-[#43474f] mt-1">
+                <p className="text-xs sm:text-sm text-[#43474f] mt-1">
                   Em até{' '}
                   <span className="font-bold text-[#0070ea]">{parcelas}x</span> de{' '}
                   <span className="font-bold text-[#0070ea]">
@@ -244,14 +244,14 @@ export default function ProductDetail() {
                   sem juros
                 </p>
               )}
-              <p className="text-xs text-[#1a6b3c] font-medium mt-1">
+              <p className="text-[11px] sm:text-xs text-[#1a6b3c] font-medium mt-1">
                 À vista: {formatPrice((precoPromo ?? preco) * 0.95)} (5% de desconto)
               </p>
             </div>
 
             {/* Features — só exibe se existir no banco */}
             {features.length > 0 && (
-              <div className="mb-5">
+              <div className="mb-4 sm:mb-5">
                 <p className="text-sm font-semibold text-[#181c20] mb-2">Principais características:</p>
                 <div className="grid grid-cols-1 gap-1.5">
                   {features.map((f, i) => (
@@ -265,62 +265,62 @@ export default function ProductDetail() {
             )}
 
             {/* Qty + Add to Cart */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center border border-[#e5e8ee] rounded-xl overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 mb-4">
+              <div className="w-full sm:w-auto inline-flex items-center border border-[#e5e8ee] rounded-xl overflow-hidden bg-white">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="px-3 py-2.5 text-[#43474f] hover:bg-[#f1f4f9] transition-colors"
+                  className="h-10 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Diminuir quantidade"
                 >
-                  <Minus size={15} />
+                  <Minus size={14} />
                 </button>
-                <span className="px-4 py-2.5 text-sm font-semibold text-[#181c20] min-w-[2.5rem] text-center">
+                <span className="h-10 flex-1 sm:flex-none sm:w-12 text-sm font-semibold text-[#181c20] inline-flex items-center justify-center">
                   {qty}
                 </span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
-                  className="px-3 py-2.5 text-[#43474f] hover:bg-[#f1f4f9] transition-colors"
+                  className="h-10 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Aumentar quantidade"
                 >
-                  <Plus size={15} />
+                  <Plus size={14} />
                 </button>
               </div>
               <button
                 onClick={() => inStock && cart.addItem && cart.addItem(product, qty)}
                 disabled={!inStock}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
+                className={`w-full sm:flex-1 h-10 sm:h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-semibold transition-all ${
                   inStock
-                    ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:scale-95'
+                    ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:scale-[0.99]'
                     : 'bg-[#e5e8ee] text-[#737780] cursor-not-allowed'
                 }`}
               >
-                <ShoppingCart size={18} />
+                <ShoppingCart size={16} />
                 {inStock ? 'Adicionar ao Carrinho' : 'Indisponível'}
               </button>
               <button
                 onClick={() => wishlist.toggle && wishlist.toggle(product)}
                 aria-label={wishlist.isWishlisted(product.id) ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
-                className={`p-3 rounded-xl border transition-all ${
+                className={`w-full sm:w-auto h-10 sm:h-11 px-4 sm:px-3 rounded-xl border transition-all inline-flex items-center justify-center ${
                   wishlist.isWishlisted(product.id)
                     ? 'border-[#0070ea] bg-[#cce0ff] text-[#0070ea]'
                     : 'border-[#e5e8ee] text-[#43474f] hover:border-[#0070ea]'
                 }`}
               >
-                <Heart size={18} fill={wishlist.isWishlisted(product.id) ? 'currentColor' : 'none'} />
+                <Heart size={17} fill={wishlist.isWishlisted(product.id) ? 'currentColor' : 'none'} />
               </button>
             </div>
 
             {/* Guarantees */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-2.5 sm:gap-3">
               {[
                 { icon: Shield,   title: '12 meses',    sub: 'Garantia' },
                 { icon: Truck,    title: 'Frete Grátis', sub: 'Acima de R$ 299' },
                 { icon: RotateCcw, title: '7 dias',     sub: 'Troca fácil' },
               ].map(({ icon: Icon, title, sub }) => (
-                <div key={title} className="bg-[#f7f9ff] rounded-xl p-3 text-center border border-[#e5e8ee]">
-                  <Icon size={18} className="text-[#0070ea] mx-auto mb-1" />
-                  <p className="text-xs font-semibold text-[#181c20]">{title}</p>
-                  <p className="text-xs text-[#737780]">{sub}</p>
+                <div key={title} className="bg-[#f7f9ff] rounded-xl p-2.5 sm:p-3 text-center border border-[#e5e8ee]">
+                  <Icon size={16} className="text-[#0070ea] mx-auto mb-1" />
+                  <p className="text-xs font-semibold text-[#181c20] leading-tight">{title}</p>
+                  <p className="text-[11px] sm:text-xs text-[#737780] leading-tight mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
@@ -328,8 +328,8 @@ export default function ProductDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl border border-[#e5e8ee] overflow-hidden mb-10">
-          <div className="flex border-b border-[#e5e8ee]">
+        <div className="bg-white rounded-2xl border border-[#e5e8ee] overflow-hidden mb-8 sm:mb-10">
+          <div className="flex border-b border-[#e5e8ee] overflow-x-auto">
             {[
               { id: 'desc',  label: 'Descrição' },
               ...(specs ? [{ id: 'specs', label: 'Especificações' }] : []),
@@ -338,7 +338,7 @@ export default function ProductDetail() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-4 text-sm font-medium transition-colors border-b-2 ${
+                className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === tab.id
                     ? 'border-[#0070ea] text-[#0070ea]'
                     : 'border-transparent text-[#43474f] hover:text-[#181c20]'
@@ -349,7 +349,7 @@ export default function ProductDetail() {
             ))}
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {activeTab === 'desc' && (
               <p className="text-[#43474f] leading-relaxed whitespace-pre-line">
                 {descricao || 'Descrição não disponível.'}
