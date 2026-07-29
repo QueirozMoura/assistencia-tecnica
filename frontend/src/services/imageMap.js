@@ -117,9 +117,10 @@ export function getPrimaryImage(produto) {
  *
  * Prioridade:
  *   1. Array de URLs do banco (imagens[]) — quando existir
- *   2. Galeria do mapeamento local por slug
- *   3. Fallback por categoria (array com 1 imagem)
- *   4. [] → componente exibe placeholder
+ *   2. URL salva no banco (imagemPrincipal) — quando existir
+ *   3. Galeria do mapeamento local por slug
+ *   4. Fallback por categoria (array com 1 imagem)
+ *   5. [] → componente exibe placeholder
  *
  * @param {Object} produto  — objeto retornado pela API
  * @returns {string[]}
@@ -130,11 +131,16 @@ export function getGallery(produto) {
   // 1. URLs do banco
   if (produto.imagens?.length > 0) return produto.imagens
 
-  // 2. Galeria local por slug
+  // 2. imagemPrincipal do banco (Cloudinary ou outra URL persistida)
+  if (typeof produto.imagemPrincipal === 'string' && produto.imagemPrincipal.trim()) {
+    return [produto.imagemPrincipal]
+  }
+
+  // 3. Galeria local por slug
   const bySlug = PRODUCT_IMAGE_MAP[produto.slug]
   if (bySlug) return bySlug.gallery
 
-  // 3. Fallback por categoria
+  // 4. Fallback por categoria
   const catSlug = produto.categoria?.slug
   if (catSlug && CATEGORY_FALLBACK[catSlug]) return CATEGORY_FALLBACK[catSlug].gallery
 
