@@ -9,6 +9,16 @@ import {
   toPedidoSucessoDto,
 } from "../dtos/pedido.dto.js";
 
+function normalizeClienteId(clienteId) {
+  const parsed = Number(clienteId);
+
+  if (!parsed || Number.isNaN(parsed)) {
+    throw Object.assign(new Error("Cliente não autenticado para este recurso."), { statusCode: 401 });
+  }
+
+  return parsed;
+}
+
 export async function listarPedidos(query) {
   const { page = 1, limit = 20, status, clienteId } = query;
   const skip = (page - 1) * limit;
@@ -68,9 +78,34 @@ export async function buscarPedidoPorId(id) {
   return toPedidoAdminDetailDto(pedido);
 }
 
+export async function buscarPedidoPorIdDoCliente(id, clienteId) {
+  const pedido = await prisma.pedido.findFirst({
+    where: {
+      id,
+      clienteId: normalizeClienteId(clienteId),
+    },
+    include: {
+      cliente: { select: { id: true, nome: true, email: true, telefone: true } },
+      itens: {
+        include: {
+          produto: {
+            select: { id: true, nome: true, slug: true, imagemPrincipal: true, preco: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!pedido) {
+    throw Object.assign(new Error("Pedido não encontrado."), { statusCode: 404 });
+  }
+
+  return toPedidoAdminDetailDto(pedido);
+}
+
 export async function criarPedido(dados) {
   const {
-    clienteId,
+    clienteId: clienteIdPayload,
     itens,
     observacoes,
     nomeDestinatario,
@@ -82,7 +117,10 @@ export async function criarPedido(dados) {
     bairro,
     cidade,
     estado,
+    clienteAutenticadoId,
   } = dados;
+
+  const clienteId = normalizeClienteId(clienteAutenticadoId ?? clienteIdPayload);
 
   if (!Array.isArray(itens) || itens.length === 0) {
     throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
@@ -173,7 +211,7 @@ export async function criarPedido(dados) {
 
 export async function criarPedidoComPagamento(dados) {
   const {
-    clienteId,
+    clienteId: clienteIdPayload,
     itens,
     observacoes,
     nomeDestinatario,
@@ -185,7 +223,10 @@ export async function criarPedidoComPagamento(dados) {
     bairro,
     cidade,
     estado,
+    clienteAutenticadoId,
   } = dados;
+
+  const clienteId = normalizeClienteId(clienteAutenticadoId ?? clienteIdPayload);
 
   if (!Array.isArray(itens) || itens.length === 0) {
     throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });

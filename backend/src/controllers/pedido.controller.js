@@ -26,7 +26,10 @@ export async function buscarPedidoPorId(req, res, next) {
 
 export async function criarPedido(req, res, next) {
   try {
-    const pedido = await pedidoService.criarPedido(req.body);
+    const pedido = await pedidoService.criarPedido({
+      ...req.body,
+      clienteAutenticadoId: req.cliente?.id ?? null,
+    });
     return res.status(201).json({ success: true, data: pedido });
   } catch (error) {
     next(error);
@@ -35,7 +38,10 @@ export async function criarPedido(req, res, next) {
 
 export async function criarPedidoComPagamento(req, res, next) {
   try {
-    const result = await pedidoService.criarPedidoComPagamento(req.body);
+    const result = await pedidoService.criarPedidoComPagamento({
+      ...req.body,
+      clienteAutenticadoId: req.cliente?.id ?? null,
+    });
     return res.status(201).json({ success: true, ...result });
   } catch (error) {
     next(error);

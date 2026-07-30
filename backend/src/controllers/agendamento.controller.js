@@ -37,7 +37,7 @@ export async function criarAgendamento(req, res, next) {
   try {
     const dadosAgendamento = {
       ...req.body,
-      clienteId: req.cliente?.id ?? null,
+      clienteAutenticadoId: req.cliente?.id ?? null,
     };
 
     const agendamento = await agendamentoService.criarAgendamento(dadosAgendamento);

@@ -1,5 +1,15 @@
 import prisma from "../config/prisma.js";
 
+function normalizeClienteId(clienteId) {
+  const parsed = Number(clienteId);
+
+  if (!parsed || Number.isNaN(parsed)) {
+    throw Object.assign(new Error("Cliente não autenticado para este recurso."), { statusCode: 401 });
+  }
+
+  return parsed;
+}
+
 export async function listarAgendamentos(query) {
   const { page = 1, limit = 20, status, dataInicio, dataFim, busca } = query;
   const skip = (page - 1) * limit;
@@ -62,9 +72,36 @@ export async function buscarAgendamentoPorId(id) {
   return agendamento;
 }
 
+export async function buscarAgendamentoPorIdDoCliente(id, clienteId) {
+  const agendamento = await prisma.agendamento.findFirst({
+    where: {
+      id,
+      clienteId: normalizeClienteId(clienteId),
+    },
+    include: {
+      cliente: { select: { id: true, nome: true, email: true, telefone: true } },
+    },
+  });
+
+  if (!agendamento) {
+    throw Object.assign(new Error("Agendamento não encontrado."), { statusCode: 404 });
+  }
+
+  return agendamento;
+}
+
 export async function criarAgendamento(dados) {
+  const { clienteId: clienteIdPayload, clienteAutenticadoId, ...restDados } = dados;
+
+  const data = {
+    ...restDados,
+    ...(clienteAutenticadoId
+      ? { clienteId: normalizeClienteId(clienteAutenticadoId) }
+      : { ...(clienteIdPayload ? { clienteId: clienteIdPayload } : {}) }),
+  };
+
   return prisma.agendamento.create({
-    data: dados,
+    data,
     include: {
       cliente: { select: { id: true, nome: true, email: true, telefone: true } },
     },
