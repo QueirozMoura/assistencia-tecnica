@@ -20,6 +20,9 @@ router.post(
   authController.register
 );
 
+// POST /api/auth/refresh
+router.post("/refresh", authController.refresh);
+
 // GET /api/auth/me
 router.get("/me", authMiddleware, authController.getMe);
 

@@ -20,6 +20,10 @@ function generateToken(usuario) {
   );
 }
 
+export function issueAuthToken(usuario) {
+  return generateToken(usuario);
+}
+
 export async function login(email, senha) {
   const emailNormalizado = normalizeEmail(email);
 
