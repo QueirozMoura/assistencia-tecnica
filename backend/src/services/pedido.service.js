@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
 import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
 import {
@@ -242,9 +243,17 @@ export async function criarPedidoComPagamento(dados) {
     where: { id: { in: produtoIds } },
   });
 
+  logger.info("CRIAR PEDIDO COM PAGAMENTO - DADOS INICIAIS", {
+    clienteId,
+    quantidadeItens: itens.length,
+    produtosEncontrados: produtos.length,
+  });
+
   if (produtos.length !== produtoIds.length) {
     throw Object.assign(new Error("Produto inexistente no carrinho."), { statusCode: 400 });
   }
+
+  logger.info("CRIAR PEDIDO COM PAGAMENTO - INICIO VALIDACAO ESTOQUE");
 
   let valorTotal = 0;
   const itensComPreco = itens.map((item) => {
@@ -272,8 +281,22 @@ export async function criarPedidoComPagamento(dados) {
     };
   });
 
+  logger.info("CRIAR PEDIDO COM PAGAMENTO - FIM VALIDACAO ESTOQUE", {
+    valorTotal,
+    itensValidados: itensComPreco.length,
+  });
+
   const resultado = await prisma.$transaction(async (tx) => {
-    const pedidoInicial = await tx.pedido.create({
+    let etapaAtual = "INICIO_TRANSACAO";
+
+    try {
+      // OBS: chamada externa (Mercado Pago) dentro de transação pode ampliar tempo de lock/rollback.
+      // Mantido por compatibilidade do fluxo atual; recomendação futura: criar preferência fora da transação
+      // e usar estado intermediário + compensação para falhas externas.
+      etapaAtual = "CRIACAO_PEDIDO";
+      logger.info("CRIAR PEDIDO COM PAGAMENTO - ANTES CRIAR PEDIDO", { clienteId, valorTotal });
+
+      const pedidoInicial = await tx.pedido.create({
       data: {
         clienteId,
         valorTotal,
@@ -307,13 +330,40 @@ export async function criarPedidoComPagamento(dados) {
       },
     });
 
-    const preferencia = await createMercadoPagoPreference({
-      pedido: pedidoInicial,
-      itens: itensComPreco,
-      payer: cliente,
-    });
+      logger.info("CRIAR PEDIDO COM PAGAMENTO - DEPOIS CRIAR PEDIDO", {
+        pedidoId: pedidoInicial.id,
+      });
 
-    const pedidoAtualizado = await tx.pedido.update({
+      etapaAtual = "MERCADO_PAGO_PREFERENCE";
+      logger.info("ANTES MERCADO PAGO", {
+        pedidoId: pedidoInicial.id,
+        itensEnviados: itensComPreco.map((item) => ({
+          produtoId: item.produtoId,
+          nome: item.nome,
+          quantidade: item.quantidade,
+          precoUnitario: item.precoUnitario,
+        })),
+        emailCliente: cliente.email,
+      });
+
+      const preferencia = await createMercadoPagoPreference({
+        pedido: pedidoInicial,
+        itens: itensComPreco,
+        payer: cliente,
+      });
+
+      logger.info("CRIAR PEDIDO COM PAGAMENTO - DEPOIS MERCADO PAGO", {
+        pedidoId: pedidoInicial.id,
+        preferenceId: preferencia.preferenceId,
+      });
+
+      etapaAtual = "ATUALIZAR_PREFERENCE_ID";
+      logger.info("CRIAR PEDIDO COM PAGAMENTO - ANTES ATUALIZAR PREFERENCE", {
+        pedidoId: pedidoInicial.id,
+        preferenceId: preferencia.preferenceId,
+      });
+
+      const pedidoAtualizado = await tx.pedido.update({
       where: { id: pedidoInicial.id },
       data: {
         preferenceId: preferencia.preferenceId,
@@ -330,19 +380,33 @@ export async function criarPedidoComPagamento(dados) {
       },
     });
 
-    const checkoutAccess = await createCheckoutAccessToken({
-      pedidoId: pedidoAtualizado.id,
-      tx,
-    });
+      logger.info("CRIAR PEDIDO COM PAGAMENTO - DEPOIS ATUALIZAR PREFERENCE", {
+        pedidoId: pedidoAtualizado.id,
+      });
 
-    return {
-      pedido: pedidoAtualizado,
-      preference_id: preferencia.preferenceId,
-      init_point: preferencia.initPoint,
-      sandbox_init_point: preferencia.sandboxInitPoint,
-      checkoutAccessToken: checkoutAccess.token,
-      checkoutAccessTokenExpiresAt: checkoutAccess.expiresAt,
-    };
+      etapaAtual = "CRIAR_CHECKOUT_ACCESS_TOKEN";
+      const checkoutAccess = await createCheckoutAccessToken({
+        pedidoId: pedidoAtualizado.id,
+        tx,
+      });
+
+      return {
+        pedido: pedidoAtualizado,
+        preference_id: preferencia.preferenceId,
+        init_point: preferencia.initPoint,
+        sandbox_init_point: preferencia.sandboxInitPoint,
+        checkoutAccessToken: checkoutAccess.token,
+        checkoutAccessTokenExpiresAt: checkoutAccess.expiresAt,
+      };
+    } catch (error) {
+      logger.error("CRIAR PEDIDO COM PAGAMENTO - ERRO NA TRANSACAO", {
+        etapa: etapaAtual,
+        message: error.message,
+        statusCode: error.statusCode,
+        stack: error.stack,
+      });
+      throw error;
+    }
   });
 
   return toPedidoCheckoutDto(resultado);

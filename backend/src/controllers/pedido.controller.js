@@ -1,4 +1,5 @@
 import * as pedidoService from "../services/pedido.service.js";
+import logger from "../config/logger.js";
 import { pedidoQuerySchema } from "../validators/pedido.validator.js";
 
 export async function listarPedidos(req, res, next) {
@@ -44,6 +45,11 @@ export async function criarPedidoComPagamento(req, res, next) {
     });
     return res.status(201).json({ success: true, ...result });
   } catch (error) {
+    logger.error("ERRO CRIAR PEDIDO COM PAGAMENTO", {
+      message: error.message,
+      stack: error.stack,
+      statusCode: error.statusCode,
+    });
     next(error);
   }
 }

@@ -63,7 +63,7 @@ export async function createMercadoPagoPreference({
     items: itens.map((item) => ({
       id: String(item.produtoId),
       title: item.nome,
-      quantity: item.quantidade,
+      quantity: Number(item.quantidade),
       unit_price: Number(item.precoUnitario),
       currency_id: "BRL",
     })),
@@ -82,6 +82,73 @@ export async function createMercadoPagoPreference({
     },
     notification_url: notificationUrl || undefined,
   };
+
+  const ensureValidHttpUrl = (value, fieldName) => {
+    if (!value) return;
+    try {
+      const parsed = new URL(value);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        throw new Error("INVALID_PROTOCOL");
+      }
+    } catch {
+      throw Object.assign(new Error(`${fieldName} inválida para Mercado Pago.`), {
+        statusCode: 400,
+      });
+    }
+  };
+
+  ensureValidHttpUrl(body.back_urls?.success, "MERCADO_PAGO_SUCCESS_URL/back_urls.success");
+  ensureValidHttpUrl(body.back_urls?.failure, "MERCADO_PAGO_FAILURE_URL/back_urls.failure");
+  ensureValidHttpUrl(body.back_urls?.pending, "MERCADO_PAGO_PENDING_URL/back_urls.pending");
+  ensureValidHttpUrl(body.notification_url, "MERCADO_PAGO_NOTIFICATION_URL/notification_url");
+
+  for (const item of body.items) {
+    if (!item.title || typeof item.title !== "string") {
+      throw Object.assign(new Error("Item inválido para Mercado Pago: title ausente."), {
+        statusCode: 400,
+      });
+    }
+
+    if (!Number.isFinite(item.quantity) || item.quantity <= 0) {
+      throw Object.assign(
+        new Error(`Item inválido para Mercado Pago: quantity inválida (${item.id}).`),
+        { statusCode: 400 },
+      );
+    }
+
+    if (!Number.isFinite(item.unit_price) || item.unit_price <= 0) {
+      throw Object.assign(
+        new Error(`Item inválido para Mercado Pago: unit_price inválido (${item.id}).`),
+        { statusCode: 400 },
+      );
+    }
+  }
+
+  if (body.payer?.email && !String(body.payer.email).includes("@")) {
+    throw Object.assign(new Error("payer.email inválido para Mercado Pago."), {
+      statusCode: 400,
+    });
+  }
+
+  const requestId = `mp_pref_${pedido.id}_${Date.now()}`;
+  const tokenPrefix = String(accessToken).slice(0, 8);
+  const sanitizedPayload = {
+    ...body,
+    payer: body.payer
+      ? {
+          email: body.payer.email ? "***@***" : undefined,
+          name: body.payer.name || undefined,
+        }
+      : undefined,
+  };
+
+  logger.info("Mercado Pago preference request payload", {
+    requestId,
+    pedidoId: pedido.id,
+    externalReference,
+    tokenPrefix,
+    payload: sanitizedPayload,
+  });
 
   try {
     const response = await fetch(
@@ -103,8 +170,19 @@ export async function createMercadoPagoPreference({
       data = null;
     }
 
+    logger.info("Mercado Pago preference response", {
+      requestId,
+      pedidoId: pedido.id,
+      status: response.status,
+      statusText: response.statusText,
+      preferenceId: data?.id ?? null,
+      hasInitPoint: Boolean(data?.init_point),
+      hasSandboxInitPoint: Boolean(data?.sandbox_init_point),
+    });
+
     if (!response.ok) {
       const details = {
+        requestId,
         status: response.status,
         statusText: response.statusText,
         message: data?.message ?? null,
@@ -113,9 +191,7 @@ export async function createMercadoPagoPreference({
         responseData: data,
       };
 
-      logger.error(
-        `Erro ao criar preferência Mercado Pago: ${JSON.stringify(details)}`,
-      );
+      logger.error("Erro ao criar preferência Mercado Pago", details);
 
       const err = new Error("Erro ao criar preferência no Mercado Pago.");
       err.statusCode = 502;
@@ -123,6 +199,7 @@ export async function createMercadoPagoPreference({
       err.mpStatusText = response.statusText;
       err.mpResponse = data;
       err.mpCause = data?.cause ?? null;
+      err.mpRequestId = requestId;
       throw err;
     }
 
@@ -136,6 +213,9 @@ export async function createMercadoPagoPreference({
     };
   } catch (error) {
     const errorDetails = {
+      requestId: error?.mpRequestId || requestId,
+      pedidoId: pedido.id,
+      externalReference,
       message: error?.message ?? null,
       name: error?.name ?? null,
       code: error?.code ?? null,
@@ -145,12 +225,9 @@ export async function createMercadoPagoPreference({
         error?.response?.statusText ?? error?.mpStatusText ?? null,
       responseData: error?.response?.data ?? error?.mpResponse ?? null,
       cause: error?.cause ?? error?.mpCause ?? null,
-      stack: error?.stack ?? null,
     };
 
-    logger.error(
-      `Falha detalhada Mercado Pago (create preference): ${JSON.stringify(errorDetails)}`,
-    );
+    logger.error("Falha detalhada Mercado Pago (create preference)", errorDetails);
 
     if (!error.statusCode) {
       throw Object.assign(
