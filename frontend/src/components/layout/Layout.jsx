@@ -60,15 +60,18 @@ export default function Layout() {
         openSettings={cookieSettingsOpen}
         currentPreferences={cookiePreferences}
         onAcceptAll={() => persistCookiePreferences({
-          essential: true,
+          essentials: true,
           statistics: true,
           marketing: true,
         })}
-        onAcceptEssential={() => persistCookiePreferences({
-          essential: true,
-          statistics: false,
-          marketing: false,
-        })}
+        onAcceptEssential={() => {
+          persistCookiePreferences({
+            essentials: true,
+            statistics: false,
+            marketing: false,
+          })
+          setCookieSettingsOpen(false)
+        }}
         onSavePreferences={(preferences) => {
           persistCookiePreferences(preferences)
           setCookieSettingsOpen(false)
