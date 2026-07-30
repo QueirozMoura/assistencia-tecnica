@@ -28,7 +28,7 @@ const footerLinks = {
   ],
 }
 
-export default function Footer() {
+export default function Footer({ onOpenCookieSettings }) {
   return (
     <footer className="bg-[#001e40] text-white">
       {/* Main Footer */}
@@ -176,7 +176,15 @@ export default function Footer() {
         <div className="container-max py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-[#8fa8c8]">
           <p>© {new Date().getFullYear()} EletroCenter. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
-            <Link to="/contato" className="hover:text-white transition-colors">Política de Privacidade</Link>
+            <Link to="/sobre" className="hover:text-white transition-colors">Política de Privacidade</Link>
+            <span>|</span>
+            <button
+              type="button"
+              onClick={onOpenCookieSettings}
+              className="hover:text-white transition-colors"
+            >
+              Configurações de Cookies
+            </button>
             <span>|</span>
             <Link to="/contato" className="hover:text-white transition-colors">Termos de Uso</Link>
           </div>
