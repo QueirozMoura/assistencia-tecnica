@@ -42,6 +42,27 @@ export async function getMe(req, res, next) {
   }
 }
 
+export async function logout(req, res, next) {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    await authService.logout(refreshToken);
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logout realizado com sucesso.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function refresh(req, res, next) {
   try {
     const token = req.cookies?.refreshToken;

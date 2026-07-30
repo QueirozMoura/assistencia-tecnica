@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.js";
-import { createRefreshToken } from "./refreshToken.service.js";
+import { createRefreshToken, revokeRefreshToken } from "./refreshToken.service.js";
 
 const SALT_ROUNDS = 12;
 
@@ -90,4 +90,12 @@ export async function getMe(id) {
   }
 
   return usuario;
+}
+
+export async function logout(refreshToken) {
+  if (!refreshToken) {
+    return;
+  }
+
+  await revokeRefreshToken(refreshToken);
 }

@@ -23,6 +23,9 @@ router.post(
 // POST /api/auth/refresh
 router.post("/refresh", authController.refresh);
 
+// POST /api/auth/logout
+router.post("/logout", authController.logout);
+
 // GET /api/auth/me
 router.get("/me", authMiddleware, authController.getMe);
 
