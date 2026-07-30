@@ -176,7 +176,7 @@ export default function Footer({ onOpenCookieSettings }) {
         <div className="container-max py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-[#8fa8c8]">
           <p>© {new Date().getFullYear()} EletroCenter. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
-            <Link to="/sobre" className="hover:text-white transition-colors">Política de Privacidade</Link>
+            <Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
             <span>|</span>
             <button
               type="button"
@@ -186,7 +186,7 @@ export default function Footer({ onOpenCookieSettings }) {
               Configurações de Cookies
             </button>
             <span>|</span>
-            <Link to="/contato" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link to="/termos-de-uso" className="hover:text-white transition-colors">Termos de Uso</Link>
           </div>
         </div>
       </div>

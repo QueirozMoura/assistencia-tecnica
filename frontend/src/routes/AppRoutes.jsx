@@ -9,6 +9,8 @@ import Services      from '../pages/Services'
 import Scheduling    from '../pages/Scheduling'
 import About         from '../pages/About'
 import Contact       from '../pages/Contact'
+import PoliticaPrivacidade from '../pages/PoliticaPrivacidade'
+import TermosUso     from '../pages/TermosUso'
 import NotFound      from '../pages/NotFound'
 
 // ── Cliente: auth + páginas ───────────────────────────────────────────────────
@@ -54,6 +56,8 @@ export default function AppRoutes() {
         <Route path="/assistencia"   element={<Services />} />
         <Route path="/agendamento"   element={<Scheduling />} />
         <Route path="/sobre"         element={<About />} />
+        <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/termos-de-uso" element={<TermosUso />} />
         <Route path="/contato"       element={<Contact />} />
 
         {/* Auth de cliente — públicas (sem Layout próprio, usam o Layout do site) */}

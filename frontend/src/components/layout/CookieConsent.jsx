@@ -85,7 +85,7 @@ function CookieSettingsModal({
 
           <p className="text-xs text-slate-500">
             Consulte nossa{' '}
-            <Link to="/sobre" className="text-[#0070ea] hover:underline">
+            <Link to="/politica-de-privacidade" className="text-[#0070ea] hover:underline">
               Política de Privacidade
             </Link>{' '}
             para mais detalhes.
@@ -145,7 +145,7 @@ export default function CookieConsent({
                   Utilizamos cookies essenciais para funcionamento do site e, com seu consentimento,
                   cookies de estatísticas e marketing. Você pode gerenciar suas preferências quando quiser.
                   Veja nossa{' '}
-                  <Link to="/sobre" className="text-[#0070ea] hover:underline font-medium">
+                  <Link to="/politica-de-privacidade" className="text-[#0070ea] hover:underline font-medium">
                     Política de Privacidade
                   </Link>
                   .
