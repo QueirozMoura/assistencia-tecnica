@@ -61,14 +61,15 @@ export default function PagamentoSucesso() {
     if (!pedido) {
       return {
         numero: "#00000",
-        cliente: "João da Silva",
+        cliente: "—",
         valor: "R$ 0,00",
-        pagamento: "Aprovado",
-        data: "17/07/2026",
+        status: "—",
+        pagamento: "—",
+        data: "—",
       };
     }
 
-    const numero = pedido.id ?? id ?? "00000";
+    const numero = pedido.id ?? pedido.numeroPedido ?? pedido.pedidoId ?? "00000";
     const cliente =
       pedido.cliente?.nome ?? pedido.nomeCliente ?? pedido.cliente ?? "—";
     const valorBruto = pedido.valorTotal ?? pedido.valor ?? pedido.total;
@@ -78,10 +79,13 @@ export default function PagamentoSucesso() {
           currency: "BRL",
         })
       : "R$ 0,00";
-    const pagamento = pedido.statusPagamento ?? pedido.pagamento ?? "Aprovado";
+
+    const status = pedido.status ?? "—";
+    const pagamento = pedido.paymentStatus ?? pedido.statusPagamento ?? pedido.pagamento ?? "—";
 
     let dataFormatada = "—";
-    const dataRaw = pedido.paidAt ?? pedido.createdAt ?? pedido.updatedAt;
+    const dataRaw =
+      pedido.dataPagamento ?? pedido.paidAt ?? pedido.createdAt ?? pedido.updatedAt;
     if (dataRaw) {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
@@ -93,10 +97,11 @@ export default function PagamentoSucesso() {
       numero: `#${String(numero).replace(/^#/, "")}`,
       cliente,
       valor,
+      status,
       pagamento,
       data: dataFormatada,
     };
-  }, [pedido, id]);
+  }, [pedido]);
 
   const timeline = useMemo(() => {
     const etapas = [
@@ -394,6 +399,54 @@ export default function PagamentoSucesso() {
                     aria-hidden="true"
                   />
                   {resumo.pagamento}
+                </span>
+              </div>
+
+              <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">
+                <div className="flex items-center gap-2 text-[#5b6475] mb-2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M4 12h16M12 4v16"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Status do pedido
+                  </span>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
+                    String(resumo.status).toUpperCase() === "PAGO"
+                      ? "border border-[#bbf7d0] bg-[#dcfce7] text-[#166534]"
+                      : String(resumo.status).toUpperCase() === "PENDENTE"
+                        ? "border border-[#fde68a] bg-[#fef9c3] text-[#a16207]"
+                        : String(resumo.status).toUpperCase() === "CANCELADO"
+                          ? "border border-[#fecaca] bg-[#fee2e2] text-[#b91c1c]"
+                          : "border border-[#cbd5e1] bg-[#e2e8f0] text-[#334155]"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      String(resumo.status).toUpperCase() === "PAGO"
+                        ? "bg-[#16a34a]"
+                        : String(resumo.status).toUpperCase() === "PENDENTE"
+                          ? "bg-[#ca8a04]"
+                          : String(resumo.status).toUpperCase() === "CANCELADO"
+                            ? "bg-[#dc2626]"
+                            : "bg-[#475569]"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  {resumo.status}
                 </span>
               </div>
 
