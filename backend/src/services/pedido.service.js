@@ -413,13 +413,44 @@ export async function criarPedidoComPagamento(dados) {
 }
 
 export async function buscarPedidoSucessoPorToken(token) {
-  const validated = await validateCheckoutAccessToken({ token, consume: true, tx: prisma });
+  try {
+    const validated = await validateCheckoutAccessToken({ token, consume: true, tx: prisma });
 
-  if (!validated.valid || !validated.pedido) {
-    throw Object.assign(new Error("Não foi possível consultar o pedido."), { statusCode: 404 });
+    logger.info("PEDIDO SUCESSO - [4] Resultado retornado pelo Prisma", {
+      valid: validated?.valid,
+      pedidoId: validated?.pedido?.id,
+      tokenRecordId: validated?.tokenRecord?.id,
+    });
+
+    if (!validated.valid || !validated.pedido) {
+      throw Object.assign(new Error("Não foi possível consultar o pedido."), { statusCode: 404 });
+    }
+
+    logger.info("PEDIDO SUCESSO - [5] Antes de montar o DTO", {
+      pedidoId: validated.pedido.id,
+    });
+
+    const dto = toPedidoSucessoDto(validated.pedido);
+
+    logger.info("PEDIDO SUCESSO - [6] DTO final", {
+      pedidoId: dto?.id,
+      status: dto?.status,
+      paymentStatus: dto?.paymentStatus,
+    });
+
+    logger.info("PEDIDO SUCESSO - [7] Antes do res.json()", {
+      pedidoId: dto?.id,
+    });
+
+    return dto;
+  } catch (error) {
+    logger.error("PEDIDO SUCESSO - [8] Erro no service", {
+      message: error?.message,
+      stack: error?.stack,
+      statusCode: error?.statusCode,
+    });
+    throw error;
   }
-
-  return toPedidoSucessoDto(validated.pedido);
 }
 
 export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null, checkoutToken = null }) {

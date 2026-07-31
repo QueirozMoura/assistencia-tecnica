@@ -85,7 +85,16 @@ export async function deletarPedido(req, res, next) {
 
 export async function buscarPedidoSucesso(req, res, next) {
   try {
+    logger.info("PEDIDO SUCESSO - [1] Entrou na rota", {
+      route: "GET /api/pedidos/sucesso",
+    });
+
     const token = req.query.token;
+
+    logger.info("PEDIDO SUCESSO - [2] Identificador recebido", {
+      token,
+      tokenType: typeof token,
+    });
 
     if (!token || typeof token !== "string") {
       return res.status(400).json({
@@ -94,13 +103,23 @@ export async function buscarPedidoSucesso(req, res, next) {
       });
     }
 
+    logger.info("PEDIDO SUCESSO - [3] Antes de consultar o banco");
     const pedido = await pedidoService.buscarPedidoSucessoPorToken(token);
+
+    logger.info("PEDIDO SUCESSO - [7] Antes do res.json()", {
+      pedidoId: pedido?.id,
+    });
 
     return res.status(200).json({
       success: true,
       data: pedido,
     });
   } catch (error) {
+    logger.error("PEDIDO SUCESSO - [8] Erro na rota", {
+      message: error?.message,
+      stack: error?.stack,
+      statusCode: error?.statusCode,
+    });
     next(error);
   }
 }
