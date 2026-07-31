@@ -14,6 +14,9 @@ router.get("/", authMiddleware, adminMiddleware, pedidoController.listarPedidos)
 // GET /api/pedidos/sucesso?token=... — público (pós pagamento seguro)
 router.get("/sucesso", pedidoSucessoSensitiveLimiter, pedidoController.buscarPedidoSucesso);
 
+// GET /api/pedidos/sucesso/:pedidoId — público (pós pagamento)
+router.get("/sucesso/:pedidoId", pedidoSucessoSensitiveLimiter, pedidoController.buscarPedidoSucessoPorId);
+
 // GET /api/pedidos/:id — ADMIN
 router.get("/:id", authMiddleware, adminMiddleware, pedidoController.buscarPedidoPorId);
 
