@@ -6,6 +6,7 @@ export default function PagamentoSucesso() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const checkoutToken = searchParams.get("token") || sessionStorage.getItem("checkout_access_token");
+  const pedidoId = searchParams.get("pedidoId");
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
@@ -16,7 +17,7 @@ export default function PagamentoSucesso() {
     let ativo = true;
 
     async function carregarPedido() {
-      if (!checkoutToken) {
+      if (!checkoutToken && !pedidoId) {
         if (!ativo) return;
         setErro("Acesso ao pedido expirado ou inválido.");
         setLoading(false);
@@ -30,7 +31,11 @@ export default function PagamentoSucesso() {
         const API_URL =
           import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-        const response = await fetch(`${API_URL}/pedidos/sucesso?token=${encodeURIComponent(checkoutToken)}`);
+        const endpoint = checkoutToken
+          ? `${API_URL}/pedidos/sucesso?token=${encodeURIComponent(checkoutToken)}`
+          : `${API_URL}/pedidos/sucesso/${encodeURIComponent(pedidoId)}`;
+
+        const response = await fetch(endpoint);
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar os dados do pedido.");
@@ -55,7 +60,7 @@ export default function PagamentoSucesso() {
     return () => {
       ativo = false;
     };
-  }, [checkoutToken]);
+  }, [checkoutToken, pedidoId]);
 
   const resumo = useMemo(() => {
     if (!pedido) {
