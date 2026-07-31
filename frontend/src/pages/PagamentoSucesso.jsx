@@ -85,7 +85,16 @@ export default function PagamentoSucesso() {
       : "R$ 0,00";
 
     const status = pedido.status ?? "—";
-    const pagamento = pedido.paymentStatus ?? "—";
+    const paymentStatusRaw = pedido.paymentStatus ?? "—";
+    const paymentStatusMap = {
+      PAID: "Pagamento aprovado",
+      PENDING: "Aguardando pagamento",
+      IN_PROCESS: "Pagamento em análise",
+      REJECTED: "Pagamento recusado",
+      CANCELLED: "Pagamento cancelado",
+    };
+    const pagamento =
+      paymentStatusMap[String(paymentStatusRaw).toUpperCase()] ?? paymentStatusRaw;
 
     let dataFormatada = "—";
     const dataRaw = pedido.paidAt;
@@ -93,7 +102,7 @@ export default function PagamentoSucesso() {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
         ? String(dataRaw)
-        : dataObj.toLocaleDateString("pt-BR");
+        : `${dataObj.toLocaleDateString("pt-BR")} às ${dataObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
     }
 
     return {
