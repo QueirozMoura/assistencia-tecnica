@@ -133,17 +133,17 @@ export default function PedidoDetail() {
           <div className="rounded-2xl border border-[#e5e8ee] bg-white p-5">
             <h2 className="mb-3 text-sm font-semibold text-[#111827]">Dados da entrega</h2>
             <div className="grid grid-cols-1 gap-2 text-sm text-[#334155] md:grid-cols-2">
-              <p><span className="font-semibold">Nome:</span> {formatFallback(pedido?.nomeDestinatario)}</p>
-              <p><span className="font-semibold">Telefone:</span> {formatFallback(pedido?.telefoneEntrega)}</p>
-              <p><span className="font-semibold">CEP:</span> {formatFallback(pedido?.cep)}</p>
-              <p><span className="font-semibold">Rua:</span> {formatFallback(pedido?.rua)}</p>
-              <p><span className="font-semibold">Número:</span> {formatFallback(pedido?.numero)}</p>
-              <p><span className="font-semibold">Complemento:</span> {formatFallback(pedido?.complemento)}</p>
-              <p><span className="font-semibold">Bairro:</span> {formatFallback(pedido?.bairro)}</p>
-              <p><span className="font-semibold">Cidade:</span> {formatFallback(pedido?.cidade)}</p>
-              <p><span className="font-semibold">Estado:</span> {formatFallback(pedido?.estado)}</p>
+              <p><span className="font-semibold">Nome:</span> {formatFallback(pedido?.entrega?.nomeDestinatario)}</p>
+              <p><span className="font-semibold">Telefone:</span> {formatFallback(pedido?.entrega?.telefoneEntrega)}</p>
+              <p><span className="font-semibold">CEP:</span> {formatFallback(pedido?.entrega?.cep)}</p>
+              <p><span className="font-semibold">Rua:</span> {formatFallback(pedido?.entrega?.rua)}</p>
+              <p><span className="font-semibold">Número:</span> {formatFallback(pedido?.entrega?.numero)}</p>
+              <p><span className="font-semibold">Complemento:</span> {formatFallback(pedido?.entrega?.complemento)}</p>
+              <p><span className="font-semibold">Bairro:</span> {formatFallback(pedido?.entrega?.bairro)}</p>
+              <p><span className="font-semibold">Cidade:</span> {formatFallback(pedido?.entrega?.cidade)}</p>
+              <p><span className="font-semibold">Estado:</span> {formatFallback(pedido?.entrega?.estado)}</p>
               <p className="md:col-span-2">
-                <span className="font-semibold">Observações:</span> {formatFallback(pedido?.observacoes)}
+                <span className="font-semibold">Observações:</span> {formatFallback(pedido?.entrega?.observacoes)}
               </p>
             </div>
           </div>
