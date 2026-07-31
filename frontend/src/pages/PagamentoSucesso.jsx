@@ -69,10 +69,8 @@ export default function PagamentoSucesso() {
       };
     }
 
-    const numero = pedido.id ?? pedido.numeroPedido ?? pedido.pedidoId ?? "00000";
-    const cliente =
-      pedido.cliente?.nome ?? pedido.nomeCliente ?? pedido.cliente ?? "—";
-    const valorBruto = pedido.valorTotal ?? pedido.valor ?? pedido.total;
+    const numero = pedido.numeroPedido ?? "00000";
+    const valorBruto = pedido.valorTotal;
     const valor = valorBruto
       ? Number(valorBruto).toLocaleString("pt-BR", {
           style: "currency",
@@ -81,11 +79,10 @@ export default function PagamentoSucesso() {
       : "R$ 0,00";
 
     const status = pedido.status ?? "—";
-    const pagamento = pedido.paymentStatus ?? pedido.statusPagamento ?? pedido.pagamento ?? "—";
+    const pagamento = status;
 
     let dataFormatada = "—";
-    const dataRaw =
-      pedido.dataPagamento ?? pedido.paidAt ?? pedido.createdAt ?? pedido.updatedAt;
+    const dataRaw = pedido.dataPedido;
     if (dataRaw) {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
@@ -95,7 +92,6 @@ export default function PagamentoSucesso() {
 
     return {
       numero: `#${String(numero).replace(/^#/, "")}`,
-      cliente,
       valor,
       status,
       pagamento,
@@ -113,7 +109,6 @@ export default function PagamentoSucesso() {
     ];
 
     const statusPedido = String(pedido?.status ?? "").toUpperCase();
-    const statusPagamento = String(pedido?.paymentStatus ?? "").toUpperCase();
 
     if (statusPedido === "CANCELADO") {
       return { etapas, etapaAtual: 0, cancelado: true, concluidoAte: -1 };
@@ -128,13 +123,6 @@ export default function PagamentoSucesso() {
     };
 
     let etapaAtual = mapaStatus[statusPedido] ?? 1;
-
-    if (
-      statusPedido === "PENDENTE" &&
-      statusPagamento === "PAID"
-    ) {
-      etapaAtual = 2;
-    }
 
     return {
       etapas,

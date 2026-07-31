@@ -355,8 +355,8 @@ export default function Checkout() {
       const response = await clientCreatePedidoComPagamento(payload)
 
       const hasRequiredFields = Boolean(
-        response?.pedido &&
-          response?.preference_id &&
+        response?.success === true &&
+          response?.pedidoId &&
           response?.init_point &&
           response?.checkoutAccessToken
       )
