@@ -29,15 +29,20 @@ app.set("trust proxy", 1);
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xPoweredBy: false,
+    contentSecurityPolicy: false,
   })
 );
+app.disable("x-powered-by");
 
 // ─────────────────────────────────────────────
 // CORS
 // ─────────────────────────────────────────────
 const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:5174")
   .split(",")
-  .map((o) => o.trim());
+  .map((o) => o.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
@@ -58,7 +63,7 @@ app.use(
 // RATE LIMITING
 // ─────────────────────────────────────────────
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000,
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
@@ -68,31 +73,7 @@ const limiter = rateLimit({
   },
 });
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Muitas tentativas de login. Tente novamente em 15 minutos.",
-  },
-});
-
-const clientAuthLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Muitas tentativas de autenticação. Tente novamente em 15 minutos.",
-  },
-});
-
 app.use("/api/", limiter);
-app.use("/api/auth/", authLimiter);
-app.use("/api/client-auth/", clientAuthLimiter);
 
 // ─────────────────────────────────────────────
 // BODY PARSER

@@ -1,9 +1,12 @@
+import logger from "../config/logger.js";
+
 export async function sendTelegramMessage(message) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
-  console.log("TOKEN:", token ? "OK" : "NÃO ENCONTRADO");
-  console.log("CHAT ID:", chatId);
+  if (!token || !chatId) {
+    throw new Error("Telegram não configurado.");
+  }
 
   const response = await fetch(
     `https://api.telegram.org/bot${token}/sendMessage`,
@@ -21,10 +24,13 @@ export async function sendTelegramMessage(message) {
 
   const data = await response.json();
 
-  console.log(data);
-
   if (!data.ok) {
-    throw new Error(data.description);
+    logger.warn("Falha ao enviar mensagem para Telegram.", {
+      status: response.status,
+      ok: data?.ok,
+      description: data?.description,
+    });
+    throw new Error("Falha ao enviar notificação Telegram.");
   }
 
   return data;
