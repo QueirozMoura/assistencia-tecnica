@@ -74,7 +74,8 @@ export default function PagamentoSucesso() {
       };
     }
 
-    const numero = pedido.numeroPedido ?? "00000";
+    const numero = pedido.id ?? "00000";
+    const cliente = pedido.cliente?.nome ?? "—";
     const valorBruto = pedido.valorTotal;
     const valor = valorBruto
       ? Number(valorBruto).toLocaleString("pt-BR", {
@@ -84,10 +85,10 @@ export default function PagamentoSucesso() {
       : "R$ 0,00";
 
     const status = pedido.status ?? "—";
-    const pagamento = status;
+    const pagamento = pedido.paymentStatus ?? "—";
 
     let dataFormatada = "—";
-    const dataRaw = pedido.dataPedido;
+    const dataRaw = pedido.paidAt;
     if (dataRaw) {
       const dataObj = new Date(dataRaw);
       dataFormatada = Number.isNaN(dataObj.getTime())
@@ -97,6 +98,7 @@ export default function PagamentoSucesso() {
 
     return {
       numero: `#${String(numero).replace(/^#/, "")}`,
+      cliente,
       valor,
       status,
       pagamento,
