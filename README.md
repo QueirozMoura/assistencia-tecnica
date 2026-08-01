@@ -339,13 +339,13 @@ Próximas melhorias planejadas:
 
 ## 👤 Autor
 
-Nome: Seu nome
+Nome: Gustavo Moura
 
-GitHub: seu-github
+GitHub: https://github.com/QueirozMoura/QueirozMoura
 
-LinkedIn: seu-linkedin
+LinkedIn: https://www.linkedin.com/in/gustavomoura-/
 
-Email: seu-email@exemplo.com
+Email: gqueiroz2008@gmail.com
 
 ---
 
