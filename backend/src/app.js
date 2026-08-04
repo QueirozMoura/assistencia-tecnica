@@ -84,7 +84,9 @@ app.use(
     verify: (req, _res, buf) => {
       const requestPath = (req.originalUrl || req.url || "").split("?")[0];
       if (req.method === "POST" && requestPath === "/api/pagamentos/webhook") {
-        req.rawBody = buf.toString("utf8");
+        req.rawBody = buf;
+        req.webhookSignature = req.headers["x-signature"];
+        req.webhookRequestId = req.headers["x-request-id"];
       }
     },
   })

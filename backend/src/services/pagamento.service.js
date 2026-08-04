@@ -4,17 +4,17 @@ import prisma from "../config/prisma.js";
 import { notifyAdminPaymentApproved } from "./notification.service.js";
 
 /**
- * Valida assinatura do webhook do Mercado Pago de forma opcional.
- * Se MERCADO_PAGO_WEBHOOK_SECRET não estiver configurado, não bloqueia requisição
- * para preservar compatibilidade do ambiente atual.
+ * Valida assinatura do webhook do Mercado Pago usando o manifesto oficial:
+ * id:{data.id};request-id:{x-request-id};ts:{timestamp};
  */
 export function validateMercadoPagoWebhookSignature({
-  rawBody,
   signatureHeader,
+  requestId,
   secret,
+  dataId,
 }) {
   if (!secret) {
-    return { valid: true, reason: "WEBHOOK_SECRET_NOT_CONFIGURED" };
+    return { valid: false, reason: "WEBHOOK_SECRET_NOT_CONFIGURED" };
   }
 
   const signatureParts = String(signatureHeader || "")
@@ -22,19 +22,33 @@ export function validateMercadoPagoWebhookSignature({
     .map((part) => part.trim())
     .filter(Boolean);
 
+  const tsPart = signatureParts.find((part) => part.toLowerCase().startsWith("ts="));
   const v1Part = signatureParts.find((part) => part.toLowerCase().startsWith("v1="));
-  if (!v1Part) {
+
+  if (!tsPart || !v1Part) {
     return { valid: false, reason: "INVALID_SIGNATURE_FORMAT" };
   }
 
+  const timestamp = tsPart.slice(3).trim();
   const received = v1Part.slice(3).trim();
-  if (!received) {
+
+  if (!timestamp || !received) {
     return { valid: false, reason: "INVALID_SIGNATURE_FORMAT" };
   }
+
+  if (!requestId) {
+    return { valid: false, reason: "MISSING_REQUEST_ID" };
+  }
+
+  if (!dataId) {
+    return { valid: false, reason: "MISSING_DATA_ID" };
+  }
+
+  const manifest = `id:${dataId};request-id:${requestId};ts:${timestamp};`;
 
   const expected = crypto
     .createHmac("sha256", secret)
-    .update(rawBody)
+    .update(manifest)
     .digest("hex");
 
   const valid =

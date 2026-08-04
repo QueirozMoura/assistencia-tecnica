@@ -59,44 +59,48 @@ export async function criarPreferencia(req, res, next) {
 
 export async function webhookMercadoPago(req, res, next) {
   try {
-    const signatureHeader =
-      req.get("x-signature") ||
-      req.get("x-signature-hmac-sha256") ||
-      req.get("x-mercadopago-signature") ||
-      "";
-    const rawBody = req.rawBody || JSON.stringify(req.body || {});
+    const signatureHeader = req.webhookSignature || req.get("x-signature") || "";
+    const requestId = req.webhookRequestId || req.get("x-request-id") || "";
     const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    const dataId = req.body?.data?.id ? String(req.body.data.id) : "";
 
     logger.info("Webhook Mercado Pago recebido no endpoint de pagamentos", {
       provider: "mercadopago",
-      hasSignatureHeader: Boolean(signatureHeader),
-      hasRawBody: Boolean(rawBody),
+      hasSecret: Boolean(process.env.MERCADO_PAGO_WEBHOOK_SECRET),
+      hasSignature: Boolean(signatureHeader),
+      hasRequestId: Boolean(requestId),
     });
 
-    const validation = validateMercadoPagoWebhookSignature({
-      rawBody,
-      signatureHeader,
-      secret,
-    });
+    const isProduction = process.env.NODE_ENV === "production";
+    const hasSignatureData = Boolean(signatureHeader && requestId && dataId);
 
-    if (validation.reason === "WEBHOOK_SECRET_NOT_CONFIGURED") {
-      logger.warn("Webhook Mercado Pago sem validação de assinatura por compatibilidade", {
-        provider: "mercadopago",
-        reason: validation.reason,
-      });
-    } else if (!validation.valid) {
-      logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
-        provider: "mercadopago",
-        reason: validation.reason,
+    if (isProduction || hasSignatureData) {
+      const validation = validateMercadoPagoWebhookSignature({
+        signatureHeader,
+        requestId,
+        secret,
+        dataId,
       });
 
-      return res.status(401).json({
-        success: false,
-        message: "Assinatura do webhook inválida.",
-      });
-    } else {
+      if (!validation.valid) {
+        logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
+          provider: "mercadopago",
+          reason: validation.reason,
+        });
+
+        return res.status(401).json({
+          success: false,
+          message: "Assinatura do webhook inválida.",
+        });
+      }
+
       logger.info("Assinatura do webhook Mercado Pago validada", {
         provider: "mercadopago",
+      });
+    } else {
+      logger.warn("Webhook Mercado Pago sem assinatura validável permitido fora de produção", {
+        provider: "mercadopago",
+        nodeEnv: process.env.NODE_ENV || "undefined",
       });
     }
 
