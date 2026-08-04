@@ -442,7 +442,11 @@ export async function processMercadoPagoWebhook(payload) {
   externalReference: payment?.external_reference,
 });
 
-  if (!payment?.preference_id || payment.preference_id !== pedidoAtual?.preferenceId) {
+  if (
+    payment?.preference_id &&
+    pedidoAtual?.preferenceId &&
+    payment.preference_id !== pedidoAtual.preferenceId
+  ) {
     logger.warn("Webhook ignorado por divergência de preferência do pagamento", {
       pedidoId,
       paymentId: payment?.id,
