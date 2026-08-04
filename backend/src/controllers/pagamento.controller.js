@@ -104,7 +104,10 @@ export async function webhookMercadoPago(req, res, next) {
       });
     }
 
-    const result = await processMercadoPagoWebhook(req.body);
+    const result = await processMercadoPagoWebhook(req.body, {
+      rawPayload: req.rawBody,
+      signatureHeader,
+    });
     return res.status(200).json({
       success: true,
       message: "Webhook processado com sucesso.",

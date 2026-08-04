@@ -351,8 +351,28 @@ async function getMercadoPagoPaymentById(paymentId) {
   return data;
 }
 
-export async function processMercadoPagoWebhook(payload) {
+export async function processMercadoPagoWebhook(payload, metadata = {}) {
   const normalized = normalizeMercadoPagoNotification(payload);
+  const rawPayload =
+    typeof metadata.rawPayload === "string"
+      ? metadata.rawPayload
+      : JSON.stringify(payload || {});
+  const signatureHeader =
+    typeof metadata.signatureHeader === "string" ? metadata.signatureHeader : "";
+  const signatureTimestampRaw = signatureHeader
+    .split(",")
+    .map((part) => part.trim())
+    .find((part) => part.toLowerCase().startsWith("ts="))
+    ?.slice(3)
+    .trim();
+  const signatureTimestamp =
+    signatureTimestampRaw && /^\d+$/.test(signatureTimestampRaw)
+      ? BigInt(signatureTimestampRaw)
+      : null;
+  const rawPayloadHash = crypto.createHash("sha256").update(rawPayload).digest("hex");
+  const signatureHash = signatureHeader
+    ? crypto.createHash("sha256").update(signatureHeader).digest("hex")
+    : null;
 
   logger.info("Webhook Mercado Pago recebido", {
     provider: "mercadopago",
@@ -468,11 +488,61 @@ export async function processMercadoPagoWebhook(payload) {
 
   try {
     const txResult = await prisma.$transaction(async (tx) => {
-      if (paymentId) {
-        await tx.mercadoPagoWebhookEvent.create({
-          data: {
+      let webhookEvent = null;
+
+      if (normalized.id) {
+        webhookEvent = await tx.mercadoPagoWebhookEvent.upsert({
+          where: {
+            provider_notificationId: {
+              provider: "mercadopago",
+              notificationId: normalized.id,
+            },
+          },
+          create: {
+            provider: "mercadopago",
+            notificationId: normalized.id,
             paymentId,
-            action: normalized.action || null,
+            signatureHash,
+            signatureTimestamp,
+            rawPayloadHash,
+            processed: false,
+            processedAt: null,
+            updatedAt: new Date(),
+          },
+          update: {
+            paymentId,
+            signatureHash,
+            signatureTimestamp,
+            rawPayloadHash,
+            updatedAt: new Date(),
+          },
+          select: {
+            id: true,
+            processed: true,
+          },
+        });
+
+        if (webhookEvent.processed) {
+          return {
+            alreadyProcessed: true,
+            updatedPedido: null,
+          };
+        }
+      } else if (paymentId) {
+        webhookEvent = await tx.mercadoPagoWebhookEvent.create({
+          data: {
+            provider: "mercadopago",
+            notificationId: null,
+            paymentId,
+            signatureHash,
+            signatureTimestamp,
+            rawPayloadHash,
+            processed: false,
+            processedAt: null,
+            updatedAt: new Date(),
+          },
+          select: {
+            id: true,
           },
         });
       }
@@ -504,12 +574,36 @@ export async function processMercadoPagoWebhook(payload) {
         },
       });
 
-      return { updatedPedido };
+      if (webhookEvent?.id) {
+        await tx.mercadoPagoWebhookEvent.update({
+          where: { id: webhookEvent.id },
+          data: {
+            processed: true,
+            processedAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      return { alreadyProcessed: false, updatedPedido };
     });
+
+    if (txResult.alreadyProcessed) {
+      return {
+        ...normalized,
+        ignored: true,
+        reason: "WEBHOOK_ALREADY_PROCESSED",
+      };
+    }
 
     pedidoAtualizado = txResult.updatedPedido;
   } catch (error) {
-    if (error?.code === "P2002" && String(error?.meta?.target || "").includes("paymentId")) {
+    if (
+      error?.code === "P2002" &&
+      (String(error?.meta?.target || "").includes("paymentId") ||
+        String(error?.meta?.target || "").includes("provider") ||
+        String(error?.meta?.target || "").includes("notificationId"))
+    ) {
       return {
         ...normalized,
         ignored: true,
