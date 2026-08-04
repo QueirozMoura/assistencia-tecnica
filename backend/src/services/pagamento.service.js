@@ -17,15 +17,25 @@ export function validateMercadoPagoWebhookSignature({
     return { valid: true, reason: "WEBHOOK_SECRET_NOT_CONFIGURED" };
   }
 
-  if (!signatureHeader) {
-    return { valid: false, reason: "MISSING_SIGNATURE_HEADER" };
+  const signatureParts = String(signatureHeader || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const v1Part = signatureParts.find((part) => part.toLowerCase().startsWith("v1="));
+  if (!v1Part) {
+    return { valid: false, reason: "INVALID_SIGNATURE_FORMAT" };
+  }
+
+  const received = v1Part.slice(3).trim();
+  if (!received) {
+    return { valid: false, reason: "INVALID_SIGNATURE_FORMAT" };
   }
 
   const expected = crypto
     .createHmac("sha256", secret)
     .update(rawBody)
     .digest("hex");
-  const received = signatureHeader.trim();
 
   const valid =
     expected.length === received.length &&
@@ -209,22 +219,17 @@ export async function createMercadoPagoPreference({
       sandboxInitPoint: data?.sandbox_init_point,
       externalReference,
       raw: data,
-      requestPayload: body,
     };
   } catch (error) {
     const errorDetails = {
-      requestId: error?.mpRequestId || requestId,
-      pedidoId: pedido.id,
-      externalReference,
-      message: error?.message ?? null,
-      name: error?.name ?? null,
-      code: error?.code ?? null,
-      status: error?.status ?? error?.statusCode ?? null,
-      responseStatus: error?.response?.status ?? error?.mpStatus ?? null,
-      responseStatusText:
-        error?.response?.statusText ?? error?.mpStatusText ?? null,
-      responseData: error?.response?.data ?? error?.mpResponse ?? null,
-      cause: error?.cause ?? error?.mpCause ?? null,
+      message: error?.message,
+      statusCode: error?.statusCode,
+      mpStatus: error?.mpStatus,
+      mpStatusText: error?.mpStatusText,
+      mpRequestId: error?.mpRequestId,
+      mpCause: error?.mpCause,
+      mpResponse: error?.mpResponse,
+      stack: process.env.NODE_ENV === "development" ? error?.stack : undefined,
     };
 
     logger.error("Falha detalhada Mercado Pago (create preference)", errorDetails);

@@ -1,6 +1,11 @@
 import prisma from "../config/prisma.js";
+import logger from "../config/logger.js";
 import * as pedidoService from "../services/pedido.service.js";
-import { createMercadoPagoPreference, processMercadoPagoWebhook } from "../services/pagamento.service.js";
+import {
+  createMercadoPagoPreference,
+  processMercadoPagoWebhook,
+  validateMercadoPagoWebhookSignature,
+} from "../services/pagamento.service.js";
 
 export async function criarPreferencia(req, res, next) {
   try {
@@ -54,6 +59,47 @@ export async function criarPreferencia(req, res, next) {
 
 export async function webhookMercadoPago(req, res, next) {
   try {
+    const signatureHeader =
+      req.get("x-signature") ||
+      req.get("x-signature-hmac-sha256") ||
+      req.get("x-mercadopago-signature") ||
+      "";
+    const rawBody = req.rawBody || JSON.stringify(req.body || {});
+    const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+
+    logger.info("Webhook Mercado Pago recebido no endpoint de pagamentos", {
+      provider: "mercadopago",
+      hasSignatureHeader: Boolean(signatureHeader),
+      hasRawBody: Boolean(rawBody),
+    });
+
+    const validation = validateMercadoPagoWebhookSignature({
+      rawBody,
+      signatureHeader,
+      secret,
+    });
+
+    if (validation.reason === "WEBHOOK_SECRET_NOT_CONFIGURED") {
+      logger.warn("Webhook Mercado Pago sem validação de assinatura por compatibilidade", {
+        provider: "mercadopago",
+        reason: validation.reason,
+      });
+    } else if (!validation.valid) {
+      logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
+        provider: "mercadopago",
+        reason: validation.reason,
+      });
+
+      return res.status(401).json({
+        success: false,
+        message: "Assinatura do webhook inválida.",
+      });
+    } else {
+      logger.info("Assinatura do webhook Mercado Pago validada", {
+        provider: "mercadopago",
+      });
+    }
+
     const result = await processMercadoPagoWebhook(req.body);
     return res.status(200).json({
       success: true,

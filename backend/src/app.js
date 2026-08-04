@@ -78,7 +78,17 @@ app.use("/api/", limiter);
 // ─────────────────────────────────────────────
 // BODY PARSER
 // ─────────────────────────────────────────────
-app.use(express.json({ limit: "10mb" }));
+app.use(
+  express.json({
+    limit: "10mb",
+    verify: (req, _res, buf) => {
+      const requestPath = (req.originalUrl || req.url || "").split("?")[0];
+      if (req.method === "POST" && requestPath === "/api/pagamentos/webhook") {
+        req.rawBody = buf.toString("utf8");
+      }
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
