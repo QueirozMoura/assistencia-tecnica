@@ -401,6 +401,39 @@ export async function processMercadoPagoWebhook(payload) {
     };
   }
 
+  const expectedAmount = Number(pedidoAtual?.valorTotal);
+  const receivedAmount = Number(payment?.transaction_amount);
+  const invalidAmount =
+    !Number.isFinite(expectedAmount) || !Number.isFinite(receivedAmount);
+
+  if (invalidAmount || Math.abs(receivedAmount - expectedAmount) > 0.01) {
+    logger.warn("Webhook ignorado por divergência de valor do pagamento", {
+      pedidoId,
+      paymentId: payment?.id,
+      expectedAmount,
+      receivedAmount,
+    });
+    return {
+      ...normalized,
+      ignored: true,
+      reason: "PAYMENT_AMOUNT_MISMATCH",
+    };
+  }
+
+  if (!payment?.preference_id || payment.preference_id !== pedidoAtual?.preferenceId) {
+    logger.warn("Webhook ignorado por divergência de preferência do pagamento", {
+      pedidoId,
+      paymentId: payment?.id,
+      expectedPreferenceId: pedidoAtual?.preferenceId ?? null,
+      receivedPreferenceId: payment?.preference_id ?? null,
+    });
+    return {
+      ...normalized,
+      ignored: true,
+      reason: "PAYMENT_PREFERENCE_MISMATCH",
+    };
+  }
+
   const mapped = mapMercadoPagoStatusToInternal(payment?.status);
 
   const pedidoAtualizado = await prisma.pedido.update({
