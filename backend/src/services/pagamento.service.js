@@ -481,6 +481,7 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
   }
 
   const paymentId = payment?.id ? String(payment.id) : null;
+  const notificationId = normalized.id != null ? String(normalized.id) : null;
 
   const mapped = mapMercadoPagoStatusToInternal(payment?.status);
 
@@ -490,17 +491,17 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
     const txResult = await prisma.$transaction(async (tx) => {
       let webhookEvent = null;
 
-      if (normalized.id) {
+      if (notificationId) {
         webhookEvent = await tx.mercadoPagoWebhookEvent.upsert({
           where: {
             provider_notificationId: {
               provider: "mercadopago",
-              notificationId: normalized.id,
+              notificationId,
             },
           },
           create: {
             provider: "mercadopago",
-            notificationId: normalized.id,
+            notificationId,
             paymentId,
             signatureHash,
             signatureTimestamp,
