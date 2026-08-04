@@ -434,6 +434,14 @@ export async function processMercadoPagoWebhook(payload) {
     };
   }
 
+  logger.info("DEBUG PREFERENCE MATCH", {
+  paymentId: payment?.id,
+  paymentPreferenceId: payment?.preference_id,
+  orderPreferenceId: pedidoAtual?.preferenceId,
+  pedidoId: pedidoAtual?.id,
+  externalReference: payment?.external_reference,
+});
+
   if (!payment?.preference_id || payment.preference_id !== pedidoAtual?.preferenceId) {
     logger.warn("Webhook ignorado por divergência de preferência do pagamento", {
       pedidoId,
