@@ -26,12 +26,38 @@ app.set("trust proxy", 1);
 // ─────────────────────────────────────────────
 // SEGURANÇA — Headers HTTP
 // ─────────────────────────────────────────────
+const isProduction = process.env.NODE_ENV === "production";
+
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+  objectSrc: ["'none'"],
+  frameAncestors: ["'none'"],
+  scriptSrc: ["'self'", "https://accounts.google.com", "https://apis.google.com"],
+  styleSrc: ["'self'", "https://fonts.googleapis.com"],
+  imgSrc: ["'self'", "https://res.cloudinary.com"],
+  fontSrc: ["'self'", "https://fonts.gstatic.com"],
+  connectSrc: [
+    "'self'",
+    "https://accounts.google.com",
+    "https://oauth2.googleapis.com",
+    "https://api.mercadopago.com",
+  ],
+  frameSrc: ["'self'", "https://accounts.google.com", "https://www.mercadopago.com", "https://www.mercadopago.com.br"],
+};
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
     xPoweredBy: false,
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: isProduction
+      ? {
+          useDefaults: false,
+          directives: cspDirectives,
+        }
+      : false,
   })
 );
 app.disable("x-powered-by");
