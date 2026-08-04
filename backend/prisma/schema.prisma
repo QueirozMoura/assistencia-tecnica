@@ -58,22 +58,23 @@ model Produto {
 }
 
 model Cliente {
-  id               Int           @id @default(autoincrement())
-  nome             String
-  email            String?       @unique
-  telefone         String
-  cpf              String?       @unique
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  senha            String?
-  googleId         String?       @unique
-  emailVerificado  Boolean       @default(false)
-  resetTokenHash   String?
-  resetTokenExpiry DateTime?
-  verifyTokenHash  String?
-  verifyTokenExpiry DateTime?
-  agendamentos     Agendamento[]
-  pedidos          Pedido[]
+  id                  Int                  @id @default(autoincrement())
+  nome                String
+  email               String?              @unique
+  telefone            String
+  cpf                 String?              @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  senha               String?
+  googleId            String?              @unique
+  emailVerificado     Boolean              @default(false)
+  resetTokenExpiry    DateTime?
+  resetTokenHash      String?
+  verifyTokenHash     String?
+  verifyTokenExpiry   DateTime?
+  agendamentos        Agendamento[]
+  clientRefreshTokens ClientRefreshToken[]
+  pedidos             Pedido[]
 
   @@map("clientes")
 }
@@ -115,7 +116,8 @@ model Pedido {
   preferenceId         String?
   externalReference    String?
   paidAt               DateTime?
-
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
   nomeDestinatario     String?
   telefoneEntrega      String?
   cep                  String?
@@ -125,41 +127,55 @@ model Pedido {
   bairro               String?
   cidade               String?
   estado               String?
-
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  checkoutAccessTokens CheckoutAccessToken[]
   itens                ItensPedido[]
   cliente              Cliente               @relation(fields: [clienteId], references: [id])
-  checkoutAccessTokens CheckoutAccessToken[]
 
   @@map("pedidos")
 }
 
 model CheckoutAccessToken {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   pedidoId  Int
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
   revokedAt DateTime?
-  createdAt DateTime @default(now())
-
-  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  pedido    Pedido    @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
 
   @@index([pedidoId])
   @@index([expiresAt])
   @@map("checkout_access_tokens")
 }
 
+model MercadoPagoWebhookEvent {
+  id                 Int       @id @default(autoincrement())
+  provider           String    @default("mercadopago")
+  notificationId     String?
+  paymentId          String?
+  signatureHash      String?
+  signatureTimestamp BigInt?
+  rawPayloadHash     String
+  processed          Boolean   @default(false)
+  processedAt        DateTime?
+  firstSeenAt        DateTime  @default(now())
+  updatedAt          DateTime
+
+  @@unique([provider, notificationId])
+  @@index([paymentId])
+  @@index([provider, processed])
+  @@map("mercado_pago_webhook_events")
+}
+
 model RefreshToken {
-  id        Int      @id @default(autoincrement())
-  tokenHash String   @unique
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
   usuarioId Int
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   revokedAt DateTime?
-
-  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
   @@index([expiresAt])
@@ -179,6 +195,21 @@ model ItensPedido {
   @@map("itens_pedido")
 }
 
+model ClientRefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  clienteId Int
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+  clientes  Cliente   @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@index([clienteId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("client_refresh_tokens")
+}
+
 enum Role {
   ADMIN
   TECNICO
@@ -195,8 +226,8 @@ enum StatusAgendamento {
 enum StatusPedido {
   PENDENTE
   PAGO
-  PREPARANDO
   ENVIADO
   ENTREGUE
   CANCELADO
+  PREPARANDO
 }

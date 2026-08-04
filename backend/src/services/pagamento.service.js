@@ -434,34 +434,64 @@ export async function processMercadoPagoWebhook(payload) {
     };
   }
 
+  const paymentId = payment?.id ? String(payment.id) : null;
+
   const mapped = mapMercadoPagoStatusToInternal(payment?.status);
 
-  const pedidoAtualizado = await prisma.pedido.update({
-    where: { id: pedidoId },
-    data: {
-      paymentId: payment?.id ? String(payment.id) : pedidoAtual.paymentId,
-      paymentMethod: payment?.payment_method_id || pedidoAtual.paymentMethod,
-      paymentStatus: mapped.paymentStatus,
-      status: mapped.pedidoStatus,
-      paidAt: mapped.paymentStatus === "PAID" ? new Date() : pedidoAtual.paidAt,
-    },
-    select: {
-      id: true,
-      status: true,
-      paymentStatus: true,
-      paymentId: true,
-      paymentMethod: true,
-      paidAt: true,
-      valorTotal: true,
-      cliente: {
+  let pedidoAtualizado;
+
+  try {
+    const txResult = await prisma.$transaction(async (tx) => {
+      if (paymentId) {
+        await tx.mercadoPagoWebhookEvent.create({
+          data: {
+            paymentId,
+            action: normalized.action || null,
+          },
+        });
+      }
+
+      const updatedPedido = await tx.pedido.update({
+        where: { id: pedidoId },
+        data: {
+          paymentId: paymentId || pedidoAtual.paymentId,
+          paymentMethod: payment?.payment_method_id || pedidoAtual.paymentMethod,
+          paymentStatus: mapped.paymentStatus,
+          status: mapped.pedidoStatus,
+          paidAt: mapped.paymentStatus === "PAID" ? new Date() : pedidoAtual.paidAt,
+        },
         select: {
           id: true,
-          nome: true,
-          email: true,
+          status: true,
+          paymentStatus: true,
+          paymentId: true,
+          paymentMethod: true,
+          paidAt: true,
+          valorTotal: true,
+          cliente: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+            },
+          },
         },
-      },
-    },
-  });
+      });
+
+      return { updatedPedido };
+    });
+
+    pedidoAtualizado = txResult.updatedPedido;
+  } catch (error) {
+    if (error?.code === "P2002" && String(error?.meta?.target || "").includes("paymentId")) {
+      return {
+        ...normalized,
+        ignored: true,
+        reason: "WEBHOOK_ALREADY_PROCESSED",
+      };
+    }
+    throw error;
+  }
 
   logger.info("Pedido atualizado por webhook Mercado Pago", {
     pedidoId,
