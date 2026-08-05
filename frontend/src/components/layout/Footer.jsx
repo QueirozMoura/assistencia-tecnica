@@ -174,7 +174,7 @@ export default function Footer({ onOpenCookieSettings }) {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container-max py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-[#8fa8c8]">
-          <p>© {new Date().getFullYear()} EletroCenter. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} JFQ assistência. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
             <Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
             <span>|</span>

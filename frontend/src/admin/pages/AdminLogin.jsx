@@ -71,7 +71,7 @@ export default function AdminLogin() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">Painel Administrativo</h1>
-          <p className="text-[#8fa8c8] text-sm mt-1">EletroCenter — Área restrita</p>
+          <p className="text-[#8fa8c8] text-sm mt-1">JFQ assistência — Área restrita</p>
         </div>
 
         {/* Card do formulário */}

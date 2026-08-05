@@ -41,7 +41,7 @@ const values = [
 ]
 
 const timeline = [
-  { year: '2014', title: 'Fundação', desc: 'A EletroCenter foi fundada com o objetivo de oferecer assistência técnica de qualidade em São Paulo.' },
+  { year: '2014', title: 'Fundação', desc: 'A JFQ assistência foi fundada com o objetivo de oferecer assistência técnica de qualidade em São Paulo.' },
   { year: '2016', title: 'Expansão', desc: 'Expandimos nossa área de atendimento para toda a Grande São Paulo e ABC Paulista.' },
   { year: '2018', title: 'E-commerce', desc: 'Lançamos nossa loja online de eletrodomésticos, ampliando o acesso aos melhores produtos.' },
   { year: '2020', title: 'Certificações', desc: 'Obtivemos certificações das principais marcas: Samsung, LG, Electrolux e Brastemp.' },
@@ -66,7 +66,7 @@ export default function About() {
                 Mais de 10 anos cuidando dos seus eletrodomésticos
               </h1>
               <p className="text-[#8fa8c8] text-lg leading-relaxed mb-6">
-                A EletroCenter nasceu da paixão por tecnologia e do compromisso com a qualidade. Somos especialistas em assistência técnica e venda de máquinas de lavar, lava e seca e centrífugas.
+                A JFQ assistência nasceu da paixão por tecnologia e do compromisso com a qualidade. Somos especialistas em assistência técnica e venda de máquinas de lavar, lava e seca e centrífugas.
               </p>
               <Link
                 to="/agendamento"
@@ -79,7 +79,7 @@ export default function About() {
               <div className="relative w-full h-80 rounded-2xl overflow-hidden">
                 <img
                   src={heroAbout}
-                  alt="Equipamentos EletroCenter"
+                  alt="Equipamentos JFQ assistência"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#001e40]/40 to-transparent" />
@@ -221,7 +221,7 @@ export default function About() {
         <div className="container-max">
           <SectionHeader
             badge="Diferenciais"
-            title="Por que escolher a EletroCenter?"
+            title="Por que escolher a JFQ assistência?"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {[

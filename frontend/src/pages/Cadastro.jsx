@@ -96,7 +96,7 @@ export default function Cadastro() {
                 <path d="M7 10h6M7 13h4" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
               </svg>
             </div>
-            EletroCenter
+            JFQ assistência
           </Link>
           <h1 className="text-2xl font-bold text-[#181c20] mt-4 mb-1">Criar conta</h1>
           <p className="text-sm text-[#737780]">Cadastre-se para acompanhar seus pedidos e agendamentos</p>

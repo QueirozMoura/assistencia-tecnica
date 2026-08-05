@@ -5,7 +5,7 @@ import { sendTelegramMessage } from "./telegram.service.js";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "noreply@assistencia.com";
 
-const APP = "EletroCenter";
+const APP = "JFQ assistência";
 
 function escapeHtml(value = "") {
   return String(value)

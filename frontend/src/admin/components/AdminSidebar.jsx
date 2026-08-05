@@ -94,7 +94,7 @@ export default function AdminSidebar({ collapsed, onToggle }) {
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <p className="text-sm font-bold text-white leading-tight">EletroCenter</p>
+            <p className="text-sm font-bold text-white leading-tight">JFQ assistência </p>
             <p className="text-[10px] text-[#8fa8c8] leading-tight">Painel Admin</p>
           </div>
         )}

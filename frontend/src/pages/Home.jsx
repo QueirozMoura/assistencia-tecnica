@@ -263,7 +263,7 @@ export default function Home() {
           <SectionHeader
             badge="Por que nos escolher"
             title="Diferenciais que fazem a diferença"
-            subtitle="Oferecemos muito mais do que um simples conserto. Conheça os benefícios de escolher a EletroCenter."
+            subtitle="Oferecemos muito mais do que um simples conserto. Conheça os benefícios de escolher a JFQ assistência."
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map(({ icon: Icon, title, desc }) => (

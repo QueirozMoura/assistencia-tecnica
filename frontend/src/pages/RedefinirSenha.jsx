@@ -47,7 +47,7 @@ export default function RedefinirSenha() {
                 <path d="M3 5l2-2h10l2 2" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
               </svg>
             </div>
-            EletroCenter
+            JFQ assistência
           </Link>
           <h1 className="text-2xl font-bold text-[#181c20] mt-4 mb-1">Redefinir senha</h1>
           <p className="text-sm text-[#737780]">Crie uma nova senha para sua conta</p>

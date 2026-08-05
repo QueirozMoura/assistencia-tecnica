@@ -35,7 +35,7 @@ export default function EsqueciSenha() {
                 <path d="M3 5l2-2h10l2 2" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
               </svg>
             </div>
-            EletroCenter
+            JFQ assistência
           </Link>
           <h1 className="text-2xl font-bold text-[#181c20] mt-4 mb-1">Esqueci minha senha</h1>
           <p className="text-sm text-[#737780]">Informe seu e-mail e enviaremos as instruções de recuperação</p>
