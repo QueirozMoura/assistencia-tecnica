@@ -21,6 +21,7 @@ import catMaquinas from "../assets/images/Máquinas de Lavar/WhatsApp Image 2026
 import catLavaSeca from "../assets/images/Lava e Seca/WhatsApp Image 2026-05-22 at 23.43.31.jpeg";
 import catMicroondas from "../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.57.jpeg";
 import catCentrifuga from "../assets/images/Máquinas de Lavar/WhatsApp Image 2026-05-22 at 23.41.47 (2).jpeg";
+import catGeladeiras from "../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.58 (1).jpeg";
 import ProductCard from "../components/ui/ProductCard";
 import ServiceCard from "../components/ui/ServiceCard";
 import SectionHeader from "../components/ui/SectionHeader";
@@ -65,7 +66,7 @@ const categoryCards = [
   {
     title: "Máquinas de Lavar",
     subtitle: "Top Load e Frontal",
-    to: "/catalogo?categoria=maquina-de-lavar",
+    to: "/catalogo?categoria=maquinas-de-lavar",
     image: catMaquinas,
     span: "lg:col-span-2 lg:row-span-2",
     textSize: "text-2xl",
@@ -81,7 +82,7 @@ const categoryCards = [
   {
     title: "Micro-ondas",
     subtitle: "Praticidade e tecnologia na cozinha",
-    to: "/catalogo?categoria=microondas",
+    to: "/catalogo?categoria=micro-ondas",
     image: catMicroondas,
     span: "",
     textSize: "text-lg",
@@ -89,9 +90,17 @@ const categoryCards = [
   {
     title: "Centrífugas",
     subtitle: "Secagem rápida e eficiente",
-    to: "/catalogo?categoria=centrifuga",
+    to: "/catalogo?categoria=centrifugas",
     image: catCentrifuga,
     span: "lg:col-span-2",
+    textSize: "text-lg",
+  },
+  {
+    title: "Geladeiras",
+    subtitle: "Conservação e economia de energia",
+    to: "/catalogo?categoria=geladeiras",
+    image: catGeladeiras,
+    span: "",
     textSize: "text-lg",
   },
 ];

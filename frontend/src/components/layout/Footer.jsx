@@ -6,11 +6,12 @@ import {
 
 const footerLinks = {
   produtos: [
-    { label: 'Máquinas de Lavar', to: '/catalogo?categoria=maquina-de-lavar' },
+    { label: 'Máquinas de Lavar', to: '/catalogo?categoria=maquinas-de-lavar' },
     { label: 'Lava e Seca', to: '/catalogo?categoria=lava-e-seca' },
-    { label: 'Micro-ondas', to: '/catalogo?categoria=microondas' },
-    { label: 'Centrífugas', to: '/catalogo?categoria=centrifuga' },
-    { label: 'Peças e Acessórios', to: '/catalogo?categoria=pecas' },
+    { label: 'Micro-ondas', to: '/catalogo?categoria=micro-ondas' },
+    { label: 'Geladeiras', to: '/catalogo?categoria=geladeiras' },
+    { label: 'Centrífugas', to: '/catalogo?categoria=centrifugas' },
+    { label: 'Peças e Acessórios', to: '/catalogo?categoria=pecas-e-acessorios' },
   ],
   servicos: [
     { label: 'Conserto de Máquina', to: '/assistencia' },

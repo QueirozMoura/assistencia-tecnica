@@ -12,10 +12,12 @@ const navLinks = [
     label: 'Produtos',
     to: '/catalogo',
     mega: [
-      { label: 'Máquinas de Lavar', to: '/catalogo?categoria=maquina-de-lavar', icon: Package },
+      { label: 'Máquinas de Lavar', to: '/catalogo?categoria=maquinas-de-lavar', icon: Package },
       { label: 'Lava e Seca', to: '/catalogo?categoria=lava-e-seca', icon: Package },
-      { label: 'Centrífugas', to: '/catalogo?categoria=centrifuga', icon: Package },
-      { label: 'Peças e Acessórios', to: '/catalogo?categoria=pecas', icon: Package },
+      { label: 'Micro-ondas', to: '/catalogo?categoria=micro-ondas', icon: Package },
+      { label: 'Geladeiras', to: '/catalogo?categoria=geladeiras', icon: Package },
+      { label: 'Centrífugas', to: '/catalogo?categoria=centrifugas', icon: Package },
+      { label: 'Peças e Acessórios', to: '/catalogo?categoria=pecas-e-acessorios', icon: Package },
     ],
   },
   {

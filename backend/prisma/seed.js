@@ -69,6 +69,12 @@ async function main() {
       descricao: "Peças originais e acessórios para eletrodomésticos",
       ativo: true,
     },
+    {
+      nome: "Geladeiras",
+      slug: "geladeiras",
+      descricao: "Geladeiras e refrigeradores das melhores marcas",
+      ativo: true,
+    },
   ];
 
   const categoriasCreated = [];
