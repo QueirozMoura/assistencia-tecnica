@@ -450,14 +450,26 @@ export default function Home() {
             {brands.map((brand) => (
               <div
                 key={brand.id}
-                className="bg-white rounded-xl p-4 flex flex-col items-center gap-2 card-hover border border-[#e5e8ee] cursor-default"
+                className="bg-white rounded-xl p-4 flex flex-col items-center justify-center gap-3 card-hover border border-[#e5e8ee] cursor-default h-28"
               >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm"
-                  style={{ backgroundColor: brand.bgColor, color: brand.color }}
-                >
-                  {brand.initial}
-                </div>
+                {brand.logo ? (
+                  <img
+                    src={brand.logo}
+                    alt={`Logo ${brand.name}`}
+                    className="h-8 w-auto max-w-[90px] object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm"
+                    style={{
+                      backgroundColor: brand.bgColor,
+                      color: brand.color,
+                    }}
+                  >
+                    {brand.initial}
+                  </div>
+                )}
                 <span className="text-xs font-medium text-[#43474f] text-center">
                   {brand.name}
                 </span>
