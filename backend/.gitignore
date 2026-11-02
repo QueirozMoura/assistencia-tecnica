@@ -11,4 +11,10 @@ node_modules
 
 
 # Scripts sensíveis (admin, seed, manutenção)
-scripts/
+scripts/*
+!scripts/migrate-local.js
+!scripts/setup-local.js
+!scripts/smoke-local.js
+!scripts/test-payment-local.js
+
+!scripts/test-stock-postgres.js

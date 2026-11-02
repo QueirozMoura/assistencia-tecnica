@@ -124,7 +124,10 @@ function maskAddress(pedido) {
 
 export function toPedidoSucessoDto(pedido) {
   return {
+    id: pedido.id,
     numeroPedido: pedido.id,
+    paymentStatus: pedido.paymentStatus || "PENDING",
+    paidAt: pedido.paidAt || null,
     status: pedido.status,
     valorTotal: toNumber(pedido.valorTotal),
     dataPedido: pedido.createdAt,

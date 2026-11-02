@@ -15,7 +15,7 @@ async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (token) headers['Authorization'] = `Bearer ${token}`
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers, credentials: 'include' })
   const responseBody = await res.json().catch(() => ({}))
 
   if (!res.ok) {
@@ -41,6 +41,7 @@ async function request(path, options = {}) {
 export async function login(email, senha) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method:  'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({ email, senha }),
   })
@@ -159,6 +160,7 @@ export async function adminUploadImagemProduto(file) {
 
   const res = await fetch(`${BASE_URL}/upload/produto`, {
     method:  'POST',
+    credentials: 'include',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body:    formData,
     // Não definir Content-Type — o browser define automaticamente com boundary

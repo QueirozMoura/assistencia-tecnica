@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 function normalizeClienteId(clienteId) {
   const parsed = Number(clienteId);
 
-  if (!parsed || Number.isNaN(parsed)) {
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
     throw Object.assign(new Error("Cliente não autenticado para este recurso."), { statusCode: 401 });
   }
 
@@ -91,13 +91,13 @@ export async function buscarAgendamentoPorIdDoCliente(id, clienteId) {
 }
 
 export async function criarAgendamento(dados) {
-  const { clienteId: clienteIdPayload, clienteAutenticadoId, ...restDados } = dados;
+  const { clienteId: _untrustedId, clienteAutenticadoId, ...restDados } = dados;
 
   const data = {
     ...restDados,
     ...(clienteAutenticadoId
       ? { clienteId: normalizeClienteId(clienteAutenticadoId) }
-      : { ...(clienteIdPayload ? { clienteId: clienteIdPayload } : {}) }),
+      : {}),
   };
 
   return prisma.agendamento.create({

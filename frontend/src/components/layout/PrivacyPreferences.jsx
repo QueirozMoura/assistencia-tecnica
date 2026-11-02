@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   COOKIE_DEFAULT_PREFERENCES,
@@ -123,11 +123,12 @@ export default function CookieConsent({
   onOpenSettings,
   onCloseSettings,
 }) {
-  const [draftPreferences, setDraftPreferences] = useState(COOKIE_DEFAULT_PREFERENCES)
-
-  useEffect(() => {
+  const [draftPreferences, setDraftPreferences] = useState(() => normalizeCookiePreferences(currentPreferences || COOKIE_DEFAULT_PREFERENCES))
+  const [previous, setPrevious] = useState({ currentPreferences, openSettings })
+  if (previous.currentPreferences !== currentPreferences || previous.openSettings !== openSettings) {
+    setPrevious({ currentPreferences, openSettings })
     setDraftPreferences(normalizeCookiePreferences(currentPreferences || COOKIE_DEFAULT_PREFERENCES))
-  }, [currentPreferences, openSettings])
+  }
 
   const handleChange = (patch) => {
     setDraftPreferences((prev) => normalizeCookiePreferences({ ...prev, ...patch }))

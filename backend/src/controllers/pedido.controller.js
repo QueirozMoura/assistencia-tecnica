@@ -113,7 +113,7 @@ export async function buscarPedidoSucessoPorId(req, res, next) {
       return res.status(400).json({ success: false, message: "ID inválido." });
     }
 
-    const pedido = await pedidoService.buscarPedidoPorId(id);
+    const pedido = await pedidoService.buscarPedidoPorIdDoCliente(id, req.cliente?.id);
 
     return res.status(200).json({
       success: true,

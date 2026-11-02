@@ -51,6 +51,7 @@ model Produto {
   categoriaId      Int
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  movimentos       EstoqueMovimento[]
   itensPedido      ItensPedido[]
   categoria        Categoria     @relation(fields: [categoriaId], references: [id])
 
@@ -127,10 +128,16 @@ model Pedido {
   bairro               String?
   cidade               String?
   estado               String?
+  stockLedgerVersion   Int?
+  creationKey          String?
+  creationHash         String?
+  checkoutInitPoint    String?
+  movimentos           EstoqueMovimento[]
   checkoutAccessTokens CheckoutAccessToken[]
   itens                ItensPedido[]
   cliente              Cliente               @relation(fields: [clienteId], references: [id])
 
+  @@unique([clienteId, creationKey])
   @@map("pedidos")
 }
 
@@ -188,6 +195,7 @@ model ItensPedido {
   pedidoId      Int
   produtoId     Int
   quantidade    Int
+  movimentos    EstoqueMovimento[]
   precoUnitario Decimal @db.Decimal(10, 2)
   pedido        Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
   produto       Produto @relation(fields: [produtoId], references: [id])
@@ -230,4 +238,26 @@ enum StatusPedido {
   ENTREGUE
   CANCELADO
   PREPARANDO
+}
+
+// CHECKs, immutable rows, stock application and deferred completeness are SQL migration rules.
+model EstoqueMovimento {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pedidoId       Int
+  itemId         Int
+  produtoId      Int
+  tipo           String
+  quantidade     Int
+  origem         String
+  debitoOrigemId String?  @unique @db.Uuid
+  createdAt      DateTime @default(now())
+  pedido         Pedido @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+  item           ItensPedido @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  produto        Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  debitoOrigem    EstoqueMovimento? @relation("Compensacao", fields: [debitoOrigemId], references: [id], onDelete: Restrict)
+  devolucao      EstoqueMovimento? @relation("Compensacao")
+
+  @@unique([itemId, tipo])
+  @@index([pedidoId])
+  @@map("estoque_movimentos")
 }

@@ -11,6 +11,7 @@ import { formatPrice }     from '../../../utils/formatPrice'
 import ConfirmModal        from '../../components/ConfirmModal'
 import AdminPagination     from '../../components/AdminPagination'
 import AdminSearchBar      from '../../components/AdminSearchBar'
+import { useAsyncData } from '../../../hooks/useAsyncData'
 
 const LIMIT = 10
 
@@ -18,15 +19,11 @@ export default function ProdutosList() {
   const navigate  = useNavigate()
   const location  = useLocation()
 
-  const [produtos,    setProdutos]    = useState([])
-  const [meta,        setMeta]        = useState({ total: 0, totalPages: 1 })
   const [categorias,  setCategorias]  = useState([])
   const [page,        setPage]        = useState(1)
   const [busca,       setBusca]       = useState('')
   const [filtroAtivo, setFiltroAtivo] = useState('')   // '' | 'true' | 'false'
   const [filtroCat,   setFiltroCat]   = useState('')
-  const [loading,     setLoading]     = useState(true)
-  const [error,       setError]       = useState(null)
 
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting,     setDeleting]     = useState(false)
@@ -53,9 +50,7 @@ export default function ProdutosList() {
   }, [])
 
   // Carregar produtos
-  const fetchProdutos = useCallback(() => {
-    setLoading(true)
-    setError(null)
+  const loadProdutos = useCallback(async () => {
     const params = {
       page,
       limit: LIMIT,
@@ -66,17 +61,11 @@ export default function ProdutosList() {
     // Sobrescrever ativo padrão do backend (que filtra só ativos)
     if (filtroAtivo === '') params.ativo = undefined
 
-    adminGetProdutos(params)
-      .then((res) => {
-        setProdutos(res.data ?? [])
-        setMeta(res.meta ?? { total: 0, totalPages: 1 })
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
+    const res = await adminGetProdutos(params)
+    return { produtos: res.data ?? [], meta: res.meta ?? { total: 0, totalPages: 1 } }
   }, [page, busca, filtroCat, filtroAtivo])
-
-  useEffect(() => { fetchProdutos() }, [fetchProdutos])
-  useEffect(() => { setPage(1) }, [busca, filtroCat, filtroAtivo])
+  const { data, loading, error, setError, reload: fetchProdutos } = useAsyncData(loadProdutos, { produtos: [], meta: { total: 0, totalPages: 1 } })
+  const { produtos, meta } = data
 
   // Toggle ativo
   async function handleToggleAtivo(prod) {
@@ -143,11 +132,11 @@ export default function ProdutosList() {
       {/* Filtros */}
       <div className="flex flex-wrap gap-3">
         <div className="flex-1 min-w-[200px]">
-          <AdminSearchBar value={busca} onChange={setBusca} placeholder="Buscar por nome, SKU..." />
+          <AdminSearchBar value={busca} onChange={(value) => { setBusca(value); setPage(1) }} placeholder="Buscar por nome, SKU..." />
         </div>
         <select
           value={filtroCat}
-          onChange={(e) => setFiltroCat(e.target.value)}
+          onChange={(e) => { setFiltroCat(e.target.value); setPage(1) }}
           className="border border-[#e5e8ee] rounded-xl px-3 py-2.5 text-sm text-[#43474f] outline-none focus:border-[#0070ea] bg-white"
         >
           <option value="">Todas as categorias</option>
@@ -157,7 +146,7 @@ export default function ProdutosList() {
         </select>
         <select
           value={filtroAtivo}
-          onChange={(e) => setFiltroAtivo(e.target.value)}
+          onChange={(e) => { setFiltroAtivo(e.target.value); setPage(1) }}
           className="border border-[#e5e8ee] rounded-xl px-3 py-2.5 text-sm text-[#43474f] outline-none focus:border-[#0070ea] bg-white"
         >
           <option value="">Todos os status</option>
@@ -215,7 +204,7 @@ export default function ProdutosList() {
                       <p className="font-medium text-[#43474f]">Nenhum produto encontrado</p>
                       {(busca || filtroCat || filtroAtivo) && (
                         <button
-                          onClick={() => { setBusca(''); setFiltroCat(''); setFiltroAtivo('') }}
+                          onClick={() => { setBusca(''); setFiltroCat(''); setFiltroAtivo(''); setPage(1) }}
                           className="text-[#0070ea] text-sm hover:underline"
                         >
                           Limpar filtros

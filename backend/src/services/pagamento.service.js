@@ -1,4 +1,7 @@
+import { releaseOrderStock } from "./stockLedger.service.js";
+import { paymentOrderTransition } from "./orderState.js";
 import crypto from "crypto";
+import { getPaymentCredentials, isPaymentTestMode, validateLocalPaymentUrls } from "../config/paymentEnvironment.js";
 import logger from "../config/logger.js";
 import prisma from "../config/prisma.js";
 import { notifyAdminPaymentApproved } from "./notification.service.js";
@@ -32,7 +35,7 @@ export function validateMercadoPagoWebhookSignature({
   const timestamp = tsPart.slice(3).trim();
   const received = v1Part.slice(3).trim();
 
-  if (!timestamp || !received) {
+  if (!/^\d+$/.test(timestamp) || !/^[a-f0-9]{64}$/i.test(received)) {
     return { valid: false, reason: "INVALID_SIGNATURE_FORMAT" };
   }
 
@@ -44,7 +47,7 @@ export function validateMercadoPagoWebhookSignature({
     return { valid: false, reason: "MISSING_DATA_ID" };
   }
 
-  const manifest = `id:${dataId};request-id:${requestId};ts:${timestamp};`;
+  const manifest = `id:${String(dataId).toLowerCase()};request-id:${requestId};ts:${timestamp};`;
 
   const expected = crypto
     .createHmac("sha256", secret)
@@ -53,7 +56,7 @@ export function validateMercadoPagoWebhookSignature({
 
   const valid =
     expected.length === received.length &&
-    crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(received));
+    crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(received, "hex"));
 
   return { valid, reason: valid ? "OK" : "INVALID_SIGNATURE" };
 }
@@ -67,18 +70,13 @@ export async function createMercadoPagoPreference({
   itens = [],
   payer,
 }) {
-  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const { accessToken } = await getPaymentCredentials();
   const notificationUrl = process.env.MERCADO_PAGO_NOTIFICATION_URL;
   const successUrl = process.env.MERCADO_PAGO_SUCCESS_URL;
   const failureUrl = process.env.MERCADO_PAGO_FAILURE_URL;
   const pendingUrl = process.env.MERCADO_PAGO_PENDING_URL;
 
-  if (!accessToken) {
-    throw Object.assign(
-      new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."),
-      { statusCode: 500 },
-    );
-  }
+  validateLocalPaymentUrls({ successUrl, failureUrl, pendingUrl, notificationUrl });
 
   const externalReference = `pedido_${pedido.id}`;
 
@@ -155,13 +153,12 @@ export async function createMercadoPagoPreference({
   }
 
   const requestId = `mp_pref_${pedido.id}_${Date.now()}`;
-  const tokenPrefix = String(accessToken).slice(0, 8);
   const sanitizedPayload = {
     ...body,
     payer: body.payer
       ? {
           email: body.payer.email ? "***@***" : undefined,
-          name: body.payer.name || undefined,
+          name: body.payer.name ? "***" : undefined,
         }
       : undefined,
   };
@@ -170,7 +167,6 @@ export async function createMercadoPagoPreference({
     requestId,
     pedidoId: pedido.id,
     externalReference,
-    tokenPrefix,
     payload: sanitizedPayload,
   });
 
@@ -184,6 +180,7 @@ export async function createMercadoPagoPreference({
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(15000),
       },
     );
 
@@ -211,8 +208,6 @@ export async function createMercadoPagoPreference({
         statusText: response.statusText,
         message: data?.message ?? null,
         error: data?.error ?? null,
-        cause: data?.cause ?? null,
-        responseData: data,
       };
 
       logger.error("Erro ao criar preferência Mercado Pago", details);
@@ -221,8 +216,6 @@ export async function createMercadoPagoPreference({
       err.statusCode = 502;
       err.mpStatus = response.status;
       err.mpStatusText = response.statusText;
-      err.mpResponse = data;
-      err.mpCause = data?.cause ?? null;
       err.mpRequestId = requestId;
       throw err;
     }
@@ -241,8 +234,6 @@ export async function createMercadoPagoPreference({
       mpStatus: error?.mpStatus,
       mpStatusText: error?.mpStatusText,
       mpRequestId: error?.mpRequestId,
-      mpCause: error?.mpCause,
-      mpResponse: error?.mpResponse,
       stack: process.env.NODE_ENV === "development" ? error?.stack : undefined,
     };
 
@@ -304,19 +295,16 @@ function extractPedidoIdFromExternalReference(externalReference) {
 }
 
 async function getMercadoPagoPaymentById(paymentId) {
-  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!accessToken) {
-    throw Object.assign(
-      new Error("MERCADO_PAGO_ACCESS_TOKEN não configurado."),
-      { statusCode: 500 },
-    );
+  const { accessToken, testMode, sellerId } = await getPaymentCredentials();
+  if (!/^\d+$/.test(String(paymentId))) {
+    throw Object.assign(new Error("ID de pagamento inválido."), { statusCode: 400 });
   }
 
-  
   const response = await fetch(
-    `https://api.mercadopago.com/v1/payments/${paymentId}`,
+    `https://api.mercadopago.com/v1/payments/${encodeURIComponent(paymentId)}`,
     {
       method: "GET",
+      signal: AbortSignal.timeout(10000),
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
@@ -340,7 +328,6 @@ async function getMercadoPagoPaymentById(paymentId) {
       paymentId,
       status: response.status,
       statusText: response.statusText,
-      responseData: data,
     });
 
     const err = new Error("Falha ao consultar pagamento no Mercado Pago.");
@@ -348,11 +335,17 @@ async function getMercadoPagoPaymentById(paymentId) {
     throw err;
   }
 
+  if (testMode && (data?.live_mode !== false || String(data?.collector_id) !== sellerId)) {
+    throw Object.assign(new Error("Pagamento recusado: ambiente ou vendedor incompatível com o teste."), { statusCode: 403 });
+  }
   return data;
 }
 
 export async function processMercadoPagoWebhook(payload, metadata = {}) {
   const normalized = normalizeMercadoPagoNotification(payload);
+  if (isPaymentTestMode() && normalized.liveMode !== false) {
+    throw Object.assign(new Error("Webhook local exige live_mode=false."), { statusCode: 403 });
+  }
   const rawPayload =
     typeof metadata.rawPayload === "string"
       ? metadata.rawPayload
@@ -486,9 +479,17 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
   const mapped = mapMercadoPagoStatusToInternal(payment?.status);
 
   let pedidoAtualizado;
+  let becamePaid = false;
 
   try {
     const txResult = await prisma.$transaction(async (tx) => {
+      const current = await tx.pedido.findUnique({ where: { id: pedidoId } });
+      if (!current) return { ignoredReason: "PEDIDO_NOT_FOUND" };
+      const transition = paymentOrderTransition(current, mapped);
+      if (transition.ignoredReason) return transition;
+      if (Number(current.valorTotal) !== expectedAmount || current.preferenceId !== pedidoAtual.preferenceId) {
+        throw Object.assign(new Error("Pedido alterado durante consulta do pagamento."), { statusCode: 409 });
+      }
       let webhookEvent = null;
 
       if (notificationId) {
@@ -548,15 +549,24 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
         });
       }
 
-      const updatedPedido = await tx.pedido.update({
-        where: { id: pedidoId },
+      const changed = await tx.pedido.updateMany({
+        where: { id: pedidoId, status: current.status, paymentStatus: current.paymentStatus },
         data: {
-          paymentId: paymentId || pedidoAtual.paymentId,
-          paymentMethod: payment?.payment_method_id || pedidoAtual.paymentMethod,
+          paymentId: paymentId || current.paymentId,
+          paymentMethod: payment?.payment_method_id || current.paymentMethod,
           paymentStatus: mapped.paymentStatus,
-          status: mapped.pedidoStatus,
-          paidAt: mapped.paymentStatus === "PAID" ? new Date() : pedidoAtual.paidAt,
+          status: transition.status,
+          paidAt: mapped.paymentStatus === "PAID" ? (current.paidAt || new Date()) : current.paidAt,
         },
+      });
+      if (changed.count !== 1) {
+        throw Object.assign(new Error("Pedido alterado por outra solicitação. Reenvie a notificação."), { statusCode: 409 });
+      }
+      if (transition.status === "CANCELADO") {
+        await releaseOrderStock(tx, pedidoId, "WEBHOOK_CANCELAMENTO");
+      }
+      const updatedPedido = await tx.pedido.findUnique({
+        where: { id: pedidoId },
         select: {
           id: true,
           status: true,
@@ -586,9 +596,13 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
         });
       }
 
-      return { alreadyProcessed: false, updatedPedido };
+      return { alreadyProcessed: false, updatedPedido, becamePaid: current.paymentStatus !== "PAID" && mapped.paymentStatus === "PAID" };
     });
 
+    if (txResult.ignoredReason) {
+      logger.warn("Webhook exige conciliação ou foi ignorado por regressão de estado", { pedidoId, reason: txResult.ignoredReason });
+      return { ...normalized, ignored: true, reason: txResult.ignoredReason };
+    }
     if (txResult.alreadyProcessed) {
       return {
         ...normalized,
@@ -598,6 +612,7 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
     }
 
     pedidoAtualizado = txResult.updatedPedido;
+    becamePaid = txResult.becamePaid;
   } catch (error) {
     if (
       error?.code === "P2002" &&
@@ -623,10 +638,7 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
     newPaymentStatus: pedidoAtualizado.paymentStatus,
   });
 
-  const becamePaid =
-    pedidoAtual.paymentStatus !== "PAID" &&
-    pedidoAtualizado.paymentStatus === "PAID" &&
-    pedidoAtualizado.status === "PAGO";
+
 
   if (becamePaid) {
     try {

@@ -3,8 +3,8 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { useOutletContext } from 'react-router-dom'
 import { SlidersHorizontal, X, ChevronDown, ChevronUp, Search, AlertCircle } from 'lucide-react'
 import ProductCard from '../components/ui/ProductCard'
-import SectionHeader from '../components/ui/SectionHeader'
 import { getProdutos, getCategorias } from '../services/api'
+import { useAsyncData } from '../hooks/useAsyncData'
 
 // Constantes de UI — não são dados do banco
 const priceRanges = [
@@ -31,9 +31,24 @@ function CardSkeleton() {
   )
 }
 
+function FilterSection({ title, id, children, openSection, setOpenSection }) {
+  return (
+    <div className="border-b border-[#e5e8ee] pb-4 mb-4">
+      <button
+        onClick={() => setOpenSection((s) => ({ ...s, [id]: !s[id] }))}
+        className="flex items-center justify-between w-full text-sm font-semibold text-[#181c20] mb-3"
+      >
+        {title}
+        {openSection[id] ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+      </button>
+      {openSection[id] && children}
+    </div>
+  )
+}
+
 export default function Catalog() {
   const { cart, wishlist } = useOutletContext()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   // ── Filtros de UI ──────────────────────────────────────────
   const [filtersOpen, setFiltersOpen]           = useState(false)
@@ -48,11 +63,6 @@ export default function Catalog() {
   const searchQuery = searchParams.get('busca') || ''
 
   // ── Estado da API — Produtos ───────────────────────────────
-  const [products, setProducts]     = useState([])
-  const [meta, setMeta]             = useState({ total: 0, totalPages: 1 })
-  const [loadingProds, setLoadingProds] = useState(true)
-  const [errorProds, setErrorProds] = useState(null)
-
   // ── Estado da API — Categorias ─────────────────────────────
   const [categorias, setCategorias]     = useState([])
   const [loadingCats, setLoadingCats]   = useState(true)
@@ -66,9 +76,7 @@ export default function Catalog() {
   }, [])
 
   // ── Buscar produtos (sempre que filtros/página mudam) ──────
-  const fetchProducts = useCallback(() => {
-    setLoadingProds(true)
-    setErrorProds(null)
+  const loadProducts = useCallback(async () => {
 
     const priceRange = priceRanges.find((r) => r.label === selectedPriceRange)
 
@@ -85,18 +93,11 @@ export default function Catalog() {
     if (sortBy === 'maior-preco') { params.orderBy = 'preco'; params.order = 'desc' }
     if (sortBy === 'nome')        { params.orderBy = 'nome';  params.order = 'asc' }
 
-    getProdutos(params)
-      .then((res) => {
-        setProducts(res.data)
-        setMeta(res.meta)
-      })
-      .catch((err) => setErrorProds(err.message))
-      .finally(() => setLoadingProds(false))
+    const res = await getProdutos(params)
+    return { products: res.data, meta: res.meta }
   }, [page, searchQuery, selectedCategories, selectedPriceRange, sortBy])
-
-  useEffect(() => {
-    fetchProducts()
-  }, [fetchProducts])
+  const { data, loading: loadingProds, error: errorProds, reload: fetchProducts } = useAsyncData(loadProducts, { products: [], meta: { total: 0, totalPages: 1 } })
+  const { products, meta } = data
 
   // ── Helpers ────────────────────────────────────────────────
   const toggleCategory = (slug) => {
@@ -114,18 +115,7 @@ export default function Catalog() {
 
   const hasFilters = selectedCategories.length > 0 || selectedPriceRange
 
-  const FilterSection = ({ title, id, children }) => (
-    <div className="border-b border-[#e5e8ee] pb-4 mb-4">
-      <button
-        onClick={() => setOpenSection((s) => ({ ...s, [id]: !s[id] }))}
-        className="flex items-center justify-between w-full text-sm font-semibold text-[#181c20] mb-3"
-      >
-        {title}
-        {openSection[id] ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-      </button>
-      {openSection[id] && children}
-    </div>
-  )
+
 
   return (
     <div className="bg-[#f7f9ff] min-h-screen">
@@ -189,7 +179,7 @@ export default function Catalog() {
               </div>
 
               {/* Categorias */}
-              <FilterSection title="Categoria" id="cat">
+              <FilterSection openSection={openSection} setOpenSection={setOpenSection} title="Categoria" id="cat">
                 {loadingCats ? (
                   <div className="space-y-2">
                     {[1, 2, 3, 4].map((i) => (
@@ -216,7 +206,7 @@ export default function Catalog() {
               </FilterSection>
 
               {/* Faixa de Preço */}
-              <FilterSection title="Faixa de Preço" id="price">
+              <FilterSection openSection={openSection} setOpenSection={setOpenSection} title="Faixa de Preço" id="price">
                 <div className="space-y-2">
                   {priceRanges.map((range) => (
                     <label key={range.label} className="flex items-center gap-2.5 cursor-pointer group">

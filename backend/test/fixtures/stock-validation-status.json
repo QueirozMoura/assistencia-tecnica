@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-02",
+  "status": "BLOCKED_NOT_RELEASED",
+  "project": {
+    "id": "cool-rice-07419769",
+    "name": "jfq-refresh-migration-rehearsal",
+    "branch": "br-billowing-wave-bchj34qy",
+    "endpoint": "ep-divine-rice-bcxmkisc",
+    "database": "neondb",
+    "identityReconfirmed": true
+  },
+  "connectivity": {
+    "connectorSql": "accessible",
+    "terminalDns": {
+      "stage": "dns",
+      "code": "EAI_AGAIN",
+      "pythonErrno": -3
+    },
+    "terminalLoopbackTcp": {
+      "code": "EPERM",
+      "errno": 1
+    },
+    "executionContext": {
+      "noNewPrivs": 1,
+      "seccompMode": 2
+    },
+    "diagnosis": "Terminal network/socket restrictions; exact enforcement layer not changed or bypassed.",
+    "preflightExitCode": 2
+  },
+  "postgresReadOnlyAssertions": {
+    "no_negative_stock": true,
+    "new_items_have_matching_debit": true,
+    "cancelled_reservations_released": true,
+    "compensation_links_valid": true,
+    "ambiguous_history_has_no_movements": true,
+    "ledger_rows": "15"
+  },
+  "automatedTests": {
+    "backend": 144,
+    "frontend": 25,
+    "total": 169,
+    "addedEvidenceValidatorTests": 15
+  },
+  "realConcurrentScenariosPassed": 0,
+  "prismaRestScenariosExecuted": 0,
+  "newDatabaseWrites": false,
+  "newMigrationApplications": false,
+  "migration": {
+    "name": "20261102200000_order_stock_ledger",
+    "sha256": "a630c14a6707f75f01259975d6a20d72084eb79b7e1cd8cf359cda234d796058",
+    "unchanged": true,
+    "previousIsolatedRehearsalRetained": true
+  },
+  "preparedRunner": {
+    "minimumRounds": 3,
+    "sequentialScenariosPerRound": 35,
+    "lockContentionScenariosPerRound": 5,
+    "evidenceRequires": [
+      "Three distinct PostgreSQL backend PIDs",
+      "Holder mutated data and remains in an open transaction",
+      "Observer sees waiter active with wait_event_type=Lock",
+      "pg_blocking_pids(waiter) includes holder",
+      "Ledger and inventory assertions after commit"
+    ],
+    "prismaRestIncluded": false
+  },
+  "blockedScenarios": [
+    "Two orders competing for last unit on independent connections",
+    "Simultaneous cancellation of one order",
+    "Rejected payment webhook versus admin cancellation, both ordering directions",
+    "Concurrent duplicate creation intent and repeated rounds",
+    "Prisma migrate deploy and real Prisma transactions against isolated full application database",
+    "Real REST legacy and simulated-provider Mercado Pago checkout",
+    "Real REST cancellation, signed webhooks, duplicates, out-of-order events, historical handling and authorization"
+  ],
+  "previousSequentialRehearsal": {
+    "scenarios": 33,
+    "rerunThisTurn": false
+  },
+  "finalChecks": {
+    "frontendLint": "passed, zero errors or warnings",
+    "frontendBuild": "passed, existing bundle >500kB warning",
+    "prismaValidate": "passed offline with synthetic URL; migration deployment not tested",
+    "gitDiffCheck": "passed",
+    "knownSecretValueMatches": 0,
+    "credentialPatternMatches": 0,
+    "protectedFileHashesUnchanged": 9,
+    "envIgnored": true,
+    "envMode": "0600",
+    "stagedDiffEmpty": true
+  }
+}

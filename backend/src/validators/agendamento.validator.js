@@ -3,8 +3,8 @@ import { z } from "zod";
 export const agendamentoSchema = z.object({
   nomeContato: z
     .string({ required_error: "Nome é obrigatório." })
-    .min(2, "Nome deve ter no mínimo 2 caracteres.")
-    .trim(),
+    .trim()
+    .min(2, "Nome deve ter no mínimo 2 caracteres."),
   telefoneContato: z
     .string()
     .trim()
@@ -14,7 +14,7 @@ export const agendamentoSchema = z.object({
       (value) => !value || /^(\+55\s?)?(\(?\d{2}\)?\s?)(\d{4,5}[-\s]?\d{4})$/.test(value),
       "Telefone inválido. Use o formato (11) 99999-9999."
     ),
-  email: z.string().email("E-mail inválido.").trim().optional().nullable(),
+  email: z.string().trim().email("E-mail inválido.").optional().nullable().or(z.literal("")),
   whatsapp: z
     .string({ required_error: "WhatsApp é obrigatório." })
     .trim()
@@ -26,21 +26,22 @@ export const agendamentoSchema = z.object({
   endereco: z.string().trim().optional().nullable(),
   cep: z
     .string()
-    .regex(/^\d{5}-?\d{3}$/, "CEP inválido. Use o formato 00000-000.")
     .trim()
+    .regex(/^\d{5}-?\d{3}$/, "CEP inválido. Use o formato 00000-000.")
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal("")),
   cidade: z.string().trim().optional().nullable(),
   equipamento: z
     .string({ required_error: "Equipamento é obrigatório." })
-    .min(2, "Informe o tipo de equipamento.")
-    .trim(),
+    .trim()
+    .min(2, "Informe o tipo de equipamento."),
   marca: z.string().trim().optional().nullable(),
   modelo: z.string().trim().optional().nullable(),
   problema: z
     .string({ required_error: "Descrição do problema é obrigatória." })
-    .min(10, "Descreva o problema com pelo menos 10 caracteres.")
-    .trim(),
+    .trim()
+    .min(10, "Descreva o problema com pelo menos 10 caracteres."),
   observacoes: z.string().trim().optional().nullable(),
   melhorHorario: z.string().trim().optional().nullable(),
   dataAgendamento: z

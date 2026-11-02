@@ -1,9 +1,9 @@
-import { createContext, useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 const STORAGE_KEY_TOKEN = 'admin_token'
 const STORAGE_KEY_USER  = 'admin_user'
 
-export const AuthContext = createContext(null)
+import { AuthContext } from './auth-context'
 
 function readStoredValue(key) {
   if (typeof window === 'undefined') return null
@@ -66,6 +66,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(() => {
+    const base = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+    void fetch(`${base}/auth/logout`, { method: 'POST', credentials: 'include', keepalive: true }).catch(() => {})
     clearStoredAuth()
     setToken(null)
     setUser(null)

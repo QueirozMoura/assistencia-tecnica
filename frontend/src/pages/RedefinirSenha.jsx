@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { clientResetPwd } from '../services/clientApi'
 
@@ -11,12 +11,11 @@ export default function RedefinirSenha() {
   const [confirmar,    setConfirmar]    = useState('')
   const [showSenha,    setShowSenha]    = useState(false)
   const [submitting,   setSubmitting]   = useState(false)
-  const [error,        setError]        = useState(null)
+  const [submitError, setError] = useState(null)
+  const error = !token ? 'Link inválido. Solicite um novo link de recuperação.' : submitError
   const [success,      setSuccess]      = useState(false)
 
-  useEffect(() => {
-    if (!token) setError('Link inválido. Solicite um novo link de recuperação.')
-  }, [token])
+
 
   async function handleSubmit(e) {
     e.preventDefault()

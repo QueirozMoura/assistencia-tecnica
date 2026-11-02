@@ -1,0 +1,211 @@
+{
+  "date": "2026-11-02",
+  "project": {
+    "id": "cool-rice-07419769",
+    "name": "jfq-refresh-migration-rehearsal",
+    "branch": "br-billowing-wave-bchj34qy",
+    "database": "neondb",
+    "postgresMajor": 18,
+    "plan": "free_v3"
+  },
+  "schema": "jfq_stock_20261102_b",
+  "migration": "20261102200000_order_stock_ledger",
+  "appliedOnlyToIsolatedSchema": true,
+  "existingPublicFixtureCountsPreserved": true,
+  "sequentialScenarios": [
+    {
+      "name": "create pending order reserves stock without marking payment paid",
+      "passed": true
+    },
+    {
+      "name": "repeated debit function is idempotent",
+      "passed": true
+    },
+    {
+      "name": "cancel releases exactly original debit",
+      "passed": true
+    },
+    {
+      "name": "repeated cancellation return is idempotent",
+      "passed": true
+    },
+    {
+      "name": "cancelled order cannot reopen",
+      "passed": true
+    },
+    {
+      "name": "historical data preserved with unknown version",
+      "passed": true
+    },
+    {
+      "name": "historical cancellation does not return unproven inventory",
+      "passed": true
+    },
+    {
+      "name": "historical debit cannot be invented",
+      "passed": true
+    },
+    {
+      "name": "create proof and persist it between transactions",
+      "passed": true
+    },
+    {
+      "name": "persisted original proof supports later return",
+      "passed": true
+    },
+    {
+      "name": "insufficient second product rolls back first debit and entire order",
+      "passed": true
+    },
+    {
+      "name": "failure after debit rolls back order and ledger",
+      "passed": true
+    },
+    {
+      "name": "prepare return rollback fixture",
+      "passed": true
+    },
+    {
+      "name": "failure after return rolls back state stock and compensation",
+      "passed": true
+    },
+    {
+      "name": "missing debit helper is rejected at commit",
+      "passed": true
+    },
+    {
+      "name": "missing release helper is rejected at commit",
+      "passed": true
+    },
+    {
+      "name": "invalid quantity 0 rejected atomically",
+      "passed": true
+    },
+    {
+      "name": "invalid quantity -1 rejected atomically",
+      "passed": true
+    },
+    {
+      "name": "ledger cannot be edited",
+      "passed": true
+    },
+    {
+      "name": "debited item cannot be edited",
+      "passed": true
+    },
+    {
+      "name": "ledger version cannot be disabled",
+      "passed": true
+    },
+    {
+      "name": "original debit cannot be compensated twice through another item",
+      "passed": true
+    },
+    {
+      "name": "excess return rejected",
+      "passed": true
+    },
+    {
+      "name": "cross item return with unused debit is rejected",
+      "passed": true
+    },
+    {
+      "name": "return identity must match original debit item product and order",
+      "passed": true
+    },
+    {
+      "name": "inactive product can receive its proven reserve back",
+      "passed": true
+    },
+    {
+      "name": "new request key uniqueness is scoped per customer",
+      "passed": true
+    },
+    {
+      "name": "same customer request key cannot create another order",
+      "passed": true
+    },
+    {
+      "name": "prepare partial return failure",
+      "passed": true
+    },
+    {
+      "name": "failure on second return rolls back first return",
+      "passed": true
+    },
+    {
+      "name": "prepare same order concurrent cancellation",
+      "passed": true
+    },
+    {
+      "name": "legacy creation uses the same atomic debit operation",
+      "passed": true
+    },
+    {
+      "name": "legacy cancellation returns its persisted debit",
+      "passed": true
+    }
+  ],
+  "parallelProbes": [
+    {
+      "name": "two independent transactions competing for one available unit",
+      "consistent": true,
+      "concurrencyProven": false,
+      "observations": [
+        {
+          "rejected": false,
+          "pid": 791,
+          "began": "2026-11-02T19:20:23.699Z",
+          "ended": "2026-11-02T19:20:24.712Z"
+        },
+        {
+          "rejected": true
+        }
+      ]
+    },
+    {
+      "name": "two independent cancellations of same order return only once",
+      "consistent": true,
+      "concurrencyProven": false,
+      "observations": [
+        {
+          "rejected": false,
+          "pid": 791,
+          "began": "2026-11-02T19:20:28.869Z",
+          "ended": "2026-11-02T19:20:29.878Z"
+        },
+        {
+          "rejected": false,
+          "pid": 791,
+          "began": "2026-11-02T19:20:31.139Z",
+          "ended": "2026-11-02T19:20:31.146Z"
+        }
+      ]
+    },
+    {
+      "name": "advisory lock serializes repeated creation intent on independent connections",
+      "consistent": true,
+      "concurrencyProven": false,
+      "observations": [
+        {
+          "rejected": false,
+          "pid": 791,
+          "began": "2026-11-02T19:20:36.427Z",
+          "ended": "2026-11-02T19:20:37.432Z"
+        },
+        {
+          "rejected": false,
+          "pid": 791,
+          "began": "2026-11-02T19:20:34.373Z",
+          "ended": "2026-11-02T19:20:35.382Z"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Connected SQL calls were serialized; real concurrent transaction overlap was NOT proven.",
+    "Direct psql/Prisma TCP access was unavailable in the sandbox (DNS error -3).",
+    "Baseline reconstructed from the pre-ledger Prisma schema; the full historical migration chain was not deployed.",
+    "No Mercado Pago transaction or authenticated browser flow was executed."
+  ]
+}

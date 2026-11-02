@@ -1,0 +1,30 @@
+const transitions = {
+  PENDENTE: ["PAGO", "CANCELADO"],
+  PAGO: ["PREPARANDO", "CANCELADO"],
+  PREPARANDO: ["ENVIADO", "CANCELADO"],
+  ENVIADO: ["ENTREGUE"],
+  ENTREGUE: [],
+  CANCELADO: [],
+};
+
+export function assertOrderTransition(current, next) {
+  if (!transitions[current] || !transitions[next] ||
+      (current !== next && !transitions[current].includes(next))) {
+    throw Object.assign(new Error("Transição de pedido inválida. Pedidos cancelados ou entregues não podem ser reabertos."), { statusCode: 409 });
+  }
+}
+
+export function assertOrderPayable(pedido) {
+  if (pedido.status !== "PENDENTE" || pedido.paymentStatus === "PAID" || pedido.paidAt) {
+    throw Object.assign(new Error("Este pedido não está disponível para iniciar pagamento."), { statusCode: 409 });
+  }
+}
+
+export function paymentOrderTransition(pedido, mapped) {
+  if (pedido.status === "CANCELADO") return { ignoredReason: "ORDER_CANCELLED_REQUIRES_RECONCILIATION" };
+  // An approved payment must not rewind preparation/shipping/delivery.
+  const advanced = ["PREPARANDO", "ENVIADO", "ENTREGUE"].includes(pedido.status);
+  const paid = pedido.paymentStatus === "PAID" || pedido.paidAt || pedido.status === "PAGO" || advanced;
+  if (paid && mapped.paymentStatus !== "PAID") return { ignoredReason: "PAYMENT_STATE_REGRESSION" };
+  return { status: advanced ? pedido.status : mapped.pedidoStatus };
+}

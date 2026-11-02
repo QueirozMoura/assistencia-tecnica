@@ -24,7 +24,6 @@ import lavaSeca2 from '../assets/images/Lava e Seca/WhatsApp Image 2026-05-22 at
 import micro1 from '../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.57.jpeg'
 import micro2 from '../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.58.jpeg'
 import micro3 from '../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.58 (1).jpeg'
-import micro4 from '../assets/images/Microondas/WhatsApp Image 2026-05-22 at 23.46.58 (2).jpeg'
 
 // ── Mapeamento por slug do produto ────────────────────────────────────────────
 //

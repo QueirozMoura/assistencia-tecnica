@@ -1,11 +1,11 @@
-import { createContext, useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { clientGetMe } from '../services/clientApi'
 
 const STORAGE_KEY_TOKEN = 'client_token'
 const STORAGE_KEY_CLIENT = 'client_user'
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-export const ClientAuthContext = createContext(null)
+import { ClientAuthContext } from './client-auth-context'
 
 function readStoredValue(key) {
   if (typeof window === 'undefined') return null

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   adminGetCategorias,
@@ -8,18 +8,15 @@ import {
 import ConfirmModal    from '../../components/ConfirmModal'
 import AdminPagination from '../../components/AdminPagination'
 import AdminSearchBar  from '../../components/AdminSearchBar'
+import { useAsyncData } from '../../../hooks/useAsyncData'
 
 const LIMIT = 10
 
 export default function CategoriasList() {
   const navigate = useNavigate()
 
-  const [categorias, setCategorias] = useState([])
-  const [meta,       setMeta]       = useState({ total: 0, totalPages: 1 })
   const [page,       setPage]       = useState(1)
   const [busca,      setBusca]      = useState('')
-  const [loading,    setLoading]    = useState(true)
-  const [error,      setError]      = useState(null)
 
   // Modal de exclusão
   const [deleteTarget, setDeleteTarget] = useState(null) // { id, nome }
@@ -35,33 +32,18 @@ export default function CategoriasList() {
   }
 
   // ── Buscar categorias ──────────────────────────────────────────
-  const fetchCategorias = useCallback(() => {
-    setLoading(true)
-    setError(null)
-    adminGetCategorias()
-      .then((res) => {
-        // Filtragem e paginação client-side (API não tem busca em categorias)
-        const all = res.data ?? []
-        const filtered = busca
-          ? all.filter((c) =>
-              c.nome.toLowerCase().includes(busca.toLowerCase()) ||
-              c.slug.toLowerCase().includes(busca.toLowerCase())
-            )
-          : all
-        const totalPages = Math.max(1, Math.ceil(filtered.length / LIMIT))
-        const safePage   = Math.min(page, totalPages)
-        const paginated  = filtered.slice((safePage - 1) * LIMIT, safePage * LIMIT)
-        setCategorias(paginated)
-        setMeta({ total: filtered.length, totalPages })
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
+  const loadCategorias = useCallback(async () => {
+    const res = await adminGetCategorias()
+    const all = res.data ?? []
+    const filtered = busca
+      ? all.filter(c => c.nome.toLowerCase().includes(busca.toLowerCase()) || c.slug.toLowerCase().includes(busca.toLowerCase()))
+      : all
+    const totalPages = Math.max(1, Math.ceil(filtered.length / LIMIT))
+    const safePage = Math.min(page, totalPages)
+    return { categorias: filtered.slice((safePage - 1) * LIMIT, safePage * LIMIT), meta: { total: filtered.length, totalPages } }
   }, [busca, page])
-
-  useEffect(() => { fetchCategorias() }, [fetchCategorias])
-
-  // Reset página ao buscar
-  useEffect(() => { setPage(1) }, [busca])
+  const { data, loading, error, setError, reload: fetchCategorias } = useAsyncData(loadCategorias, { categorias: [], meta: { total: 0, totalPages: 1 } })
+  const { categorias, meta } = data
 
   // ── Toggle ativo ───────────────────────────────────────────────
   async function handleToggleAtivo(cat) {
@@ -122,7 +104,7 @@ export default function CategoriasList() {
       <div className="max-w-sm">
         <AdminSearchBar
           value={busca}
-          onChange={setBusca}
+          onChange={(value) => { setBusca(value); setPage(1) }}
           placeholder="Buscar por nome ou slug..."
         />
       </div>
@@ -171,7 +153,7 @@ export default function CategoriasList() {
                         <path d="M5 10a4 4 0 014-4h7l4 4h11a4 4 0 014 4v16a4 4 0 01-4 4H9a4 4 0 01-4-4V10z" stroke="#c3c6d1" strokeWidth="1.5" strokeLinejoin="round"/>
                       </svg>
                       <p className="font-medium text-[#43474f]">Nenhuma categoria encontrada</p>
-                      {busca && <button onClick={() => setBusca('')} className="text-[#0070ea] text-sm hover:underline">Limpar busca</button>}
+                      {busca && <button onClick={() => { setBusca(''); setPage(1) }} className="text-[#0070ea] text-sm hover:underline">Limpar busca</button>}
                     </div>
                   </td>
                 </tr>

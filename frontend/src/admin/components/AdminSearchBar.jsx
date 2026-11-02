@@ -12,14 +12,17 @@ export default function AdminSearchBar({
 }) {
   const [local, setLocal] = useState(externalValue)
 
-  // Sincroniza se o valor externo mudar (ex: limpar filtros)
-  useEffect(() => { setLocal(externalValue) }, [externalValue])
+  const [previousValue, setPreviousValue] = useState(externalValue)
+  if (externalValue !== previousValue) {
+    setPreviousValue(externalValue)
+    setLocal(externalValue)
+  }
 
   // Debounce: só chama onChange após parar de digitar
   useEffect(() => {
-    const t = setTimeout(() => { onChange?.(local) }, debounce)
+    const t = setTimeout(() => { if (local !== externalValue) onChange?.(local) }, debounce)
     return () => clearTimeout(t)
-  }, [local, debounce, onChange])
+  }, [local, externalValue, debounce, onChange])
 
   return (
     <div className="relative">

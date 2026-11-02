@@ -1,4 +1,5 @@
 import logger from "../config/logger.js";
+import { sanitizeUrl } from "../utils/logSanitizer.js";
 
 export function errorMiddleware(err, req, res, _next) {
   logger.error("Erro capturado pelo middleware", {
@@ -6,7 +7,7 @@ export function errorMiddleware(err, req, res, _next) {
     name: err.name,
     code: err.code,
     stack: err.stack,
-    path: req.originalUrl,
+    path: sanitizeUrl(req.originalUrl),
   });
 
   // Erros de validação Zod
@@ -14,7 +15,7 @@ export function errorMiddleware(err, req, res, _next) {
     return res.status(400).json({
       success: false,
       message: "Dados inválidos.",
-      errors: err.errors.map((e) => ({
+      errors: (err.issues || err.errors || []).map((e) => ({
         campo: e.path.join("."),
         mensagem: e.message,
       })),

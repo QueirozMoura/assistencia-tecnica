@@ -1,6 +1,10 @@
 import logger from "../config/logger.js";
 
 export async function sendTelegramMessage(message) {
+  if (process.env.NODE_ENV === "development" && process.env.TELEGRAM_TRANSPORT === "mock") {
+    logger.info("[telegram:mock] Notificacao simulada; nenhuma mensagem enviada.");
+    return { simulated: true };
+  }
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 

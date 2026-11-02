@@ -9,9 +9,15 @@
     "db:migrate": "npx prisma migrate dev",
     "db:migrate:prod": "npx prisma migrate deploy",
     "db:generate": "npx prisma generate",
+    "db:migrate:local": "node scripts/migrate-local.js",
+    "db:setup:local": "node scripts/setup-local.js",
+    "test:local": "node scripts/smoke-local.js",
+    "test:payment:local": "node scripts/test-payment-local.js",
+    "test": "node --test test/*.test.js",
     "db:seed": "node prisma/seed.js",
     "db:studio": "npx prisma studio",
-    "db:reset": "npx prisma migrate reset --force && node prisma/seed.js"
+    "db:reset": "npx prisma migrate reset --force && node prisma/seed.js",
+    "test:stock:postgres": "node scripts/test-stock-postgres.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

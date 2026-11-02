@@ -4,9 +4,8 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import WhatsAppButton from './WhatsAppButton'
 import CartDrawer from './CartDrawer'
-import CookieConsent from './CookieConsent'
+import CookieConsent from './PrivacyPreferences'
 import {
-  COOKIE_DEFAULT_PREFERENCES,
   normalizeCookiePreferences,
 } from '../../constants/cookies'
 import { useCart } from '../../hooks/useCart'

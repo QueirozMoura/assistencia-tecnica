@@ -108,13 +108,13 @@ export default function Contact() {
                 <div className="w-14 h-14 bg-[#d4f5e2] rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle size={28} className="text-[#1a6b3c]" />
                 </div>
-                <h3 className="font-bold text-[#003366] mb-2">Mensagem enviada!</h3>
-                <p className="text-sm text-[#43474f]">Responderemos em até 4 horas úteis.</p>
+                <h3 className="font-bold text-[#003366] mb-2">Mensagem não enviada</h3>
+                <p className="text-sm text-[#43474f]">O formulário ainda não possui envio integrado. Utilize os canais de contato desta página.</p>
                 <button
                   onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }) }}
                   className="mt-4 text-sm text-[#0070ea] hover:underline"
                 >
-                  Enviar outra mensagem
+                  Voltar ao formulário
                 </button>
               </div>
             ) : (

@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+const queryBoolean = z.preprocess(
+  (value) => value === "true" ? true : value === "false" ? false : value,
+  z.boolean(),
+);
+
 export const produtoSchema = z.object({
   nome: z
     .string({ required_error: "Nome é obrigatório." })
@@ -47,10 +52,10 @@ export const produtoQuerySchema = z.object({
   categoriaId: z.coerce.number().int().positive().optional(),
   categoriaSlug: z.string().optional(),
   busca: z.string().trim().optional(),
-  precoMin: z.coerce.number().positive().optional(),
-  precoMax: z.coerce.number().positive().optional(),
-  destaque: z.coerce.boolean().optional(),
-  ativo: z.coerce.boolean().optional().default(true),
+  precoMin: z.coerce.number().nonnegative().optional(),
+  precoMax: z.coerce.number().nonnegative().optional(),
+  destaque: queryBoolean.optional(),
+  ativo: queryBoolean.optional().default(true),
   orderBy: z.enum(["nome", "preco", "createdAt", "estoque"]).optional().default("createdAt"),
   order: z.enum(["asc", "desc"]).optional().default("desc"),
 });

@@ -61,7 +61,7 @@ export default function PedidoDetail() {
           {pedido && (
             <select
               value={pedido.status}
-              disabled={updatingStatus}
+              disabled={updatingStatus || ['CANCELADO', 'ENTREGUE'].includes(pedido.status)}
               onChange={async (e) => {
                 try {
                   setUpdatingStatus(true)

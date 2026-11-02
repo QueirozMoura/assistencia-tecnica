@@ -5,6 +5,7 @@ import logger from "./config/logger.js";
 import prisma from "./config/prisma.js";
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || (process.env.NODE_ENV === "development" ? "127.0.0.1" : undefined);
 
 /**
  * 🔧 Força resolução IPv4 (corrige problemas com Supabase / DNS / Windows)
@@ -49,7 +50,7 @@ async function bootstrap() {
     logger.error("⚠️ Falha na conexão com banco (servidor continuará rodando):", error);
   }
 
-  app.listen(PORT, () => {
+  app.listen(PORT, HOST, () => {
     logger.info(`Servidor rodando na porta ${PORT}`);
     logger.info(`Ambiente: ${process.env.NODE_ENV || "development"}`);
   });

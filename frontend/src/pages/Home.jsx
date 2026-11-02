@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useAsyncData } from '../hooks/useAsyncData';
+import { useState, useCallback } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import {
   ArrowRight,
@@ -113,20 +114,10 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [newsletterSent, setNewsletterSent] = useState(false);
 
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [errorProducts, setErrorProducts] = useState(null);
+  const loadFeatured = useCallback(async () => (await getProdutosDestaque(4)).data, []);
+  const { data: featuredProducts, loading: loadingProducts, error: errorProducts, reload: reloadFeatured } = useAsyncData(loadFeatured, []);
 
   const featuredServices = services.slice(0, 3);
-
-  useEffect(() => {
-    setLoadingProducts(true);
-    setErrorProducts(null);
-    getProdutosDestaque(4)
-      .then((res) => setFeaturedProducts(res.data))
-      .catch((err) => setErrorProducts(err.message))
-      .finally(() => setLoadingProducts(false));
-  }, []);
 
   const handleNewsletter = (e) => {
     e.preventDefault();
@@ -373,14 +364,7 @@ export default function Home() {
                 Não foi possível carregar os produtos.
               </p>
               <button
-                onClick={() => {
-                  setLoadingProducts(true);
-                  setErrorProducts(null);
-                  getProdutosDestaque(4)
-                    .then((res) => setFeaturedProducts(res.data))
-                    .catch((err) => setErrorProducts(err.message))
-                    .finally(() => setLoadingProducts(false));
-                }}
+                onClick={reloadFeatured}
                 className="text-sm text-[#0070ea] hover:underline font-medium"
               >
                 Tentar novamente

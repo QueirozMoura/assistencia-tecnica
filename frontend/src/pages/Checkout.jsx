@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { useClientAuth } from '../hooks/useClientAuth'
 import { getItemPrice } from '../hooks/useCart'
+import { cartTotal } from '../utils/cart'
 import { clientCreatePedidoComPagamento } from '../services/clientApi'
 import { formatPrice } from '../utils/formatPrice'
 
@@ -49,7 +50,7 @@ function OrderSummary({ items, subtotal }) {
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-[#43474f]">Frete</span>
-          <span className="text-[#737780]">Calculado no próximo passo</span>
+          <span className="text-[#737780]">Não incluído no total</span>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-[#e5e8ee]">
           <span className="text-base font-bold text-[#003366]">Total Geral</span>
@@ -221,6 +222,7 @@ function PaymentCard() {
 }
 
 export default function Checkout() {
+  const creationIntent = useRef(null)
   const { cart } = useOutletContext()
   const { cliente } = useClientAuth()
 
@@ -245,9 +247,9 @@ export default function Checkout() {
   const [errorMessage, setErrorMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
 
-  const items = cart?.items ?? []
+  const items = useMemo(() => cart?.items ?? [], [cart?.items])
   const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + getItemPrice(item) * Number(item.quantity || 0), 0),
+    () => cartTotal(items),
     [items]
   )
 
@@ -348,6 +350,12 @@ export default function Checkout() {
       cidade: requiredFieldValues.cidade,
       estado: requiredFieldValues.estado,
     }
+
+    const fingerprint = JSON.stringify(payload)
+    if (creationIntent.current?.fingerprint !== fingerprint) {
+      creationIntent.current = { fingerprint, key: crypto.randomUUID() }
+    }
+    payload.creationKey = creationIntent.current.key
 
     setIsSubmitting(true)
 

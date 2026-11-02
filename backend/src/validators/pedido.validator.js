@@ -12,6 +12,7 @@ const itemPedidoSchema = z.object({
 });
 
 export const pedidoSchema = z.object({
+  creationKey: z.string().regex(/^[a-zA-Z0-9_-]{16,128}$/).optional(),
   clienteId: z
     .number({ required_error: "Cliente é obrigatório." })
     .int()

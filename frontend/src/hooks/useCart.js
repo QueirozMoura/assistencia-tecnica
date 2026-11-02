@@ -1,16 +1,14 @@
 import { useState, useCallback, useEffect } from 'react'
+import { addCartItem, updateCartQuantity, restoreCart, cartTotal } from '../utils/cart'
+export { getItemPrice } from '../utils/cart'
 
 const CART_STORAGE_KEY = 'jfq-cart'
-
-export const getItemPrice = (item) =>
-  Number(item?.price ?? item?.preco ?? item?.precoUnitario ?? item?.produto?.preco ?? 0)
 
 const getInitialItems = () => {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY)
     if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    return restoreCart(raw)
   } catch {
     return []
   }
@@ -20,35 +18,11 @@ export function useCart() {
   const [items, setItems] = useState(getInitialItems)
 
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+    try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items)) } catch { /* Storage may be unavailable. */ }
   }, [items])
 
-  const normalizeQuantity = (quantity) => {
-    const parsed = Number(quantity)
-    if (!Number.isFinite(parsed) || parsed <= 0) return 1
-    return parsed
-  }
-
   const addItem = useCallback((product, quantity = 1) => {
-    const safeQuantity = normalizeQuantity(quantity)
-
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === product.id)
-      if (existing) {
-        return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: Number(i.quantity || 0) + safeQuantity } : i
-        )
-      }
-
-      return [
-        ...prev,
-        {
-          ...product,
-          price: getItemPrice(product),
-          quantity: safeQuantity,
-        },
-      ]
-    })
+    setItems(prev => addCartItem(prev, product, quantity))
   }, [])
 
   const removeItem = useCallback((productId) => {
@@ -56,22 +30,16 @@ export function useCart() {
   }, [])
 
   const updateQuantity = useCallback((productId, quantity) => {
-    if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.id !== productId))
-      return
-    }
-    setItems((prev) =>
-      prev.map((i) => (i.id === productId ? { ...i, quantity } : i))
-    )
+    setItems(prev => updateCartQuantity(prev, productId, quantity))
   }, [])
 
   const clearCart = useCallback(() => {
     setItems([])
-    localStorage.removeItem(CART_STORAGE_KEY)
+    try { localStorage.removeItem(CART_STORAGE_KEY) } catch { /* Storage may be unavailable. */ }
   }, [])
 
-  const total = items.reduce((sum, i) => sum + getItemPrice(i) * Number(i.quantity || 0), 0)
-  const count = items.reduce((sum, i) => sum + i.quantity, 0)
+  const total = cartTotal(items)
+  const count = items.reduce((sum, i) => sum + Number(i.quantity), 0)
 
   return { items, addItem, removeItem, updateQuantity, clearCart, total, count }
 }

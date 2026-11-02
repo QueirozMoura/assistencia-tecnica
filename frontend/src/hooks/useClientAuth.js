@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { ClientAuthContext } from '../contexts/ClientAuthContext'
+import { ClientAuthContext } from '../contexts/client-auth-context'
 
 export function useClientAuth() {
   const ctx = useContext(ClientAuthContext)

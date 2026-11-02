@@ -156,6 +156,9 @@ export async function googleAuth({ idToken, code }) {
       statusCode: 400,
     });
   }
+  if (payload.email_verified !== true) {
+    throw Object.assign(new Error("O Google não confirmou a propriedade deste e-mail."), { statusCode: 401 });
+  }
 
   const { sub: googleId, email, name: nome } = payload;
   const emailNormalizado = normalizeEmail(email);
@@ -165,6 +168,9 @@ export async function googleAuth({ idToken, code }) {
   });
 
   if (cliente) {
+    if (cliente.googleId && cliente.googleId !== googleId) {
+      throw Object.assign(new Error("Conta Google incompatível com o cadastro."), { statusCode: 401 });
+    }
     if (!cliente.googleId || !cliente.emailVerificado) {
       cliente = await prisma.cliente.update({
         where: { id: cliente.id },
@@ -272,10 +278,14 @@ export async function resetPassword(token, novaSenha) {
 
   const senhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS);
 
-  await prisma.cliente.update({
-    where: { id: cliente.id },
+  const changed = await prisma.cliente.updateMany({
+    where: { id: cliente.id, resetTokenHash, resetTokenExpiry: { gt: new Date() } },
     data: { senha: senhaHash, resetTokenHash: null, resetTokenExpiry: null },
   });
+
+  if (changed.count !== 1) {
+    throw Object.assign(new Error("Token inválido ou expirado. Solicite um novo link."), { statusCode: 400 });
+  }
 
   return { message: "Senha redefinida com sucesso." };
 }
@@ -283,7 +293,7 @@ export async function resetPassword(token, novaSenha) {
 export async function createPassword(clienteId, novaSenha) {
   const cliente = await prisma.cliente.findUnique({
     where: { id: clienteId },
-    select: { id: true },
+    select: { id: true, senha: true },
   });
 
   if (!cliente) {
@@ -292,12 +302,20 @@ export async function createPassword(clienteId, novaSenha) {
     });
   }
 
+  if (cliente.senha) {
+    throw Object.assign(new Error("Esta conta já possui senha. Utilize a recuperação de senha."), { statusCode: 409 });
+  }
+
   const senhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS);
 
-  await prisma.cliente.update({
-    where: { id: cliente.id },
+  const changed = await prisma.cliente.updateMany({
+    where: { id: cliente.id, senha: null },
     data: { senha: senhaHash },
   });
+
+  if (changed.count !== 1) {
+    throw Object.assign(new Error("Esta conta já possui senha. Utilize a recuperação de senha."), { statusCode: 409 });
+  }
 
   return { message: "Senha criada com sucesso." };
 }

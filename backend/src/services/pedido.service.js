@@ -1,3 +1,6 @@
+import { creationIdentity, creationFields, findCreation, lockCreation, replayCheckout } from "./orderCreation.service.js";
+import { reserveOrderStock, releaseOrderStock } from "./stockLedger.service.js";
+import { assertOrderTransition, assertOrderPayable } from "./orderState.js";
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
@@ -13,11 +16,25 @@ import {
 function normalizeClienteId(clienteId) {
   const parsed = Number(clienteId);
 
-  if (!parsed || Number.isNaN(parsed)) {
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
     throw Object.assign(new Error("Cliente não autenticado para este recurso."), { statusCode: 401 });
   }
 
   return parsed;
+}
+
+function validateOrderItems(itens) {
+  if (!Array.isArray(itens) || itens.length === 0) {
+    throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
+  }
+  const ids = new Set();
+  for (const item of itens) {
+    if (!Number.isSafeInteger(item?.produtoId) || item.produtoId <= 0 ||
+        !Number.isSafeInteger(item?.quantidade) || item.quantidade <= 0 || ids.has(item.produtoId)) {
+      throw Object.assign(new Error("Itens do carrinho inválidos ou duplicados."), { statusCode: 400 });
+    }
+    ids.add(item.produtoId);
+  }
 }
 
 export async function listarPedidos(query) {
@@ -106,7 +123,6 @@ export async function buscarPedidoPorIdDoCliente(id, clienteId) {
 
 export async function criarPedido(dados) {
   const {
-    clienteId: clienteIdPayload,
     itens,
     observacoes,
     nomeDestinatario,
@@ -121,11 +137,13 @@ export async function criarPedido(dados) {
     clienteAutenticadoId,
   } = dados;
 
-  const clienteId = normalizeClienteId(clienteAutenticadoId ?? clienteIdPayload);
+  const clienteId = normalizeClienteId(clienteAutenticadoId);
 
-  if (!Array.isArray(itens) || itens.length === 0) {
-    throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
-  }
+  validateOrderItems(itens);
+  const identity = creationIdentity(dados, false);
+  const previous = await findCreation(prisma, clienteId, identity);
+  if (previous) return previous;
+
 
   // Verificar cliente
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
@@ -151,7 +169,7 @@ export async function criarPedido(dados) {
   const itensComPreco = itens.map((item) => {
     const produto = produtos.find((p) => p.id === item.produtoId);
 
-    if (produto.estoque < item.quantidade) {
+    if (!identity && produto.estoque < item.quantidade) {
       throw Object.assign(
         new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.estoque}.`),
         { statusCode: 400 }
@@ -159,7 +177,7 @@ export async function criarPedido(dados) {
     }
 
     const precoUnitario = Number(produto.precoPromocional || produto.preco);
-    valorTotal += precoUnitario * item.quantidade;
+    valorTotal = (Math.round(valorTotal * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
 
     return {
       produtoId: item.produtoId,
@@ -170,10 +188,15 @@ export async function criarPedido(dados) {
 
   // Criar pedido e atualizar estoque em transação
   const pedido = await prisma.$transaction(async (tx) => {
+    await lockCreation(tx, clienteId, identity);
+    const previous = await findCreation(tx, clienteId, identity);
+    if (previous) return previous;
     const novoPedido = await tx.pedido.create({
       data: {
         clienteId,
         valorTotal,
+        stockLedgerVersion: 1,
+        ...creationFields(identity),
         observacoes,
         nomeDestinatario,
         telefoneEntrega,
@@ -196,13 +219,7 @@ export async function criarPedido(dados) {
       },
     });
 
-    // Decrementar estoque
-    for (const item of itensComPreco) {
-      await tx.produto.update({
-        where: { id: item.produtoId },
-        data: { estoque: { decrement: item.quantidade } },
-      });
-    }
+    await reserveOrderStock(tx, novoPedido.id);
 
     return novoPedido;
   });
@@ -212,7 +229,6 @@ export async function criarPedido(dados) {
 
 export async function criarPedidoComPagamento(dados) {
   const {
-    clienteId: clienteIdPayload,
     itens,
     observacoes,
     nomeDestinatario,
@@ -227,11 +243,13 @@ export async function criarPedidoComPagamento(dados) {
     clienteAutenticadoId,
   } = dados;
 
-  const clienteId = normalizeClienteId(clienteAutenticadoId ?? clienteIdPayload);
+  const clienteId = normalizeClienteId(clienteAutenticadoId);
 
-  if (!Array.isArray(itens) || itens.length === 0) {
-    throw Object.assign(new Error("Carrinho vazio."), { statusCode: 400 });
-  }
+  validateOrderItems(itens);
+  const identity = creationIdentity(dados, true);
+  const previous = await findCreation(prisma, clienteId, identity);
+  if (previous) return prisma.$transaction(tx => replayCheckout(tx, previous));
+
 
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
   if (!cliente) {
@@ -263,7 +281,7 @@ export async function criarPedidoComPagamento(dados) {
       throw Object.assign(new Error(`Produto inativo: "${produto.nome}".`), { statusCode: 400 });
     }
 
-    if (produto.estoque < item.quantidade) {
+    if (!identity && produto.estoque < item.quantidade) {
       throw Object.assign(
         new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.estoque}.`),
         { statusCode: 400 }
@@ -271,7 +289,7 @@ export async function criarPedidoComPagamento(dados) {
     }
 
     const precoUnitario = Number(produto.precoPromocional || produto.preco);
-    valorTotal += precoUnitario * item.quantidade;
+    valorTotal = (Math.round(valorTotal * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
 
     return {
       produtoId: item.produtoId,
@@ -287,6 +305,9 @@ export async function criarPedidoComPagamento(dados) {
   });
 
   const resultado = await prisma.$transaction(async (tx) => {
+    await lockCreation(tx, clienteId, identity);
+    const previous = await findCreation(tx, clienteId, identity);
+    if (previous) return { replay: await replayCheckout(tx, previous) };
     let etapaAtual = "INICIO_TRANSACAO";
 
     try {
@@ -300,6 +321,8 @@ export async function criarPedidoComPagamento(dados) {
       data: {
         clienteId,
         valorTotal,
+        stockLedgerVersion: 1,
+        ...creationFields(identity),
         observacoes,
         nomeDestinatario,
         telefoneEntrega,
@@ -334,6 +357,8 @@ export async function criarPedidoComPagamento(dados) {
         pedidoId: pedidoInicial.id,
       });
 
+      await reserveOrderStock(tx, pedidoInicial.id, true);
+
       etapaAtual = "MERCADO_PAGO_PREFERENCE";
       logger.info("ANTES MERCADO PAGO", {
         pedidoId: pedidoInicial.id,
@@ -367,6 +392,7 @@ export async function criarPedidoComPagamento(dados) {
       where: { id: pedidoInicial.id },
       data: {
         preferenceId: preferencia.preferenceId,
+        checkoutInitPoint: preferencia.initPoint,
         externalReference: preferencia.externalReference,
         paymentStatus: "PENDING",
       },
@@ -409,12 +435,12 @@ export async function criarPedidoComPagamento(dados) {
     }
   });
 
-  return toPedidoCheckoutDto(resultado);
+  return resultado.replay || toPedidoCheckoutDto(resultado);
 }
 
 export async function buscarPedidoSucessoPorToken(token) {
   try {
-    const validated = await validateCheckoutAccessToken({ token, consume: true, tx: prisma });
+    const validated = await validateCheckoutAccessToken({ token, consume: false, tx: prisma });
 
     logger.info("PEDIDO SUCESSO - [4] Resultado retornado pelo Prisma", {
       valid: validated?.valid,
@@ -471,6 +497,7 @@ export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null,
   }
 
   if (clienteId && pedido.clienteId === clienteId) {
+    assertOrderPayable(pedido);
     return { pedido, authorizedBy: "OWNER" };
   }
 
@@ -478,6 +505,7 @@ export async function validarAcessoPagamentoPedido({ pedidoId, clienteId = null,
     const validated = await validateCheckoutAccessToken({ token: checkoutToken, pedidoId, consume: false, tx: prisma });
 
     if (validated.valid) {
+      assertOrderPayable(pedido);
       return { pedido, authorizedBy: "TOKEN" };
     }
   }
@@ -522,47 +550,40 @@ export async function listarMeusPedidos(clienteId) {
 }
 
 export async function atualizarStatusPedido(id, status) {
-  await buscarPedidoPorId(id);
+  const pedidoAtualizado = await prisma.$transaction(async (tx) => {
+    const pedido = await tx.pedido.findUnique({ where: { id }, include: { itens: true } });
+    if (!pedido) throw Object.assign(new Error("Pedido não encontrado."), { statusCode: 404 });
+    assertOrderTransition(pedido.status, status);
 
-  // Se cancelado, devolver estoque
-  if (status === "CANCELADO") {
-    const pedido = await prisma.pedido.findUnique({
-      where: { id },
-      include: { itens: true },
-    });
-
-    await prisma.$transaction(async (tx) => {
-      await tx.pedido.update({ where: { id }, data: { status } });
-
-      for (const item of pedido.itens) {
-        await tx.produto.update({
-          where: { id: item.produtoId },
-          data: { estoque: { increment: item.quantidade } },
-        });
+    if (pedido.status !== status) {
+      const changed = await tx.pedido.updateMany({ where: { id, status: pedido.status }, data: { status } });
+      if (changed.count !== 1) {
+        const latest = await tx.pedido.findUnique({ where: { id } });
+        if (latest?.status !== status) {
+          throw Object.assign(new Error("Pedido alterado por outra solicitação. Atualize os dados e tente novamente."), { statusCode: 409 });
+        }
+      } else if (status === "CANCELADO") {
+        await releaseOrderStock(tx, id, "ADMIN_CANCELAMENTO");
       }
-    });
-  } else {
-    await prisma.pedido.update({ where: { id }, data: { status } });
-  }
-
-  const pedidoAtualizado = await prisma.pedido.findUnique({
-    where: { id },
-    include: {
-      cliente: { select: { id: true, nome: true, email: true, telefone: true } },
-      itens: {
-        include: {
-          produto: {
-            select: { id: true, nome: true, slug: true, imagemPrincipal: true, preco: true },
-          },
-        },
+    }
+    return tx.pedido.findUnique({
+      where: { id },
+      include: {
+        cliente: { select: { id: true, nome: true, email: true, telefone: true } },
+        itens: { include: { produto: { select: { id: true, nome: true, slug: true, imagemPrincipal: true, preco: true } } } },
       },
-    },
+    });
   });
-
   return toPedidoAdminDetailDto(pedidoAtualizado);
 }
 
 export async function deletarPedido(id) {
-  await buscarPedidoPorId(id);
+  const pedido = await buscarPedidoPorId(id);
+  if (pedido.status !== "CANCELADO") {
+    throw Object.assign(new Error("Cancele o pedido antes de solicitar exclusão."), { statusCode: 409 });
+  }
+  if (await prisma.estoqueMovimento.count({ where: { pedidoId: id } })) {
+    throw Object.assign(new Error("Pedido com histórico de estoque deve ser preservado para auditoria."), { statusCode: 409 });
+  }
   return prisma.pedido.delete({ where: { id } });
 }

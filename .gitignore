@@ -21,6 +21,9 @@ build
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
+!.env.example
+backend/uploads/dev/
 
 # Banco de dados
 *.sqlite

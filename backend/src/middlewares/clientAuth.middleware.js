@@ -13,7 +13,11 @@ async function getClienteFromToken(req) {
 
   if (!secret) throw new Error("JWT_CLIENT_SECRET não configurado.");
 
-  const decoded = jwt.verify(token, secret);
+  const decoded = jwt.verify(token, secret, { algorithms: ["HS256"] });
+
+  if (decoded.type !== "client" || !Number.isSafeInteger(decoded.id) || decoded.id <= 0) {
+    throw new jwt.JsonWebTokenError("Token de cliente inválido.");
+  }
 
   const cliente = await prisma.cliente.findUnique({
     where: { id: decoded.id },

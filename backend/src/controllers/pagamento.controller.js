@@ -35,14 +35,17 @@ export async function criarPreferencia(req, res, next) {
       payer: pedido.cliente,
     });
 
-    await prisma.pedido.update({
-      where: { id: pedidoId },
+    const saved = await prisma.pedido.updateMany({
+      where: { id: pedidoId, status: "PENDENTE", paymentStatus: pedido.paymentStatus, preferenceId: pedido.preferenceId },
       data: {
         preferenceId: pref.preferenceId,
         externalReference: pref.externalReference,
       },
     });
 
+    if (saved.count !== 1) {
+      throw Object.assign(new Error("Pedido alterado durante criação da preferência. Atualize os dados."), { statusCode: 409 });
+    }
     return res.status(200).json({
       success: true,
       data: {
@@ -62,7 +65,10 @@ export async function webhookMercadoPago(req, res, next) {
     const signatureHeader = req.webhookSignature || req.get("x-signature") || "";
     const requestId = req.webhookRequestId || req.get("x-request-id") || "";
     const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
-    const dataId = req.body?.data?.id ? String(req.body.data.id) : "";
+    const dataId = String(req.query?.["data.id"] ?? req.body?.data?.id ?? "");
+    if (req.body?.data?.id != null && String(req.body.data.id).toLowerCase() !== dataId.toLowerCase()) {
+      return res.status(401).json({ success: false, message: "ID do webhook divergente." });
+    }
 
     logger.info("Webhook Mercado Pago recebido no endpoint de pagamentos", {
       provider: "mercadopago",
@@ -71,38 +77,28 @@ export async function webhookMercadoPago(req, res, next) {
       hasRequestId: Boolean(requestId),
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
-    const hasSignatureData = Boolean(signatureHeader && requestId && dataId);
+    const validation = validateMercadoPagoWebhookSignature({
+      signatureHeader,
+      requestId,
+      secret,
+      dataId,
+    });
 
-    if (isProduction || hasSignatureData) {
-      const validation = validateMercadoPagoWebhookSignature({
-        signatureHeader,
-        requestId,
-        secret,
-        dataId,
+    if (!validation.valid) {
+      logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
+        provider: "mercadopago",
+        reason: validation.reason,
       });
 
-      if (!validation.valid) {
-        logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
-          provider: "mercadopago",
-          reason: validation.reason,
-        });
-
-        return res.status(401).json({
-          success: false,
-          message: "Assinatura do webhook inválida.",
-        });
-      }
-
-      logger.info("Assinatura do webhook Mercado Pago validada", {
-        provider: "mercadopago",
-      });
-    } else {
-      logger.warn("Webhook Mercado Pago sem assinatura validável permitido fora de produção", {
-        provider: "mercadopago",
-        nodeEnv: process.env.NODE_ENV || "undefined",
+      return res.status(401).json({
+        success: false,
+        message: "Assinatura do webhook inválida.",
       });
     }
+
+    logger.info("Assinatura do webhook Mercado Pago validada", {
+      provider: "mercadopago",
+    });
 
     const result = await processMercadoPagoWebhook(req.body, {
       rawPayload: req.rawBody,

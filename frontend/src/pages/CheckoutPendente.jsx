@@ -56,7 +56,7 @@ export default function CheckoutPendente() {
       isCheckingRef.current = true;
 
       try {
-        const response = await fetch(`${apiBaseUrl}/pedidos/sucesso/${pedidoIdInicial}`);
+        const response = await fetch(`${apiBaseUrl}/pedidos/sucesso/${pedidoIdInicial}`, { headers: localStorage.getItem("client_token") ? { Authorization: `Bearer ${localStorage.getItem("client_token")}` } : {} });
 
         if (!response.ok) {
           throw new Error("Falha ao consultar o status do pedido.");

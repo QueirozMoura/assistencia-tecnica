@@ -20,7 +20,11 @@ export async function authMiddleware(req, res, next) {
       throw new Error("JWT_SECRET não configurado.");
     }
 
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret, { algorithms: ["HS256"] });
+
+    if (decoded.type === "client" || !Number.isSafeInteger(decoded.id) || decoded.id <= 0) {
+      throw new jwt.JsonWebTokenError("Token administrativo inválido.");
+    }
 
     const usuario = await prisma.usuario.findUnique({
       where: { id: decoded.id },

@@ -3,17 +3,17 @@ import { z } from "zod";
 export const clientRegisterSchema = z.object({
   nome: z
     .string({ required_error: "Nome é obrigatório." })
-    .min(2, "Nome deve ter no mínimo 2 caracteres.")
-    .trim(),
+    .trim()
+    .min(2, "Nome deve ter no mínimo 2 caracteres."),
   email: z
     .string({ required_error: "E-mail é obrigatório." })
+    .trim()
     .email("E-mail inválido.")
-    .toLowerCase()
-    .trim(),
+    .toLowerCase(),
   telefone: z
     .string({ required_error: "Telefone é obrigatório." })
-    .min(10, "Telefone inválido.")
-    .trim(),
+    .trim()
+    .min(10, "Telefone inválido."),
   senha: z
     .string({ required_error: "Senha é obrigatória." })
     .min(6, "Senha deve ter no mínimo 6 caracteres."),
@@ -26,9 +26,9 @@ export const clientRegisterSchema = z.object({
 export const clientLoginSchema = z.object({
   email: z
     .string({ required_error: "E-mail é obrigatório." })
+    .trim()
     .email("E-mail inválido.")
-    .toLowerCase()
-    .trim(),
+    .toLowerCase(),
   senha: z
     .string({ required_error: "Senha é obrigatória." })
     .min(1, "Senha é obrigatória."),
@@ -37,9 +37,9 @@ export const clientLoginSchema = z.object({
 export const forgotPasswordSchema = z.object({
   email: z
     .string({ required_error: "E-mail é obrigatório." })
+    .trim()
     .email("E-mail inválido.")
-    .toLowerCase()
-    .trim(),
+    .toLowerCase(),
 });
 
 export const resetPasswordSchema = z.object({

@@ -27,9 +27,9 @@ function normalize(p) {
   // Suporte a ambos os formatos: API (pt) e mock local (en)
   const name          = p.nome          ?? p.name          ?? ''
   const description   = p.descricao     ?? p.description   ?? ''
-  const price         = Number(p.preco  ?? p.price         ?? 0)
+  const price         = Number(p.precoPromocional ?? p.preco ?? p.price ?? 0)
   const originalPrice = p.precoPromocional != null
-    ? Number(p.precoPromocional)
+    ? Number(p.preco)
     : p.originalPrice != null
       ? Number(p.originalPrice)
       : null

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import OrderStatusBadge from '../../../components/admin/OrderStatusBadge'
 import SkeletonLoader from '../../../components/ui/SkeletonLoader'
@@ -6,6 +6,7 @@ import ErrorState from '../../../components/ui/ErrorState'
 import EmptyState from '../../../components/ui/EmptyState'
 import { getPedidos } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
+import { useAsyncData } from '../../../hooks/useAsyncData'
 
 const STATUS_FILTERS = ['TODOS', 'PENDENTE', 'PAGO', 'PREPARANDO', 'ENVIADO', 'ENTREGUE', 'CANCELADO']
 
@@ -20,36 +21,19 @@ function formatDateBR(date) {
 
 export default function Pedidos() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [pedidos, setPedidos] = useState([])
-  const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 })
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
   const currentStatus = (searchParams.get('status') || 'TODOS').toUpperCase()
   const currentPage = Number(searchParams.get('page') || 1)
 
-  const fetchPedidos = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError('')
-      const response = await getPedidos({
-        status: currentStatus === 'TODOS' ? undefined : currentStatus,
-        page: currentPage,
-        limit: 10,
-      })
-      setPedidos(response?.data || [])
-      setMeta(response?.meta || { page: 1, totalPages: 1, total: 0 })
-    } catch (err) {
-      setError(err?.message || 'Erro ao carregar pedidos.')
-      setPedidos([])
-    } finally {
-      setLoading(false)
-    }
+  const loadPedidos = useCallback(async () => {
+    const response = await getPedidos({
+      status: currentStatus === 'TODOS' ? undefined : currentStatus,
+      page: currentPage,
+      limit: 10,
+    })
+    return { pedidos: response?.data || [], meta: response?.meta || { page: 1, totalPages: 1, total: 0 } }
   }, [currentPage, currentStatus])
-
-  useEffect(() => {
-    fetchPedidos()
-  }, [fetchPedidos])
+  const { data, loading, error, reload: fetchPedidos } = useAsyncData(loadPedidos, { pedidos: [], meta: { page: 1, totalPages: 1, total: 0 } })
+  const { pedidos, meta } = data
 
   function handleStatusChange(status) {
     const params = new URLSearchParams(searchParams)

@@ -169,7 +169,7 @@ export default function About() {
             <div className="relative">
               <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-[#e5e8ee]" />
               <div className="space-y-6">
-                {timeline.map((item, i) => (
+                {timeline.map((item) => (
                   <div key={item.year} className="flex gap-6 relative">
                     <div className="w-16 h-16 bg-[#003366] rounded-2xl flex items-center justify-center flex-shrink-0 z-10 shadow-md">
                       <span className="text-white text-xs font-bold">{item.year}</span>

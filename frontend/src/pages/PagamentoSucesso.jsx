@@ -35,7 +35,7 @@ export default function PagamentoSucesso() {
           ? `${API_URL}/pedidos/sucesso?token=${encodeURIComponent(checkoutToken)}`
           : `${API_URL}/pedidos/sucesso/${encodeURIComponent(pedidoId)}`;
 
-        const response = await fetch(endpoint);
+        const response = await fetch(endpoint, { headers: localStorage.getItem("client_token") ? { Authorization: `Bearer ${localStorage.getItem("client_token")}` } : {} });
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar os dados do pedido.");
@@ -45,13 +45,14 @@ export default function PagamentoSucesso() {
 
         if (!ativo) return;
         setPedido(data.data);
-        sessionStorage.removeItem("checkout_access_token");
+        if (data.data?.paymentStatus === "PAID") {
+          sessionStorage.removeItem("checkout_access_token");
+        }
       } catch {
         if (!ativo) return;
         setErro("Não foi possível carregar os dados do pedido.");
       } finally {
-        if (!ativo) return;
-        setLoading(false);
+        if (ativo) setLoading(false);
       }
     }
 
@@ -190,14 +191,19 @@ export default function PagamentoSucesso() {
           </div>
 
           <h1 className="text-3xl font-bold text-[#003366] mb-2">
-            Pagamento realizado com sucesso!
+            {pedido?.paymentStatus === "PAID"
+              ? "Pagamento realizado com sucesso!"
+              : "Acompanhamento do pagamento"}
           </h1>
           <p className="text-base text-[#43474f] mb-1">
-            Obrigado pela sua compra.
+            {pedido?.paymentStatus === "PAID"
+              ? "Obrigado pela sua compra."
+              : "Consulte abaixo o status do seu pedido."}
           </p>
           <p className="text-sm text-[#737780]">
-            Seu pagamento foi confirmado e nossa equipe já foi notificada
-            automaticamente.
+            {pedido?.paymentStatus === "PAID"
+              ? "Seu pagamento foi confirmado e nossa equipe já foi notificada automaticamente."
+              : "A confirmação depende do processamento do pagamento pelo Mercado Pago."}
           </p>
         </div>
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useAsyncData } from '../hooks/useAsyncData'
+import { useState, useCallback } from 'react'
 import { useParams, Link, useOutletContext } from 'react-router-dom'
 import {
   Star, ShoppingCart, Heart, Shield, Truck, RotateCcw,
@@ -39,38 +40,32 @@ export default function ProductDetail() {
   const [activeImg, setActiveImg] = useState(0)
   const [activeTab, setActiveTab] = useState('desc')
 
-  // ── Estado da API ──────────────────────────────────────────
-  const [product, setProduct]   = useState(null)
-  const [related, setRelated]   = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [error, setError]       = useState(null)
-
-  useEffect(() => {
-    if (!slug) return
-    setLoading(true)
-    setError(null)
+  const [previousSlug, setPreviousSlug] = useState(slug)
+  if (previousSlug !== slug) {
+    setPreviousSlug(slug)
     setActiveImg(0)
     setQty(1)
+  }
 
-    getProdutoBySlug(slug)
-      .then((res) => {
-        setProduct(res.data)
-        // Buscar relacionados em paralelo — falha silenciosa
-        return getProdutosRelacionados(res.data.id, 4)
-          .then((rel) => setRelated(rel.data))
-          .catch(() => setRelated([]))
-      })
-      .catch((err) => {
-        setError(err.status === 404 ? 'not_found' : err.message)
-      })
-      .finally(() => setLoading(false))
+  const loadProduct = useCallback(async () => {
+    if (!slug) return { product: null, related: [] }
+    try {
+      const res = await getProdutoBySlug(slug)
+      const related = await getProdutosRelacionados(res.data.id, 4).then(rel => rel.data).catch(() => [])
+      return { product: res.data, related }
+    } catch (error) {
+      if (error.status === 404) throw new Error('not_found', { cause: error })
+      throw error
+    }
   }, [slug])
+  const { data, loading, error } = useAsyncData(loadProduct, { product: null, related: [] })
+  const { product, related } = data
 
   // ── Loading ────────────────────────────────────────────────
   if (loading) return <DetailSkeleton />
 
   // ── Produto não encontrado ─────────────────────────────────
-  if (error === 'not_found' || (!loading && !product)) {
+  if (error === 'not_found' || (!loading && !error && !product)) {
     return (
       <div className="container-max py-20 text-center">
         <h2 className="text-xl font-bold text-[#003366] mb-4">Produto não encontrado</h2>
@@ -232,7 +227,7 @@ export default function ProductDetail() {
                 <p className="text-xs sm:text-sm text-[#737780] line-through">{formatPrice(preco)}</p>
               )}
               <p className="text-2xl sm:text-3xl font-bold text-[#003366] leading-tight">
-                {formatPrice(precoPromo != null && precoPromo < preco ? precoPromo : preco)}
+                {formatPrice(precoPromo ?? preco)}
               </p>
               {parcelas != null && parcelas > 1 && (
                 <p className="text-xs sm:text-sm text-[#43474f] mt-1">
@@ -245,7 +240,7 @@ export default function ProductDetail() {
                 </p>
               )}
               <p className="text-[11px] sm:text-xs text-[#1a6b3c] font-medium mt-1">
-                À vista: {formatPrice((precoPromo ?? preco) * 0.95)} (5% de desconto)
+                À vista: {formatPrice(precoPromo ?? preco)}
               </p>
             </div>
 

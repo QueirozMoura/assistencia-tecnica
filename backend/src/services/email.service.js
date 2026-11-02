@@ -2,7 +2,8 @@ import logger from "../config/logger.js";
 import { Resend } from "resend";
 import { sendTelegramMessage } from "./telegram.service.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const mockEmail = process.env.NODE_ENV === "development" && process.env.EMAIL_TRANSPORT === "mock";
+const resend = mockEmail ? null : new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "noreply@assistencia.com";
 
 const APP = "JFQ assistência";
@@ -20,6 +21,10 @@ function escapeHtml(value = "") {
  * Envia email de verificação de conta.
  */
 export async function sendVerificationEmail(email, nome, token) {
+  if (mockEmail) {
+    logger.info("[email:mock] Verificacao simulada; nenhum email enviado.");
+    return { simulated: true };
+  }
   const frontendUrl = process.env.FRONTEND_URL || "https://example.com";
   const url = `${frontendUrl}/verificar-email?token=${encodeURIComponent(token)}`;
   const safeNome = escapeHtml(nome);
@@ -60,6 +65,10 @@ export async function sendVerificationEmail(email, nome, token) {
  * Envia email de recuperação de senha.
  */
 export async function sendPasswordResetEmail(email, nome, token) {
+  if (mockEmail) {
+    logger.info("[email:mock] Recuperacao simulada; nenhum email enviado.");
+    return { simulated: true };
+  }
   const frontendUrl = process.env.FRONTEND_URL || "https://example.com";
   const url = `${frontendUrl}/redefinir-senha?token=${encodeURIComponent(token)}`;
   const safeNome = escapeHtml(nome);
@@ -99,6 +108,10 @@ export async function sendPasswordResetEmail(email, nome, token) {
  * Retorna objeto com status para facilitar uso por camadas intermediárias.
  */
 export async function sendAdminPaymentApprovedEmail({ pedido, payment }) {
+  if (mockEmail) {
+    logger.info("[email:mock] Notificacao administrativa simulada; nenhum email enviado.");
+    return { simulated: true, sent: false, skipped: true, reason: "DEVELOPMENT_MOCK" };
+  }
   const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
 
   if (!adminEmail) {

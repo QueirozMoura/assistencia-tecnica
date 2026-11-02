@@ -202,8 +202,7 @@ export default function PedidoDetalhes() {
         if (!active) return
         setError('Não foi possível carregar os detalhes do pedido.')
       } finally {
-        if (!active) return
-        setLoading(false)
+        if (active) setLoading(false)
       }
     }
 
