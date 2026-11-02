@@ -206,10 +206,12 @@ sem commit/push, pagamento, notificação real, exclusão, reinício ou mudança
 
 **Esta seção substitui as conclusões anteriores de decisão pendente.** O usuário
 aprovou a reserva na criação nos fluxos legado e Mercado Pago. A implementação
-local está preparada, mas **a funcionalidade ainda não está liberada**: falta
-comprovar concorrência com conexões sobrepostas e validar a aplicação completa
-com Prisma contra o ensaio. Nenhuma migration foi aplicada ao jfq-development
-ou à produção. Não iniciar esta versão contra um banco sem a nova migration:
+local está preparada. **Atualização de 02/11/2026 (tarde):** a concorrência real em
+PostgreSQL e a validação Prisma/REST completa **foram executadas e aprovadas no
+projeto isolado de ensaio** (ver "Validação em PostgreSQL real e REST" abaixo).
+A aplicação em jfq-development **continua pendente de autorização específica**
+e de decisões listadas nos riscos. Nenhuma migration foi aplicada ao
+jfq-development ou à produção. Não iniciar esta versão contra um banco sem a nova migration:
 o novo Prisma Client espera as colunas e funções adicionadas.
 
 ### Diagnóstico e decisão aplicada
@@ -397,11 +399,433 @@ backend/package.json e backend/.gitignore para disponibilizar o runner; estes
 relatórios. O Prisma Client local foi regenerado em node_modules, ignorado.
 As demais alterações do diff são acumuladas de rodadas anteriores.
 
+### Validação em PostgreSQL real e REST — 02/11/2026 (executada e aprovada)
+
+**Ambiente.** O terminal desta sessão alcança DNS e TCP (o EAI_AGAIN/EPERM
+registrado antes não ocorreu): resolução de neon.tech/google.com, TCP de saída,
+bind em loopback e `--preflight` do runner passaram. Destino: projeto
+`jfq-refresh-migration-rehearsal` (cool-rice-07419769), branch
+br-billowing-wave-bchj34qy, endpoint ep-divine-rice-bcxmkisc, database neondb,
+confirmados no console Neon pelo navegador autenticado do usuário (projeto com
+uma única branch, distinto de jfq-development, que é outro projeto da conta).
+A connection string direta (sem pooler) foi copiada pelo botão "Copy snippet" e
+lida do clipboard apenas dentro do processo do teste; não foi impressa, gravada em
+arquivo nem colocada em .env. O clipboard foi limpo ao final. psql usou
+`sslmode=verify-full` com `PGSSLROOTCERT=system`; o Prisma usou `sslmode=require`.
+
+**Isolamento comprovado.** O runner recusa qualquer host/database diferente do
+endpoint isolado, nunca lê .env, escreve somente em schemas novos
+`jfq_stock_<timestamp>_<rodada>` (o baseline filtra `CREATE SCHEMA` e a migration
+reescreve o qualificador de schema) e seus logs contêm só PIDs e saldos. Antes e
+depois das execuções o schema `public` do ensaio (4 tabelas, 1 linha cada, 0
+funções) ficou **idêntico**, comparado por nomes e contagens. Nada foi apagado;
+os schemas de teste ficam retidos (`jfq_stock_1793649741213_1..3`,
+`jfq_rest_1793650401616`, `..675287`, `..951966`, além dos dois anteriores).
+
+**Concorrência real — `npm run test:stock:postgres`, 3 rodadas: 105 cenários
+sequenciais e 15 disputas, todos aprovados.** Em cada disputa o holder alterou
+dados e manteve a transação aberta; um observador independente registrou o waiter
+`active` com `wait_event_type=Lock` e `pg_blocking_pids(waiter)` contendo o PID do
+holder, com holder, waiter e observador em três PIDs distintos. Só então o holder
+commitou. Resultado, idêntico nas rodadas 1, 2 e 3:
+
+| Cenário (5 por rodada) | Bloqueio real | Resultado verificado |
+| --- | --- | --- |
+| Dois pedidos disputam a última unidade | 3/3 | um vence; o outro recebe JFQ_STOCK_INSUFFICIENT; estoque 0; 1 débito |
+| Duas devoluções simultâneas do mesmo pedido | 3/3 | estoque restaurado uma vez; 1 devolução |
+| Mesma intenção de criação (advisory lock) | 3/3 | 1 pedido, 1 débito |
+| Cancelamento administrativo segura a linha, webhook rejeitado tenta CAS | 3/3 | webhook recusado (conflito); 1 devolução |
+| Webhook rejeitado segura a linha, cancelamento administrativo repete | 3/3 | estado cancelado; 1 devolução; evento processado |
+
+Ledger e estoque foram conferidos após cada disputa, sem débito ou devolução
+duplicados e com estoque global não negativo. Exemplos de PIDs (rodada 1,
+cancelamento vs webhook): holder 1117, waiter 1118, observador 1125, blockers [1117].
+
+**Prisma/REST — `npm run test:rest:isolated` (novo): 28 cenários aprovados.**
+Método: o runner copia `src` e `prisma` para diretório temporário trocando **somente
+o literal `"public".`** (3 ocorrências no código, 39 na migration do ledger) por um
+schema novo, aplica a cadeia real com `prisma migrate deploy`, sobe o Express real
+em porta efêmera de loopback e simula o Mercado Pago (identidade do vendedor,
+preferências, consulta de pagamento). Qualquer outra chamada externa é bloqueada
+e contada: **0 requisições externas**. Cobertura:
+
+- Cadeia de migrations: as 9 migrations aplicadas uma vez, sem falha nem rollback;
+  triggers do ledger presentes. A migration do ledger foi aplicada pelo Prisma.
+- Autenticação/autorização: sem token, token malformado, segredo errado, token de
+  admin usado como cliente, token de cliente na API administrativa, perfil técnico
+  (403); pedido vinculado ao dono do token, não ao `clienteId` do corpo; terceiros
+  não leem nem pagam pedido alheio; checkout token forjado recusado.
+- Fluxo legado e Mercado Pago: reserva atômica, preço sempre do servidor, falha do
+  provedor (502) e identidade de vendedor errada (503) revertem pedido, estoque e
+  ledger; pedido multi-item reverte o primeiro débito; `creationKey` reaproveita
+  sem nova preferência nem segundo débito e rejeita payload diferente (409).
+- Cancelamento administrativo: devolução única ligada ao débito original,
+  repetição idempotente, sem reabertura (409), pedido pago devolve uma vez,
+  entregue não cancela, exclusão com histórico de estoque recusada.
+- Webhooks: assinatura ausente/inválida/ID divergente (401); live_mode, coletor e
+  valor/preferência divergentes recusados ou ignorados; evento não-pagamento
+  ignorado; duplicado idempotente; rejeitado devolve estoque uma vez; aprovado
+  após cancelamento fica para conciliação; rejeitado/pendente após aprovado não
+  regride.
+- Históricos ambíguos (sem versão do ledger): cancelamento por admin e por webhook
+  não inventam devolução; saldo e movimentos inalterados.
+- Concorrência HTTP real (em 3 rodadas quando aplicável): duas compras pela última
+  unidade (um 201 e um 400; só o vencedor chama o provedor); mesma `creationKey`
+  simultânea nos dois fluxos (1 pedido, 1 débito); dois cancelamentos simultâneos;
+  webhook rejeitado × cancelamento nos dois sentidos; webhook aprovado ×
+  cancelamento (estados finais observados: PAGO e CANCELADO, ambos consistentes).
+  Um monitor em conexão separada observou sessões bloqueadas em 16 das 17
+  execuções monitoradas (informativo; a prova formal de bloqueio é a do runner SQL).
+- Invariantes verificadas no banco após cada grupo: sem estoque negativo; estoque =
+  semente + ledger por produto; um débito por item versionado; uma devolução por
+  item cancelado e nenhuma em não cancelado; devolução ligada a débito do mesmo
+  item/produto/pedido/quantidade; nenhum movimento em pedido histórico; total do
+  pedido = soma dos itens.
+
+**Totais (revisados após a regra de 02/11/2026, ver seção seguinte).** Automatizados locais: 152 backend + 25 frontend = **177 aprovados**; REST isolado: 30 cenários.
+Banco real: 105 sequenciais + 15 disputas com bloqueio + 28 Prisma/REST = **148
+cenários**. Lint, build (aviso >500 kB mantido), `prisma validate` e
+`git diff --check` aprovados. Varredura do diff e dos arquivos novos: 0
+ocorrências da senha do banco isolado e 0 padrões de connection string/token.
+
+**Limitações desta evidência.**
+1. O código da aplicação referencia `"public".` fixo em SQL cru
+   (`stockLedger.service.js`, `orderCreation.service.js`). Como o `public` do
+   ensaio já tem dados, o REST rodou numa cópia mecânica com apenas esse literal
+   trocado; o código-fonte em si não foi alterado. Em dev/produção o schema é
+   `public`. A cópia não prova a conexão do arquivo original com `public`.
+2. Mercado Pago, e-mail e Telegram foram simulados: nenhum pagamento ou
+   notificação real, e nenhum teste de entrega externa de webhook.
+3. O teste REST usa tokens JWT gerados com segredos aleatórios do teste; os
+   endpoints de login/Google/refresh não fazem parte desta evidência.
+4. Ensaio em Neon gratuito de 0,25 CU: não mede carga nem duração de locks da
+   migration em tabelas grandes.
+
+**Comportamento observado → regra aprovada e implementada (ver seção seguinte).**
+
+### Regra aprovada: confirmação de pagamento × cancelamento (02/11/2026, implementada)
+
+**Decisão do usuário.** (1) Confirmação processada primeiro: pedido PAGO, sem
+cancelamento automático pelo fluxo atual. (2) Cancelamento primeiro: CANCELADO e
+estoque liberado exatamente uma vez. (3) Confirmação tardia de pedido cancelado:
+preservar CANCELADO, não reservar estoque e registrar pendência de
+conciliação/reembolso. (4) Nenhum reembolso automático. (5) Nenhuma confirmação
+financeira tardia descartada em silêncio. (6) Idempotência, transação e proteção
+contra concorrência.
+
+**Diagnóstico da implementação anterior.** Regra 2: já atendida. Regra 1: **não
+atendida** — `PAGO → CANCELADO` era transição permitida, então o cancelamento
+administrativo posterior ao webhook cancelava um pedido pago (estado observado
+na corrida). Regra 3: estado e estoque já eram preservados, mas a pendência ia
+apenas para log e resposta HTTP 200 (o Mercado Pago não reenvia): **o fato
+financeiro não ficava persistido**. Regras 4 e 6 já atendidas.
+
+**Ajuste mínimo implementado (somente código, sem migration).**
+- `orderState.js`: `isPaymentConfirmed` (paymentStatus PAID ou paidAt) e
+  `assertOrderCancellable` → 409 "pagamento confirmado... reembolso/conciliação manual".
+- `pedido.service.js` (`atualizarStatusPedido`): a transição real para CANCELADO
+  é recusada se o pagamento está confirmado; o `updateMany` de cancelamento passa
+  a comparar também o `paymentStatus` observado. Se o pagamento for confirmado
+  entre a leitura e a escrita, o compare falha e a re-leitura devolve o mesmo
+  409 em vez de cancelar. Repetição de cancelamento de pedido já cancelado segue
+  idempotente. Pedido marcado PAGO manualmente pelo admin, **sem** confirmação do
+  provedor, continua cancelável (não há dinheiro confirmado a proteger).
+- Nenhum reembolso é disparado; o caminho do webhook não foi alterado.
+- Efeito de UI: o botão de status do admin passa a receber 409 com mensagem
+  legível ao tentar cancelar pedido pago. Nenhum arquivo de frontend alterado.
+
+**Testes de regressão.** Backend 152 (eram 144; +8 em `order-state.test.js`):
+resultado 1 e resultado 2 sequenciais; interleavings A (pagamento confirmado
+entre leitura e escrita do cancelamento) e B (cancelamento commitado entre leitura
+e escrita do webhook); aprovação e cancelamento simultâneos nos dois sentidos de
+serialização; PAGO manual ainda cancelável; PREPARANDO/ENVIADO com pagamento
+confirmado não cancelam. No banco real isolado (`test:rest:isolated`, **30
+cenários aprovados**, 0 chamadas externas): cenário determinístico das regras
+1 e 2/3 e corrida HTTP aprovado × cancelamento em 5 rodadas × 2 sentidos = 10
+disputas, com **os dois resultados observados** (4 PAGO e 6 CANCELADO). Em PAGO:
+cancelamento 409, paymentStatus PAID, 0 devoluções, estoque debitado. Em
+CANCELADO: cancelamento 200, sem paidAt/PAID, 1 devolução, estoque restaurado e
+webhook tardio recusado ou retido para conciliação, nunca aplicado. Invariantes
+globais mantidas. O harness unitário não verifica o estado final das corridas
+(reverte a mutação concorrente simulada); isso é coberto no REST.
+
+**Pendência persistente de conciliação — proposta (APROVADA em 02/11/2026 e implementada na seção seguinte).** Hoje a confirmação tardia só aparece em
+log/resposta. Persistir de forma auditável exige estrutura nova; a tabela
+`mercado_pago_webhook_events` não tem motivo, valor, estado de resolução nem
+responsável (reutilizá-la com `processed=false` misturaria deduplicação e
+conciliação, e seria pouco auditável). Proposta: tabela `pagamento_conciliacoes`
+(migration aditiva `…_payment_reconciliation`, sem backfill):
+`id`, `pedidoId` (FK RESTRICT), `provider`, `paymentId`, `tipo`
+(`PAGAMENTO_APROVADO_PEDIDO_CANCELADO`), `status` (`PENDENTE`, `EM_ANALISE`,
+`REEMBOLSADO_MANUALMENTE`, `RESOLVIDO_SEM_REEMBOLSO`), `valor` (Decimal do
+provedor), `statusProvedor`, `notificationId`, `rawPayloadHash`, `ocorrencias`,
+`primeiraVezEm`, `ultimaVezEm`, `resolvidoEm`, `resolvidoPorId` (Usuario),
+`observacao`; `UNIQUE(provider, paymentId, tipo)` para idempotência e índice em
+`status`. Escrita por *upsert* na **mesma transação** do webhook, antes de
+responder (incrementa `ocorrencias`, nunca cria duplicata); se a transação
+falhar o Mercado Pago recebe não-2xx e reenvia, então nada se perde. Sem refund
+automático: apenas endpoints administrativos de listagem e de marcação manual
+com autoria e data, mais alerta ao admin pelo serviço de notificação existente.
+Decidir ainda: se aprovações ignoradas por divergência de valor/preferência
+também entram (recomendado, pois também são dinheiro recebido), e se a migration
+vai junto com a do ledger no mesmo deploy (recomendado: duas migrations aditivas
+em um único `migrate deploy`). **Aguardando sua aprovação antes de codificar.**
+
+### Jfq-development: comparação somente leitura e plano de implantação (não executado)
+
+**Verificações feitas (só leitura; `default_transaction_read_only=on`).** Projeto
+jfq-development (autumn-rain-12939944), branch br-jolly-pine-b8g7sy9k, endpoint
+ep-summer-bar-b8esi79j, confirmados no console Neon. Nenhuma escrita, migration ou
+mudança de projeto/branch. `_prisma_migrations`: **8 migrations, todas concluídas,
+nenhuma revertida, e os 8 checksums SHA-256 são idênticos aos de
+`migration.sql` locais**. Pendente apenas `20261102200000_order_stock_ledger`
+(a cadeia local tem 9). `prisma migrate diff` (introspecção do banco → schema.prisma)
+mostra como única diferença exatamente a parte da migration do ledger: **não há
+drift** (inclusive refresh tokens, já presentes e registrados). Perfil: 1 pedido
+(PENDENTE, histórico), 1 item, 3 produtos (nenhum com estoque negativo), 3
+clientes, 0 eventos de webhook, 0 funções `jfq_`. A migration é aditiva (4
+colunas em `pedidos`, 1 tabela, constraints, triggers e funções), roda em uma
+única transação (BEGIN/COMMIT), sem backfill e sem alterar linhas: o pedido
+existente fica com `stockLedgerVersion` NULL e nenhum movimento inventado.
+
+**Plano de aplicação coordenada (a executar só com autorização expressa).**
+0. *Portões:* decisão sobre a tabela de conciliação (migration junto ou depois);
+   revisão final do diff; testes, lint, build e REST isolado verdes.
+1. *Preparar janela:* confirmar que nenhum backend local/outro escritor usa o
+   banco dev (processos e abas). Sem expiração de reservas nem outros escritores.
+2. *Backup/restauração:* o histórico de restauração do projeto gratuito é de apenas
+   6 horas. Antes de tudo, (a) criar uma branch Neon de cópia (snapshot instantâneo
+   do jfq-development) — **exige autorização por modificar o projeto** — e (b)
+   `pg_dump` lógico para arquivo local 0600 fora do repositório (dados de clientes
+   são pessoais). Conferir que a branch/dump abrem e têm as contagens acima.
+3. *Aplicar:* somente com `npm run db:migrate:local` (recusa qualquer host que não
+   seja o do jfq-development e exige NODE_ENV=development); nunca `migrate dev` nem
+   `reset`. A migration é atômica: em falha nada é aplicado.
+4. *Verificar o banco (SQL só leitura):* 9 linhas em `_prisma_migrations` concluídas;
+   tabela `estoque_movimentos` vazia; 4 colunas novas; funções/triggers `jfq_*`
+   presentes (mesmas contagens do ensaio); constraints
+   `pedidos_ledger_version_check` e `estoque_movimentos_shape_check`; pedido
+   histórico com versão NULL e estoque dos 3 produtos inalterado.
+5. *Subir o novo backend* (o Prisma Client novo exige a migration; nunca iniciá-lo
+   antes do passo 3 nem manter o antigo em paralelo) e rodar o smoke com dados
+   fictícios: criar pedido legado e MP simulado, cancelar, conferir ledger/estoque.
+   O smoke cria registros sintéticos no dev (exige autorização explícita).
+6. *Validação posterior:* repetir as invariantes do ensaio sobre o dev; monitorar
+   erros `JFQ_STOCK_*` e a fila de conciliação.
+**Compatibilidade.** Backend novo + schema antigo: incompatível (colunas/funções
+ausentes) — por isso a ordem migration → backend. Backend antigo + schema novo:
+cria pedidos sem versão (tratados como históricos, sem débito) e não consegue
+cancelar pedido versionado sem compensação (trigger diferido o impede); não
+manter escritores antigos e novos simultaneamente.
+**Rollback.** (i) Falha na migration: nada aplicado; corrigir e repetir.
+(ii) Problema detectado *antes* de qualquer pedido novo: restaurar a branch/dump do
+passo 2 (as 3 contagens e o checksum da cadeia confirmam o retorno). (iii) *Depois*
+de pedidos versionados: corrigir para a frente; bloquear novas escritas de
+checkout se preciso; **não** remover tabela/triggers nem voltar ao cancelamento
+antigo (devoluções em duplicidade). O dev tem poucos dados, então o custo é baixo,
+mas o procedimento deve ser ensaiado como se fosse produção.
+
+### Fila persistente de conciliação financeira — implementada localmente (02/11/2026)
+
+**Aprovado pelo usuário:** registrar na fila (1) pagamentos confirmados após cancelamento,
+(2) divergências de valor, (3) divergências de preferência e (4) outros eventos
+financeiros que exijam investigação manual, **diferenciando** pagamentos
+efetivamente confirmados pelo Mercado Pago de eventos não verificados ou
+suspeitos; migration `pagamento_conciliacoes` a ser aplicada **junto** com a do
+ledger em um único deploy. A aprovação cobre apenas criar e testar localmente: **nada
+foi aplicado ao jfq-development ou à produção.**
+
+**Arquitetura.**
+- *Migration* `20261102210000_pagamento_conciliacoes` (aditiva, sem backfill, atômica
+  em BEGIN/COMMIT, **depois** do ledger na ordem de deploy): tabelas
+  `pagamento_conciliacoes` (a pendência) e `pagamento_conciliacao_historico`
+  (append-only). Nenhuma alteração em tabelas existentes além das FKs que
+  referenciam `pedidos` e `usuarios` (RESTRICT).
+- *Classificação (`verificacao`) é derivada do tipo e imposta por CHECK*, não por
+  convenção: `CONFIRMADO_PELO_PROVEDOR` somente para pagamento aprovado lido
+  de volta na API do Mercado Pago e atribuído ao pedido (tipo
+  `PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO`) e para estorno/chargeback informado
+  (`ESTORNO_OU_CHARGEBACK`); `NAO_VERIFICADO` para toda divergência (valor,
+  preferência, pedido inexistente, referência não mapeável) — **não é presumida
+  como dinheiro recebido**; `SUSPEITO` para vendedor/ambiente divergente. A
+  API e o painel só mostram "dinheiro confirmado" quando verificação =
+  confirmado **e** status do provedor = approved.
+- *Idempotência:* `UNIQUE(provider, chaveIdempotencia, tipo)`. A chave é
+  `pid:<paymentId>` **somente** quando o ID vem da leitura autenticada ao
+  provedor (o ID declarado no payload fica à parte em `paymentIdInformado`); sem ID
+  confiável usa `nid:<notificationId>`; sem isso `hash:<sha256 do payload>`. CHECKs
+  garantem o formato e a coerência chave × paymentId. Escrita por
+  `INSERT … ON CONFLICT DO UPDATE` (contador `ocorrencias`, `ultimaVezEm`) + linha de
+  histórico, **na mesma transação** da decisão sobre pedido/estoque; duplicatas
+  simultâneas serializam no índice único.
+- *Transacionalidade e estado preservado:* pagamento tardio e estorno são
+  registrados dentro da transação do webhook existente (se ela falhar, nada fica
+  e o Mercado Pago recebe não-2xx e reenvia); divergências e demais casos usam
+  transação própria. Pedido e estoque **não são alterados** pela fila (mesmo
+  comportamento de antes). Notificações sem assinatura válida **não** são
+  persistidas (dado controlado por atacante; permanecem só em log).
+- *Eventos que NÃO entram:* rejeitado/pendente/em processo em pedido cancelado,
+  divergência de valor/preferência com status não aprovado, tentativas
+  rejeitadas antigas após pagamento aprovado — não são dinheiro recebido.
+- *Dados mínimos:* só IDs, status, valores, IDs de preferência/referência
+  externa e hash do payload. Não há e-mail do pagador, cartão ou payload bruto; a
+  observação do administrador é limitada a 1000 caracteres e a tela orienta a não
+  colar dados de cartão.
+- *API administrativa* `/api/conciliacoes` (somente perfil ADMIN; sem token → 401,
+  cliente → 401, técnico → 403): `GET /` (filtros status/tipo/verificacao/pedidoId,
+  paginação), `GET /resumo`, `GET /:id` (evidência + histórico), `PATCH /:id/status`.
+  **Não existe endpoint de reembolso.** A resolução manual exige justificativa
+  (≥3 caracteres) nos status finais, registra responsável e data, é terminal
+  (nova notificação do mesmo pagamento apenas incrementa o contador) e usa
+  compare-and-swap: dois administradores simultâneos → um vence, o outro 409.
+- *Proteções no banco:* histórico imutável (UPDATE/DELETE bloqueados); item não
+  pode ser apagado; identidade (chave, tipo, verificação, pedido, paymentId, hash)
+  imutável; status final imutável; **toda mudança de status exige, na mesma
+  transação, uma linha de histórico com o responsável** (constraint trigger
+  diferida). O pedido com pendência não pode ser excluído (409, e FK RESTRICT).
+- *Painel:* `/admin/conciliacoes` (resumo, filtros, lista) e
+  `/admin/conciliacoes/:id` (evidência, formulário de status, histórico), com
+  aviso permanente de que não há reembolso automático.
+
+
+**Testes e validação em PostgreSQL real (02/11/2026, projeto isolado, 3 rodadas no runner SQL).**
+- *Automatizados locais:* **172 backend** (eram 152; +10 em `reconciliation.test.js` e +10 na fila de
+  `order-state.test.js`) e **29 frontend** (+4) = **201 aprovados**; lint, build, `prisma validate` e
+  `git diff --check` aprovados.
+- *`npm run test:stock:postgres` (migrations ledger + conciliação, em schemas novos):* **114 cenários sequenciais e
+  21 disputas com bloqueio real, todos aprovados** (eram 35 e 5 por rodada; agora 38 e 7). As 2 disputas novas por
+  rodada — dois webhooks fazendo upsert da mesma chave (1 item, `ocorrencias` = 2) e dois administradores resolvendo o
+  mesmo item (um vence, o outro recebe `JFQ_TEST_RESOLUTION_CONFLICT`, uma única transição auditada) — tiveram
+  `wait_event_type=Lock`, waiter `active`, `pg_blocking_pids` contendo o holder e três PIDs distintos em **3/3**
+  rodadas (ex.: rodada 1, upsert: holder 1262, waiter 1261, observador 1268). As 21 disputas passam na validação de
+  evidência do runner.
+- *`npm run test:rest:isolated` (Express real + Prisma, cadeia de **10 migrations** por `prisma migrate deploy`,
+  Mercado Pago simulado, 0 chamadas externas, 0 credenciais no log): **41 cenários aprovados**.* Novos: pagamento
+  tardio registrado uma vez com estado e estoque intactos; **8 notificações duplicadas simultâneas → 1 item com
+  contagem exata (9) e 9 linhas de histórico**; divergências de valor, preferência, pedido inexistente e referência
+  não mapeável como `NAO_VERIFICADO`; vendedor/ambiente divergente como `SUSPEITO` (403 mantido); estorno/chargeback
+  registrado sem regredir o pedido; eventos que não são dinheiro não entram; notificações sem assinatura ou forjadas
+  não criam item; API somente ADMIN; filtros, resumo, detalhe e ausência de campos sensíveis; resolução manual com
+  justificativa, responsável, data e histórico, terminal e sem reembolso; **dois administradores simultâneos em 3
+  rodadas → sempre 1 vitória e 1 × 409**; guardas no banco (histórico imutável, sem DELETE, identidade e resolução
+  imutáveis, mudança de status sem histórico recusada no commit, CHECKs de classificação, chave e resolução); pedido
+  com pendência não pode ser excluído; ID de pagamento não confiável cai para a chave de notificação e depois para o
+  hash. A corrida aprovação × cancelamento (10 disputas, ambos os sentidos) deu **5 PAGO e 5 CANCELADO**; em
+  CANCELADO, o reenvio do webhook após o conflito de CAS gera exatamente 1 pendência; em PAGO, nenhuma. Invariantes
+  globais verificadas após cada grupo, incluindo as da fila. Objetos no schema de teste: 10 funções `jfq_`,
+  9 triggers, 14 CHECKs e 10 migrations finalizadas.
+- *Achado da validação em banco real:* a primeira execução falhou com 500 porque o SQL cru da fila usava o nome da
+  tabela sem schema — o Prisma qualifica apenas as consultas que gera, nunca `$queryRaw`. Em `public` (dev e
+  produção) funcionaria, mas dependia do `search_path`; o SQL passou a usar `"public".` como o ledger (agora **4**
+  literais no código). Também corrigi dois erros do meu próprio teste. Execução final limpa: 41/41.
+- *Inspeção da repetição interrompida do runner (somente leitura, nada excluído):* os schemas
+  `jfq_stock_1793651810837_1..3` existem completos (12 tabelas, 7 funções, 6 triggers, como os demais); **nenhum
+  schema parcial** e **0 sessões abertas**. Isso é esperado, pois cada migration é uma transação atômica. O `public`
+  do ensaio segue idêntico (4 tabelas, mesmas contagens). Ficam **18 schemas `jfq_*` retidos**.
+
+**Riscos e limitações pendentes.**
+1. Nenhuma notificação ao administrador quando um item novo entra na fila (só consulta no painel); decidir canal e
+   política (hoje não há envio real, em linha com a restrição).
+2. Notificações com assinatura inválida não são persistidas, por design; ataque ou erro de configuração do segredo
+   só aparece em log. Avaliar contador/alerta de rejeições.
+3. O reembolso continua 100% manual e fora do sistema; a fila registra a decisão humana mas não a valida contra o
+   Mercado Pago. Não há conciliação automática de extrato.
+4. Divergências de valor/preferência só são registradas para status `approved`; outros estados do provedor
+   (ex.: `in_process`) não entram e podem exigir revisão quando houver dados reais.
+5. O REST usa cópia mecânica do código com `"public".` trocado por schema novo (4 literais); a fonte original não
+   foi alterada nem executada contra o schema `public` do ensaio (que tem dados).
+6. Checkout Mercado Pago real de teste segue pendente (sem credenciais de teste no dev); Mercado Pago, e-mail e
+   Telegram foram simulados.
+7. Riscos já conhecidos e inalterados: reservas abandonadas sem expiração, preferência externa órfã após rollback e
+   chaves de idempotência de checkout ausentes ou diferentes.
+8. O histórico de restauração do projeto gratuito é de 6 h: o backup por branch + `pg_dump` deve ser feito
+   imediatamente antes da janela.
+9. Ensaio em Neon gratuito (0,25 CU): não mede carga nem duração de locks em tabelas grandes.
+
+### Plano de aplicação das duas migrations no jfq-development (preparado, NÃO executado)
+
+**Escopo e autorizações.** Alvo único: jfq-development (autumn-rain-12939944, branch
+br-jolly-pine-b8g7sy9k, endpoint ep-summer-bar-b8esi79j). Pendentes, nesta ordem:
+`20261102200000_order_stock_ledger` e `20261102210000_pagamento_conciliacoes`, aplicadas
+por **um único `prisma migrate deploy`**. Dependem de autorização expressa para
+(a) criar a branch de backup (modifica o projeto Neon) e (b) aplicar. Nada disso foi feito.
+Produção fica fora deste plano.
+
+**Ferramentas preparadas (somente leitura, sem segredo em disco).**
+`backend/scripts/verify-dev-deploy.js` com `--pre [--snapshot arq]` e
+`--post [--compare arq]`: recusa qualquer host que não seja o direto do
+jfq-development, força `default_transaction_read_only=on`, compara
+`_prisma_migrations` com os checksums locais, deriva as contagens esperadas de
+funções/triggers/constraints das próprias migrations, e grava só contagens.
+A URL entra apenas por variável de ambiente (`read -rs` no terminal).
+
+**Passos e portões (parar em qualquer FAIL).**
+1. *Portão de código:* testes backend/frontend, lint, build, `prisma validate`,
+   `test:stock:postgres` (3 rodadas) e `test:rest:isolated` verdes na mesma
+   revisão que será implantada; diff revisado. Sem commit pendente de revisão.
+2. *Pré-verificação (leitura):* `verify-dev-deploy.js --pre --snapshot <arq 0600 fora do repo>`.
+   Esperado: 8 migrations aplicadas e idênticas, pendentes = as duas, nenhum objeto
+   `jfq_*`, perfil de contagens. Qualquer divergência interrompe.
+3. *Backup (exige autorização):*
+   a. **Branch Neon** do jfq-development (cópia pontual instantânea e independente
+      do histórico de 6 h do plano gratuito) pelo console ("Create child branch" a partir
+      da branch principal, sem agendar expiração) ou `neonctl branches create`. Nome sugerido
+      `backup-pre-ledger-AAAAMMDD-HHMM`. Registrar o ID da branch.
+   b. **`pg_dump` lógico** (dados de clientes são pessoais; arquivo 0600 fora do repositório):
+      `PGSSLROOTCERT=system pg_dump --format=custom --no-owner --no-privileges --file ~/backups/jfq-dev-pre-ledger-AAAAMMDD-HHMM.dump "$URL_DIRETA"`
+      (URL direta, sem pooler, via `read -rs`; nunca gravada). Validar:
+      `pg_restore --list` abre o arquivo e lista as 12 tabelas; `sha256sum` anotado;
+      contagens da branch de backup = snapshot do passo 2 (consulta somente leitura).
+   c. Os backups ficam retidos até o fim da janela de observação; nunca apagar antes.
+4. *Congelar escritores:* garantir que não há backend/aba usando o banco dev
+   (`ss -ltnp` nas portas 3000/5173 e processos node do projeto), sem expirar nem
+   mover nada. O backend novo **não** deve subir antes do passo 5 e o antigo **não** deve rodar
+   em paralelo.
+5. *Aplicar:* somente `cd backend && npm run db:migrate:local` (recusa host diferente do
+   jfq-development e exige NODE_ENV=development). Nunca `migrate dev`, `reset` ou
+   `db push`. Cada migration é atômica (BEGIN/COMMIT); a primeira só adiciona colunas
+   nulas, tabela, constraints e triggers (bloqueio breve; sem reescrita de linhas). Se a segunda
+   falhar, o banco fica com o ledger aplicado e a segunda registrada como falha: **não subir
+   o backend**; corrigir, `prisma migrate resolve --rolled-back 20261102210000_pagamento_conciliacoes` e repetir
+   `migrate deploy`; ou restaurar o backup (passo de rollback).
+6. *Pós-verificação (leitura):* `verify-dev-deploy.js --post --compare <snapshot>`:
+   10 migrations finalizadas e idênticas, 10 funções/9 triggers/14 CHECKs, 3 tabelas novas e
+   4 colunas novas, dados de negócio idênticos ao snapshot, ledger e fila vazios, pedido
+   histórico sem versão.
+7. *Subir o backend novo (uma instância)* e o frontend. Smoke com dados **fictícios**
+   (exige autorização, pois grava no dev): `npm run test:local` e, no admin,
+   conferir `/admin/conciliacoes` (vazia) e o cancelamento de um pedido fictício com débito no
+   ledger. O checkout Mercado Pago real de teste continua pendente (credenciais de teste
+   ausentes no dev); sua lógica está validada no ensaio isolado.
+8. *Validação posterior (leitura):* sem estoque negativo; um débito por item versionado;
+   uma devolução por item cancelado; devolução ligada ao débito; histórico de
+   conciliação coerente com as ocorrências. Janela de observação: erros `JFQ_STOCK_*`,
+   `JFQ_CONCILIACAO_*`, 5xx no webhook e itens abertos na fila.
+
+**Compatibilidade.** Backend novo + schema antigo: incompatível (colunas/funções/tabelas
+ausentes; o webhook tardio falharia com 500 e o provedor reenviaria) — por isso a
+ordem é migrations → backend → frontend. Backend antigo + schema novo: roda, mas cria
+pedidos sem versão (tratados como históricos, sem débito) e não registra a fila; o cancelamento
+antigo não consegue cancelar pedido versionado sem compensação (trigger diferido).
+Não manter escritores antigos e novos simultâneos. Frontend novo + backend antigo:
+a tela de conciliação recebe 404 (sem efeito sobre o resto).
+
+**Rollback.** (i) Falha durante `migrate deploy`: nada parcial dentro de cada migration;
+corrigir e repetir ou restaurar o backup. (ii) Problema antes do primeiro pedido
+versionado ou item de fila real: restaurar a branch/dump do passo 3 e reaplicar do zero depois
+da correção; conferir contagens e checksums. (iii) Depois de pedidos versionados ou itens de
+fila: **corrigir para a frente**; bloquear novas escritas de checkout se necessário;
+não remover tabelas/triggers, não desfazer saldos em lote e não voltar ao código antigo
+de cancelamento. O histórico de conciliação nunca é apagado (triggers o impedem).
+No dev o custo é baixo (poucos dados), mas o procedimento deve ser ensaiado como se fosse
+produção, que terá plano próprio e nova autorização.
+
 ### Condições para liberação e riscos restantes
 
-1. Executar o runner fora do isolamento e exigir três disputas com conexões reais
-   sobrepostas; executar também os serviços Prisma/REST contra o ensaio. Reprovar
-   a liberação se houver deadlock sem tratamento operacional ou saldo divergente.
+1. ~~Executar o runner fora do isolamento e exigir três disputas...~~ **Cumprido em
+   02/11/2026** (ver seção acima: 15 disputas com bloqueio comprovado e 28
+   cenários Prisma/REST, todos aprovados). Reprovar a liberação se, em nova
+   execução, houver deadlock sem tratamento operacional ou saldo divergente.
 2. Revisar schema real, _prisma_migrations e eventual divergência das tabelas de
    refresh tokens antes de planejar deploy. Não marcar migrations como aplicadas
    só porque tabelas já existem. Nenhuma foi aplicada ao banco dev principal.

@@ -8,15 +8,17 @@ datasource db {
 }
 
 model Usuario {
-  id            Int            @id @default(autoincrement())
-  nome          String
-  email         String         @unique
-  senha         String
-  role          Role           @default(ADMIN)
-  ativo         Boolean        @default(true)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  refreshTokens RefreshToken[]
+  id                     Int                             @id @default(autoincrement())
+  nome                   String
+  email                  String                          @unique
+  senha                  String
+  role                   Role                            @default(ADMIN)
+  ativo                  Boolean                         @default(true)
+  createdAt              DateTime                        @default(now())
+  updatedAt              DateTime                        @updatedAt
+  refreshTokens          RefreshToken[]
+  conciliacoesResolvidas PagamentoConciliacao[]          @relation("ConciliacaoResolvidaPor")
+  conciliacaoHistorico   PagamentoConciliacaoHistorico[]
 
   @@map("usuarios")
 }
@@ -36,24 +38,24 @@ model Categoria {
 }
 
 model Produto {
-  id               Int           @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   nome             String
-  slug             String        @unique
+  slug             String             @unique
   descricao        String?
-  preco            Decimal       @db.Decimal(10, 2)
-  precoPromocional Decimal?      @db.Decimal(10, 2)
-  estoque          Int           @default(0)
-  sku              String?       @unique
+  preco            Decimal            @db.Decimal(10, 2)
+  precoPromocional Decimal?           @db.Decimal(10, 2)
+  estoque          Int                @default(0)
+  sku              String?            @unique
   imagemPrincipal  String?
-  imagens          String[]      @default([])
-  destaque         Boolean       @default(false)
-  ativo            Boolean       @default(true)
+  imagens          String[]           @default([])
+  destaque         Boolean            @default(false)
+  ativo            Boolean            @default(true)
   categoriaId      Int
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   movimentos       EstoqueMovimento[]
   itensPedido      ItensPedido[]
-  categoria        Categoria     @relation(fields: [categoriaId], references: [id])
+  categoria        Categoria          @relation(fields: [categoriaId], references: [id])
 
   @@map("produtos")
 }
@@ -106,10 +108,10 @@ model Agendamento {
 }
 
 model Pedido {
-  id                   Int                   @id @default(autoincrement())
+  id                   Int                    @id @default(autoincrement())
   clienteId            Int
-  valorTotal           Decimal               @db.Decimal(10, 2)
-  status               StatusPedido          @default(PENDENTE)
+  valorTotal           Decimal                @db.Decimal(10, 2)
+  status               StatusPedido           @default(PENDENTE)
   observacoes          String?
   paymentStatus        String?
   paymentMethod        String?
@@ -117,8 +119,8 @@ model Pedido {
   preferenceId         String?
   externalReference    String?
   paidAt               DateTime?
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
   nomeDestinatario     String?
   telefoneEntrega      String?
   cep                  String?
@@ -133,9 +135,10 @@ model Pedido {
   creationHash         String?
   checkoutInitPoint    String?
   movimentos           EstoqueMovimento[]
+  conciliacoes         PagamentoConciliacao[]
   checkoutAccessTokens CheckoutAccessToken[]
   itens                ItensPedido[]
-  cliente              Cliente               @relation(fields: [clienteId], references: [id])
+  cliente              Cliente                @relation(fields: [clienteId], references: [id])
 
   @@unique([clienteId, creationKey])
   @@map("pedidos")
@@ -191,14 +194,14 @@ model RefreshToken {
 }
 
 model ItensPedido {
-  id            Int     @id @default(autoincrement())
+  id            Int                @id @default(autoincrement())
   pedidoId      Int
   produtoId     Int
   quantidade    Int
   movimentos    EstoqueMovimento[]
-  precoUnitario Decimal @db.Decimal(10, 2)
-  pedido        Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  produto       Produto @relation(fields: [produtoId], references: [id])
+  precoUnitario Decimal            @db.Decimal(10, 2)
+  pedido        Pedido             @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produto       Produto            @relation(fields: [produtoId], references: [id])
 
   @@map("itens_pedido")
 }
@@ -242,22 +245,79 @@ enum StatusPedido {
 
 // CHECKs, immutable rows, stock application and deferred completeness are SQL migration rules.
 model EstoqueMovimento {
-  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   pedidoId       Int
   itemId         Int
   produtoId      Int
   tipo           String
   quantidade     Int
   origem         String
-  debitoOrigemId String?  @unique @db.Uuid
-  createdAt      DateTime @default(now())
-  pedido         Pedido @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
-  item           ItensPedido @relation(fields: [itemId], references: [id], onDelete: Restrict)
-  produto        Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
-  debitoOrigem    EstoqueMovimento? @relation("Compensacao", fields: [debitoOrigemId], references: [id], onDelete: Restrict)
+  debitoOrigemId String?           @unique @db.Uuid
+  createdAt      DateTime          @default(now())
+  pedido         Pedido            @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+  item           ItensPedido       @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  produto        Produto           @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  debitoOrigem   EstoqueMovimento? @relation("Compensacao", fields: [debitoOrigemId], references: [id], onDelete: Restrict)
   devolucao      EstoqueMovimento? @relation("Compensacao")
 
   @@unique([itemId, tipo])
   @@index([pedidoId])
   @@map("estoque_movimentos")
+}
+
+// Fila persistente e auditável de pendências financeiras para conciliação MANUAL.
+// Nunca dispara reembolso. Guarda apenas identificadores, status, valores e hash do payload.
+model PagamentoConciliacao {
+  id                  Int                             @id @default(autoincrement())
+  provider            String                          @default("mercadopago")
+  chaveIdempotencia   String
+  tipo                String
+  verificacao         String
+  status              String                          @default("PENDENTE")
+  pedidoId            Int?
+  paymentId           String?
+  paymentIdInformado  String?
+  notificationId      String?
+  rawPayloadHash      String
+  referenciaExterna   String?
+  statusProvedor      String?
+  statusPedido        String?
+  valorProvedor       Decimal?                        @db.Decimal(10, 2)
+  valorPedido         Decimal?                        @db.Decimal(10, 2)
+  preferenciaProvedor String?
+  preferenciaPedido   String?
+  ocorrencias         Int                             @default(1)
+  primeiraVezEm       DateTime                        @default(now())
+  ultimaVezEm         DateTime                        @default(now())
+  resolvidoEm         DateTime?
+  resolvidoPorId      Int?
+  observacao          String?
+  updatedAt           DateTime
+  pedido              Pedido?                         @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+  resolvidoPor        Usuario?                        @relation("ConciliacaoResolvidaPor", fields: [resolvidoPorId], references: [id], onDelete: Restrict)
+  historico           PagamentoConciliacaoHistorico[]
+
+  @@unique([provider, chaveIdempotencia, tipo])
+  @@index([status, tipo])
+  @@index([pedidoId])
+  @@index([paymentId])
+  @@map("pagamento_conciliacoes")
+}
+
+// Append-only: triggers impedem UPDATE/DELETE.
+model PagamentoConciliacaoHistorico {
+  id             Int                  @id @default(autoincrement())
+  conciliacaoId  Int
+  acao           String
+  statusAnterior String?
+  statusNovo     String?
+  usuarioId      Int?
+  observacao     String?
+  notificationId String?
+  createdAt      DateTime             @default(now())
+  conciliacao    PagamentoConciliacao @relation(fields: [conciliacaoId], references: [id], onDelete: Restrict)
+  usuario        Usuario?             @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+
+  @@index([conciliacaoId, createdAt])
+  @@map("pagamento_conciliacao_historico")
 }

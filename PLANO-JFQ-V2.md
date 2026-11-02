@@ -84,8 +84,11 @@ edição dos sete JSONs, commit/push ou operação em produção foi realizada.
 
 Esta atualização prevalece sobre a proposta anterior de decisão pendente. O usuário
 aprovou a reserva na criação tanto no legado quanto no Mercado Pago. O código e a
-migration estão preparados; **não estão liberados contra jfq-development**.
-O detalhamento e as evidências estão na primeira seção de AUDITORIA-FUNCIONAL.md.
+migration estão preparados e, em 02/11/2026, **a concorrência real e a validação
+Prisma/REST foram aprovadas no projeto isolado de ensaio**. Continuam **não
+aplicados ao jfq-development** — a aplicação depende de autorização específica.
+O detalhamento e as evidências estão na seção "Validação em PostgreSQL real e REST"
+de AUDITORIA-FUNCIONAL.md.
 
 ### Implementado
 
@@ -108,9 +111,10 @@ O detalhamento e as evidências estão na primeira seção de AUDITORIA-FUNCIONA
 
 ### Validação e migration
 
-**154 testes locais aprovados** (129 backend, 25 frontend), lint limpo, build
-aprovado e Prisma validate/generate aprovados. **33 cenários sequenciais SQL reais
-aprovados**, incluindo rollback parcial, histórico, unicidade e compensação.
+**169 testes locais aprovados** (144 backend, 25 frontend), lint limpo, build
+aprovado e Prisma validate aprovado (revalidados em 02/11/2026). **33 cenários
+sequenciais SQL reais** na rodada anterior e, na rodada final, 105 sequenciais +
+15 disputas com bloqueio comprovado + 28 cenários Prisma/REST.
 
 Migration 20261102200000_order_stock_ledger aplicada somente nos schemas novos
 jfq_stock_20261102_a/b do projeto gratuito de ensaio cool-rice-07419769, cuja
@@ -119,22 +123,66 @@ refresh tokens inalterada. Nenhuma migration aplicada ao jfq-development ou à
 produção. O ensaio utilizou baseline equivalente ao schema anterior; ainda falta
 validar a cadeia completa/metadata do Prisma antes de deploy futuro.
 
-**Concorrência real permanece um bloqueio:** as sondagens paralelas via conector
-foram serializadas na mesma sessão, apesar de produzirem saldos corretos. Não
-são teste de sobreposição nem foram contadas como tal. O terminal ficou sem DNS
-para o endpoint isolado. O runner npm run test:stock:postgres está preparado para
-conexões psql independentes, com exigência de PIDs distintos e sobreposição,
-alvo fixo ao ensaio, schema novo, timeouts e sem ler/editar .env. Ver instruções
-seguras no relatório de auditoria. Falta ainda validar os serviços Prisma/REST
-com esse PostgreSQL; doubles locais não comprovam a integração de transporte.
+**Concorrência real — comprovada (02/11/2026).** `npm run test:stock:postgres`,
+3 rodadas: 105 cenários sequenciais e 15 disputas, com três PIDs distintos,
+`wait_event_type=Lock` e `pg_blocking_pids` contendo o holder em todas; estoque e
+ledger consistentes, sem débito/devolução duplicados. As sondagens anteriores do
+conector (serializadas) seguem sem valor como prova. **Prisma/REST — comprovado:**
+`npm run test:rest:isolated`, 28 cenários (cadeia de 9 migrations via
+`prisma migrate deploy`, autenticação/autorização, legado e Mercado Pago
+simulado, reserva, cancelamento, webhooks duplicados/fora de ordem, históricos
+ambíguos, corridas HTTP) e 0 chamadas externas. Total: 169 testes locais + 148
+cenários em banco real. Limitação: o REST usou cópia mecânica do código com o
+literal `"public".` trocado por schema novo (o `public` do ensaio tem dados);
+fonte original inalterada. O `public` do ensaio ficou idêntico.
+
+### Regra de pagamento × cancelamento e plano para o dev (02/11/2026)
+
+**Regra aprovada e implementada (código, sem migration):** pagamento confirmado
+primeiro → PAGO e cancelamento administrativo recusado (409); cancelamento primeiro
+→ CANCELADO, estoque liberado uma vez, aprovação tardia retida sem reservar estoque.
+Sem reembolso automático. 152 testes backend + 25 frontend; REST isolado 30/30,
+10 corridas aprovado × cancelamento com os dois resultados observados (4 PAGO,
+6 CANCELADO). **Pendente de aprovação:** tabela persistente `pagamento_conciliacoes`
+(nova migration aditiva) para a fila de conciliação/reembolso manual — hoje a
+aprovação tardia só aparece em log e resposta. Proposta completa e decisões
+em aberto na seção correspondente de AUDITORIA-FUNCIONAL.md.
+
+**jfq-development (somente leitura):** 8 migrations aplicadas, checksums idênticos
+aos locais, sem drift; só a do ledger está pendente (1 pedido histórico, 3
+produtos). Plano coordenado (backup por branch Neon + pg_dump, `db:migrate:local`,
+verificação SQL, backend novo só após a migration, smoke fictício, rollback
+antes/depois do primeiro pedido versionado) está na auditoria. **Nada aplicado.**
+
+### Fila de conciliação financeira e plano das duas migrations (02/11/2026)
+
+**Aprovado e implementado localmente:** tabela `pagamento_conciliacoes` (+ histórico imutável) na migration
+`20261102210000_pagamento_conciliacoes`, para ser aplicada **junto** com a do ledger em um único deploy. Registra
+pagamentos confirmados após cancelamento, divergências de valor/preferência e outros eventos financeiros,
+distinguindo **confirmado pelo Mercado Pago** de **não verificado** e **suspeito** (classificação imposta por CHECK;
+divergência nunca é presumida como dinheiro). Idempotente por provedor + paymentId confiável (senão notificação,
+senão hash do payload) + tipo; gravada na mesma transação do webhook; API e painel só para ADMIN; resolução manual
+com responsável, data e histórico auditável; **sem reembolso automático**. **201 testes locais** (172 backend + 29
+frontend); no banco isolado: **114 sequenciais + 21 disputas com bloqueio real (3 rodadas) e 41 cenários
+Prisma/REST**, todos aprovados. A validação real achou e corrigiu uma dependência de `search_path` no SQL cru.
+Inspeção do runner interrompido: nenhum schema parcial, 0 sessões abertas, `public` do ensaio intacto, 18 schemas
+`jfq_*` retidos.
+
+**Nada foi aplicado ao jfq-development nem à produção.** O plano completo (backup por branch Neon + `pg_dump`, pré e
+pós-verificação somente leitura com `backend/scripts/verify-dev-deploy.js`, aplicação por `db:migrate:local`, smoke
+fictício, compatibilidade e rollback) está em AUDITORIA-FUNCIONAL.md. **Decisões ainda abertas:** canal de alerta ao
+admin para itens novos, política para estados `in_process` e para rejeições de assinatura, e autorização expressa
+para criar o backup e aplicar.
 
 ### Próxima etapa para liberação segura
 
-1. Executar runner com rede e testes de serviços no ensaio; conservar evidências.
-2. Conferir divergência real de schema e _prisma_migrations, incluindo refresh
-   tokens. Planejar aplicação autorizada em desenvolvimento e smoke test antes
-   de liberar o aplicativo. Novo Prisma Client exige a migration; não iniciar
-   contra schema antigo. Nenhuma autorização de migração principal foi presumida.
+1. ~~Executar runner e testes de serviços no ensaio~~ — **concluído** (acima).
+2. Conferir divergência real de schema e _prisma_migrations de jfq-development,
+   incluindo refresh tokens. Planejar aplicação autorizada em desenvolvimento e
+   smoke test antes de liberar o aplicativo. Novo Prisma Client exige a migration;
+   não iniciar contra schema antigo. Nenhuma autorização de migração principal
+   foi presumida. **Decidir:** webhook aprovado × cancelamento administrativo pode
+   deixar pedido CANCELADO com pagamento aprovado (conciliação manual).
 3. Coordenar atualização de todos os escritores/consumidores. Não misturar
    cancelamento antigo com pedidos novos; adotar chave estável nos retries.
 4. Definir acompanhamento manual de reservas abandonadas e conciliação de

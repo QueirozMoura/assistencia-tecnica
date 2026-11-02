@@ -1,6 +1,6 @@
 import { creationIdentity, creationFields, findCreation, lockCreation, replayCheckout } from "./orderCreation.service.js";
 import { reserveOrderStock, releaseOrderStock } from "./stockLedger.service.js";
-import { assertOrderTransition, assertOrderPayable } from "./orderState.js";
+import { assertOrderTransition, assertOrderPayable, assertOrderCancellable } from "./orderState.js";
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
@@ -554,11 +554,17 @@ export async function atualizarStatusPedido(id, status) {
     const pedido = await tx.pedido.findUnique({ where: { id }, include: { itens: true } });
     if (!pedido) throw Object.assign(new Error("Pedido não encontrado."), { statusCode: 404 });
     assertOrderTransition(pedido.status, status);
+    const cancelling = status === "CANCELADO" && pedido.status !== "CANCELADO";
+    if (cancelling) assertOrderCancellable(pedido);
 
     if (pedido.status !== status) {
-      const changed = await tx.pedido.updateMany({ where: { id, status: pedido.status }, data: { status } });
+      // A cancellation also compares the observed payment state, so a payment confirmed between the
+      // read and this write makes the compare fail instead of cancelling a paid order.
+      const changed = await tx.pedido.updateMany({
+        where: { id, status: pedido.status, ...(cancelling ? { paymentStatus: pedido.paymentStatus } : {}) }, data: { status } });
       if (changed.count !== 1) {
         const latest = await tx.pedido.findUnique({ where: { id } });
+        if (cancelling && latest && latest.status !== "CANCELADO") assertOrderCancellable(latest);
         if (latest?.status !== status) {
           throw Object.assign(new Error("Pedido alterado por outra solicitação. Atualize os dados e tente novamente."), { statusCode: 409 });
         }
@@ -584,6 +590,9 @@ export async function deletarPedido(id) {
   }
   if (await prisma.estoqueMovimento.count({ where: { pedidoId: id } })) {
     throw Object.assign(new Error("Pedido com histórico de estoque deve ser preservado para auditoria."), { statusCode: 409 });
+  }
+  if (await prisma.pagamentoConciliacao.count({ where: { pedidoId: id } })) {
+    throw Object.assign(new Error("Pedido com pendência de conciliação financeira deve ser preservado para auditoria."), { statusCode: 409 });
   }
   return prisma.pedido.delete({ where: { id } });
 }

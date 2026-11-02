@@ -5,6 +5,7 @@ import { getPaymentCredentials, isPaymentTestMode, validateLocalPaymentUrls } fr
 import logger from "../config/logger.js";
 import prisma from "../config/prisma.js";
 import { notifyAdminPaymentApproved } from "./notification.service.js";
+import { registrarPendencia, registrarPendenciaIsolada, TIPOS } from "./conciliacao.service.js";
 
 /**
  * Valida assinatura do webhook do Mercado Pago usando o manifesto oficial:
@@ -336,7 +337,7 @@ async function getMercadoPagoPaymentById(paymentId) {
   }
 
   if (testMode && (data?.live_mode !== false || String(data?.collector_id) !== sellerId)) {
-    throw Object.assign(new Error("Pagamento recusado: ambiente ou vendedor incompatível com o teste."), { statusCode: 403 });
+    throw Object.assign(new Error("Pagamento recusado: ambiente ou vendedor incompatível com o teste."), { statusCode: 403, pagamentoSuspeito: data });
   }
   return data;
 }
@@ -393,7 +394,30 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
     };
   }
 
-  const payment = await getMercadoPagoPaymentById(normalized.dataId);
+  const approvedByProvider = candidate => String(candidate?.status || "").toLowerCase() === "approved";
+  // Evidence only: identifiers, statuses and amounts. `paymentId` is trusted only when it comes from the provider API.
+  const evidence = (candidate, extra = {}) => ({
+    paymentId: candidate?.id ?? null,
+    paymentIdInformado: normalized.dataId,
+    notificationId: normalized.id,
+    rawPayloadHash,
+    referenciaExterna: candidate?.external_reference ?? null,
+    statusProvedor: candidate?.status ?? null,
+    valorProvedor: candidate?.transaction_amount ?? null,
+    preferenciaProvedor: candidate?.preference_id ?? null,
+    ...extra,
+  });
+
+  let payment;
+  try {
+    payment = await getMercadoPagoPaymentById(normalized.dataId);
+  } catch (error) {
+    // A signed notification whose payment belongs to another seller/environment is refused (403) but never lost.
+    if (error?.pagamentoSuspeito && approvedByProvider(error.pagamentoSuspeito)) {
+      await registrarPendenciaIsolada(evidence(error.pagamentoSuspeito, { tipo: TIPOS.VENDEDOR_OU_AMBIENTE_DIVERGENTE }));
+    }
+    throw error;
+  }
   const externalReference = payment?.external_reference || null;
   const pedidoId = extractPedidoIdFromExternalReference(externalReference);
 
@@ -402,10 +426,13 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
       paymentId: payment?.id,
       externalReference,
     });
+    const conciliacao = approvedByProvider(payment)
+      ? await registrarPendenciaIsolada(evidence(payment, { tipo: TIPOS.REFERENCIA_NAO_MAPEAVEL })) : null;
     return {
       ...normalized,
       ignored: true,
       reason: "EXTERNAL_REFERENCE_NOT_MAPPABLE",
+      conciliacaoId: conciliacao?.id ?? null,
       payment,
     };
   }
@@ -420,10 +447,13 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
       paymentId: payment?.id,
       externalReference,
     });
+    const conciliacao = approvedByProvider(payment)
+      ? await registrarPendenciaIsolada(evidence(payment, { tipo: TIPOS.PEDIDO_NAO_ENCONTRADO })) : null;
     return {
       ...normalized,
       ignored: true,
       reason: "PEDIDO_NOT_FOUND",
+      conciliacaoId: conciliacao?.id ?? null,
       payment,
     };
   }
@@ -440,10 +470,15 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
       expectedAmount,
       receivedAmount,
     });
+    // Approved at the provider but for a different amount: not assumed to be money for this order.
+    const conciliacao = approvedByProvider(payment)
+      ? await registrarPendenciaIsolada(evidence(payment, { tipo: TIPOS.DIVERGENCIA_VALOR, pedidoId, statusPedido: pedidoAtual.status,
+        valorPedido: invalidAmount ? null : expectedAmount, preferenciaPedido: pedidoAtual.preferenceId })) : null;
     return {
       ...normalized,
       ignored: true,
       reason: "PAYMENT_AMOUNT_MISMATCH",
+      conciliacaoId: conciliacao?.id ?? null,
     };
   }
 
@@ -466,10 +501,14 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
       expectedPreferenceId: pedidoAtual?.preferenceId ?? null,
       receivedPreferenceId: payment?.preference_id ?? null,
     });
+    const conciliacao = approvedByProvider(payment)
+      ? await registrarPendenciaIsolada(evidence(payment, { tipo: TIPOS.DIVERGENCIA_PREFERENCIA, pedidoId, statusPedido: pedidoAtual.status,
+        valorPedido: expectedAmount, preferenciaPedido: pedidoAtual.preferenceId })) : null;
     return {
       ...normalized,
       ignored: true,
       reason: "PAYMENT_PREFERENCE_MISMATCH",
+      conciliacaoId: conciliacao?.id ?? null,
     };
   }
 
@@ -486,7 +525,19 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
       const current = await tx.pedido.findUnique({ where: { id: pedidoId } });
       if (!current) return { ignoredReason: "PEDIDO_NOT_FOUND" };
       const transition = paymentOrderTransition(current, mapped);
-      if (transition.ignoredReason) return transition;
+      if (transition.ignoredReason) {
+        // Recorded in THIS transaction: the queue entry commits (or rolls back) with the decision to leave the order untouched.
+        const providerStatus = String(payment?.status || "").toLowerCase();
+        let tipo = null;
+        if (transition.ignoredReason === "ORDER_CANCELLED_REQUIRES_RECONCILIATION" && approvedByProvider(payment)) tipo = TIPOS.PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO;
+        else if (transition.ignoredReason === "PAYMENT_STATE_REGRESSION" && ["refunded", "charged_back"].includes(providerStatus)) tipo = TIPOS.ESTORNO_OU_CHARGEBACK;
+        if (tipo) {
+          const registro = await registrarPendencia(tx, evidence(payment, { tipo, pedidoId, statusPedido: current.status,
+            valorPedido: Number(current.valorTotal), preferenciaPedido: current.preferenceId }));
+          return { ...transition, conciliacaoId: registro.id };
+        }
+        return transition;
+      }
       if (Number(current.valorTotal) !== expectedAmount || current.preferenceId !== pedidoAtual.preferenceId) {
         throw Object.assign(new Error("Pedido alterado durante consulta do pagamento."), { statusCode: 409 });
       }
@@ -601,7 +652,7 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
 
     if (txResult.ignoredReason) {
       logger.warn("Webhook exige conciliação ou foi ignorado por regressão de estado", { pedidoId, reason: txResult.ignoredReason });
-      return { ...normalized, ignored: true, reason: txResult.ignoredReason };
+      return { ...normalized, ignored: true, reason: txResult.ignoredReason, conciliacaoId: txResult.conciliacaoId ?? null };
     }
     if (txResult.alreadyProcessed) {
       return {

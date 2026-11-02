@@ -14,6 +14,17 @@ export function assertOrderTransition(current, next) {
   }
 }
 
+// Confirmed money is never reversed by the order flow: refunds are a manual, audited reconciliation.
+export function isPaymentConfirmed(pedido) {
+  return pedido.paymentStatus === "PAID" || Boolean(pedido.paidAt);
+}
+
+export function assertOrderCancellable(pedido) {
+  if (isPaymentConfirmed(pedido)) {
+    throw Object.assign(new Error("Pedido com pagamento confirmado não pode ser cancelado automaticamente. Trate como reembolso/conciliação manual."), { statusCode: 409 });
+  }
+}
+
 export function assertOrderPayable(pedido) {
   if (pedido.status !== "PENDENTE" || pedido.paymentStatus === "PAID" || pedido.paidAt) {
     throw Object.assign(new Error("Este pedido não está disponível para iniciar pagamento."), { statusCode: 409 });

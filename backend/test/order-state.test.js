@@ -11,7 +11,7 @@ const { atualizarStatusPedido, validarAcessoPagamentoPedido } = await import("..
 const { processMercadoPagoWebhook } = await import("../src/services/pagamento.service.js");
 const { assertOrderTransition } = await import("../src/services/orderState.js");
 
-let order, stock, increments, events, nextPayment, beforeCompare, queue, debitEvidence, returned, failReturn;
+let pendencias, history, order, stock, increments, events, nextPayment, beforeCompare, queue, debitEvidence, returned, failReturn;
 const originals = [];
 const originalFetch = globalThis.fetch;
 const copy = value => structuredClone(value);
@@ -21,7 +21,7 @@ function replace(target, key, value) {
 }
 beforeEach(() => {
   order = { id: 1, clienteId: 1, status: "PENDENTE", paymentStatus: "PENDING", paidAt: null, valorTotal: 10, preferenceId: "fixture-preference", itens: [{ produtoId: 1, quantidade: 2 }], cliente: { id: 1, email: "fixture@example.invalid" } };
-  debitEvidence = true; returned = false; failReturn = false;
+  debitEvidence = true; returned = false; failReturn = false; pendencias = new Map(); history = [];
   stock = 3; increments = 0; events = new Map(); beforeCompare = null; queue = Promise.resolve();
   nextPayment = { id: 1, collector_id: 123, live_mode: false, external_reference: "pedido_1", preference_id: "fixture-preference", status: "pending", transaction_amount: 10 };
   globalThis.fetch = async url => {
@@ -41,7 +41,16 @@ beforeEach(() => {
   };
   const tx = {
     pedido,
-    $queryRaw: async (sql, id, source) => {
+    pagamentoConciliacaoHistorico: { create: async ({ data }) => { history.push(copy(data)); return data; } },
+    $queryRaw: async (sql, ...params) => {
+      if (String(sql[0]).includes("pagamento_conciliacoes")) { // INSERT ... ON CONFLICT DO UPDATE (atomic upsert by provider, key, tipo)
+        const [provider, chave, tipo, verificacao, pedidoId, paymentId, paymentIdInformado, notificationId, rawPayloadHash, referenciaExterna, statusProvedor, statusPedido, valorProvedor, valorPedido, preferenciaProvedor, preferenciaPedido] = params;
+        const key = `${provider}|${chave}|${tipo}`; const existing = pendencias.get(key);
+        if (existing) { existing.ocorrencias++; return [{ id: existing.id, status: existing.status, inserted: false }]; }
+        const row = { id: pendencias.size + 1, status: "PENDENTE", ocorrencias: 1, chave, tipo, verificacao, pedidoId, paymentId, paymentIdInformado, notificationId, rawPayloadHash, referenciaExterna, statusProvedor, statusPedido, valorProvedor, valorPedido, preferenciaProvedor, preferenciaPedido };
+        pendencias.set(key, row); return [{ id: row.id, status: row.status, inserted: true }];
+      }
+      const [id, source] = params;
       assert.equal(id, 1);
       assert.ok(["ADMIN_CANCELAMENTO", "WEBHOOK_CANCELAMENTO"].includes(source));
       assert.equal(order.status, "CANCELADO");
@@ -63,9 +72,9 @@ beforeEach(() => {
   replace(prisma.pedido, "findUnique", pedido.findUnique);
   replace(prisma, "$transaction", callback => {
     const run = queue.then(async () => {
-      const snapshot = { order: copy(order), stock, increments, returned, events: copy(events) };
+      const snapshot = { order: copy(order), stock, increments, returned, events: copy(events), pendencias: copy(pendencias), history: copy(history) };
       try { return await callback(tx); }
-      catch (error) { ({ order, stock, increments, returned, events } = snapshot); throw error; }
+      catch (error) { ({ order, stock, increments, returned, events, pendencias, history } = snapshot); throw error; }
     });
     queue = run.catch(() => {}); return run;
   });
@@ -205,4 +214,140 @@ test("return failure rolls back webhook state, dedupe marker and inventory", asy
   await assert.rejects(() => webhook(), { statusCode: 409 });
   assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "PENDING");
   assert.equal(stock, 3); assert.equal(events.size, 0);
+});
+
+// --- Approved business rule: payment-vs-cancellation race (two valid outcomes only) ---
+test("race outcome 1: confirmation first leaves the order PAGO; later administrative cancellation is refused", async () => {
+  nextPayment.status = "approved";
+  assert.equal((await webhook()).updated, true);
+  await assert.rejects(() => atualizarStatusPedido(1, "CANCELADO"), { statusCode: 409 });
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.ok(order.paidAt);
+  assert.equal(increments, 0); assert.equal(stock, 3);
+});
+test("race outcome 2: cancellation first releases stock once; later approval is held, not applied, and never re-reserves", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  nextPayment.status = "approved";
+  const late = await webhook();
+  assert.equal(late.reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION"); assert.equal(late.ignored, true);
+  assert.equal(order.status, "CANCELADO"); assert.equal(order.paidAt, null); assert.notEqual(order.paymentStatus, "PAID");
+  assert.equal(increments, 1); assert.equal(stock, 5, "stock released exactly once and not reserved again");
+  await atualizarStatusPedido(1, "CANCELADO"); // idempotent retry
+  assert.equal(increments, 1); assert.equal(stock, 5);
+});
+test("race interleaving A: payment confirmed between the cancellation read and write cannot be cancelled", async () => {
+  beforeCompare = () => { order.status = "PAGO"; order.paymentStatus = "PAID"; order.paidAt = new Date().toISOString(); };
+  await assert.rejects(() => atualizarStatusPedido(1, "CANCELADO"), { statusCode: 409, message: /pagamento confirmado/ });
+  assert.equal(increments, 0); assert.equal(stock, 3); // final row state is asserted in the real-database REST suite (this harness rolls back the simulated concurrent commit)
+});
+test("race interleaving B: cancellation committed between the webhook read and write rejects the webhook transaction", async () => {
+  nextPayment.status = "approved";
+  beforeCompare = () => { order.status = "CANCELADO"; };
+  await assert.rejects(() => webhook(), { statusCode: 409 });
+  assert.equal(events.size, 0); assert.equal(increments, 0);
+});
+for (const adminFirst of [true, false]) {
+  test(`simultaneous approval and cancellation (${adminFirst ? "cancellation" : "approval"} serialized first) never ends CANCELADO with a confirmed payment`, async () => {
+    nextPayment.status = "approved";
+    const launch = [() => webhook().catch(error => ({ error })), () => atualizarStatusPedido(1, "CANCELADO").catch(error => ({ error }))];
+    if (adminFirst) launch.reverse();
+    await Promise.all(launch.map(fn => fn()));
+    if (order.status === "CANCELADO") { assert.notEqual(order.paymentStatus, "PAID"); assert.equal(order.paidAt, null); assert.equal(increments, 1); assert.equal(stock, 5); }
+    else { assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.equal(increments, 0); assert.equal(stock, 3); }
+  });
+}
+test("only provider-confirmed payment blocks cancellation: a manually marked PAGO without confirmation remains cancellable", async () => {
+  await atualizarStatusPedido(1, "PAGO"); order.paymentStatus = null; order.paidAt = null;
+  await atualizarStatusPedido(1, "CANCELADO");
+  assert.equal(order.status, "CANCELADO"); assert.equal(increments, 1);
+});
+test("confirmed payment also blocks cancellation from preparation and shipping", async () => {
+  for (const status of ["PREPARANDO", "ENVIADO"]) {
+    order.status = status; order.paymentStatus = "PAID";
+    await assert.rejects(() => atualizarStatusPedido(1, "CANCELADO"), { statusCode: 409 });
+    assert.equal(order.status, status);
+  }
+  assert.equal(increments, 0);
+});
+
+// --- Reconciliation queue (approved decision, 02/11/2026) ---
+const all = () => [...pendencias.values()];
+test("late approval on a cancelled order is queued as provider-confirmed, once, and never re-reserves stock", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  nextPayment.status = "approved";
+  const late = await webhook("late-1");
+  assert.equal(late.reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION"); assert.ok(late.conciliacaoId);
+  assert.equal(all().length, 1);
+  const [item] = all();
+  assert.equal(item.tipo, "PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO"); assert.equal(item.verificacao, "CONFIRMADO_PELO_PROVEDOR");
+  assert.equal(item.pedidoId, 1); assert.equal(item.paymentId, "1"); assert.equal(item.statusProvedor, "approved"); assert.equal(item.valorProvedor, 10);
+  assert.equal(order.status, "CANCELADO"); assert.equal(order.paidAt, null); assert.equal(stock, 5); assert.equal(increments, 1);
+  assert.deepEqual(history.map(h => h.acao), ["REGISTRADA"]);
+});
+test("duplicate and repeated notifications of the same payment count occurrences without duplicating the item", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  nextPayment.status = "approved";
+  await webhook("dup-1"); await webhook("dup-1"); await webhook("dup-2");
+  await Promise.all([webhook("dup-3"), webhook("dup-4")]);
+  assert.equal(all().length, 1); assert.equal(all()[0].ocorrencias, 5);
+  assert.deepEqual(history.map(h => h.acao), ["REGISTRADA", "REOCORRENCIA", "REOCORRENCIA", "REOCORRENCIA", "REOCORRENCIA"]);
+  assert.equal(stock, 5); assert.equal(increments, 1);
+});
+test("non-money events on a cancelled order are not queued (rejected, pending)", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  for (const status of ["rejected", "pending", "in_process"]) { nextPayment.status = status; await webhook(status); }
+  assert.equal(all().length, 0);
+});
+test("approved amount mismatch is queued as NOT verified and leaves order and stock untouched", async () => {
+  nextPayment.status = "approved"; nextPayment.transaction_amount = 99;
+  const result = await webhook("amount");
+  assert.equal(result.reason, "PAYMENT_AMOUNT_MISMATCH"); assert.ok(result.conciliacaoId);
+  const [item] = all();
+  assert.equal(item.tipo, "DIVERGENCIA_VALOR"); assert.equal(item.verificacao, "NAO_VERIFICADO"); assert.equal(item.valorProvedor, 99); assert.equal(item.valorPedido, 10);
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "PENDING"); assert.equal(order.paidAt, null); assert.equal(increments, 0);
+});
+test("non-approved amount mismatch is not money: nothing queued", async () => {
+  nextPayment.status = "pending"; nextPayment.transaction_amount = 99;
+  assert.equal((await webhook("pending-amount")).reason, "PAYMENT_AMOUNT_MISMATCH");
+  assert.equal(all().length, 0);
+});
+test("approved preference mismatch is queued as NOT verified", async () => {
+  nextPayment.status = "approved"; nextPayment.preference_id = "someone-elses-preference";
+  const result = await webhook("preference");
+  assert.equal(result.reason, "PAYMENT_PREFERENCE_MISMATCH");
+  const [item] = all(); assert.equal(item.tipo, "DIVERGENCIA_PREFERENCIA"); assert.equal(item.verificacao, "NAO_VERIFICADO");
+  assert.equal(item.preferenciaProvedor, "someone-elses-preference"); assert.equal(order.status, "PENDENTE");
+});
+test("approved payment for an unknown order or unmappable reference is queued without an order link", async () => {
+  nextPayment.status = "approved"; nextPayment.external_reference = "not-an-order";
+  assert.equal((await webhook("unmappable")).reason, "EXTERNAL_REFERENCE_NOT_MAPPABLE");
+  nextPayment.external_reference = "pedido_1"; const previous = prisma.pedido.findUnique;
+  replace(prisma.pedido, "findUnique", async () => null);
+  assert.equal((await webhook("not-found")).reason, "PEDIDO_NOT_FOUND");
+  prisma.pedido.findUnique = previous;
+  assert.deepEqual(all().map(item => [item.tipo, item.verificacao, item.pedidoId]).sort(), [["PEDIDO_NAO_ENCONTRADO", "NAO_VERIFICADO", null], ["REFERENCIA_NAO_MAPEAVEL", "NAO_VERIFICADO", null]]);
+});
+test("seller/environment divergence stays refused (403) but is queued as suspicious", async () => {
+  nextPayment.status = "approved"; nextPayment.collector_id = 999;
+  await assert.rejects(() => webhook("suspicious"), { statusCode: 403 });
+  const [item] = all(); assert.equal(item.tipo, "VENDEDOR_OU_AMBIENTE_DIVERGENTE"); assert.equal(item.verificacao, "SUSPEITO"); assert.equal(item.pedidoId, null);
+  assert.equal(order.status, "PENDENTE");
+});
+test("refund/chargeback reported for a paid order is queued and never regresses the order", async () => {
+  order.status = "PAGO"; order.paymentStatus = "PAID";
+  for (const status of ["refunded", "charged_back"]) { nextPayment.status = status; assert.equal((await webhook(status)).reason, "PAYMENT_STATE_REGRESSION"); }
+  assert.equal(all().length, 1, "same payment id and type collapse into one item");
+  assert.equal(all()[0].tipo, "ESTORNO_OU_CHARGEBACK"); assert.equal(order.status, "PAGO");
+  nextPayment.status = "rejected"; await webhook("rejected-old"); assert.equal(all().length, 1, "an old rejected attempt is not a financial event");
+});
+test("a rolled-back webhook transaction leaves no queue entry (the provider will retry)", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  nextPayment.status = "approved"; failReturn = false;
+  const original = prisma.pedido.findUnique;
+  beforeCompare = () => {};
+  events.set("x", { id: "x" });
+  let thrown = false;
+  replace(prisma.pedido, "findUnique", async () => { thrown = true; throw new Error("simulated database outage"); });
+  await assert.rejects(() => webhook("outage"), /simulated database outage/);
+  prisma.pedido.findUnique = original;
+  assert.ok(thrown); assert.equal(all().length, 0);
 });

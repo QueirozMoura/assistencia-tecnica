@@ -29,6 +29,7 @@ export function stockPostgresSuite(schema, baseline, migration) {
     `INSERT INTO categorias(id,nome,slug,"updatedAt") VALUES (1,'Fixture ledger','fixture-ledger',now())`,
     `INSERT INTO clientes(id,nome,telefone,"updatedAt") VALUES (1,'Fixture ledger','00000000000',now())`,
     ...[[1,10],[2,1],[3,0],[10,1],[11,5],[12,5],[13,5],[20,2],[21,2147483647]].map(([id, stock]) => `INSERT INTO produtos(id,nome,slug,preco,estoque,"categoriaId","updatedAt") VALUES (${id},'Fixture ${id}','fixture-${id}',5,${stock},1,now())`),
+    `INSERT INTO usuarios(id,nome,email,senha,"updatedAt") VALUES (1,'Fixture admin','fixture-admin@example.invalid','not-a-real-hash',now())`,
     `INSERT INTO pedidos(id,"clienteId","valorTotal","updatedAt") VALUES (900,1,10,now())`,
     `INSERT INTO itens_pedido(id,"pedidoId","produtoId",quantidade,"precoUnitario") VALUES (9000,900,1,1,5)`,
   ];
@@ -87,6 +88,21 @@ export function stockPostgresSuite(schema, baseline, migration) {
     PERFORM jfq_release_order_stock(${id},'WEBHOOK_CANCELAMENTO');
     UPDATE mercado_pago_webhook_events SET processed=true,"processedAt"=now() WHERE "notificationId"='fixture-race-${id}';
   END $$`;
+  // Reconciliation queue (second migration): atomic upsert by key and compare-and-swap resolution.
+  const queueRow = key => `INSERT INTO pagamento_conciliacoes(provider,"chaveIdempotencia",tipo,verificacao,status,"paymentId","rawPayloadHash","statusProvedor","updatedAt")
+    VALUES ('mercadopago','pid:${key}','REFERENCIA_NAO_MAPEAVEL','NAO_VERIFICADO','PENDENTE','${key}',repeat('d',64),'approved',now())`;
+  const queueUpsert = key => `${queueRow(key)} ON CONFLICT (provider,"chaveIdempotencia",tipo) DO UPDATE
+    SET ocorrencias = pagamento_conciliacoes.ocorrencias + 1, "ultimaVezEm" = now(), "updatedAt" = now()`;
+  const resolve = (key, final) => `DO $$ DECLARE item integer; BEGIN
+    SELECT id INTO item FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:${key}';
+    UPDATE pagamento_conciliacoes SET status='${final}',"resolvidoEm"=now(),"resolvidoPorId"=1,observacao='fixture resolution',"updatedAt"=now()
+      WHERE id=item AND status='PENDENTE';
+    IF NOT FOUND THEN RAISE EXCEPTION 'JFQ_TEST_RESOLUTION_CONFLICT'; END IF;
+    INSERT INTO pagamento_conciliacao_historico("conciliacaoId",acao,"statusAnterior","statusNovo","usuarioId") VALUES (item,'STATUS_ALTERADO','PENDENTE','${final}',1);
+  END $$`;
+  add('prepare open reconciliation item for the resolution race', [queueRow('5550002'), assertSql(`(SELECT status='PENDENTE' AND ocorrencias=1 FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:5550002')`)]);
+  add('reconciliation items cannot be deleted and history is append-only', [`DELETE FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:5550002'`], 'JFQ_CONCILIACAO_DELETE_FORBIDDEN');
+  add('status change without an audited history row is refused at commit', [`UPDATE pagamento_conciliacoes SET status='EM_ANALISE' WHERE "chaveIdempotencia"='pid:5550002'`], 'JFQ_CONCILIACAO_AUDIT_MISSING');
   const suite = {
     schema,
     // Existing public fixtures are untouched; baseline is created exclusively in a new schema.
@@ -119,6 +135,12 @@ export function stockPostgresSuite(schema, baseline, migration) {
       { name: 'rejected webhook holds row while administrative cancellation retries',
         a: [scope, webhookReject(71)], b: [scope, adminCancel(71)], errors: [],
         verify: [scope, assertSql(`(SELECT estoque=5 FROM produtos WHERE id=13) AND (SELECT count(*)=1 FROM estoque_movimentos WHERE "pedidoId"=71 AND tipo='DEVOLUCAO') AND (SELECT status='CANCELADO' AND "paymentStatus"='FAILED' FROM pedidos WHERE id=71) AND EXISTS(SELECT 1 FROM mercado_pago_webhook_events WHERE "notificationId"='fixture-race-71' AND processed)`)] },
+      { name: 'two independent webhooks upsert the same reconciliation key: one item, exact occurrence count',
+        a: [scope, queueUpsert('5550001'), 'SELECT pg_sleep(1)'], b: [scope, queueUpsert('5550001')], errors: [],
+        verify: [scope, assertSql(`(SELECT count(*)=1 FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:5550001') AND (SELECT ocorrencias=2 FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:5550001')`)] },
+      { name: 'two administrators resolve the same reconciliation item: one wins, the other conflicts, one audited transition',
+        a: [scope, resolve('5550002', 'REEMBOLSADO_MANUALMENTE'), 'SELECT pg_sleep(1)'], b: [scope, resolve('5550002', 'RESOLVIDO_SEM_REEMBOLSO')], errors: ['JFQ_TEST_RESOLUTION_CONFLICT'],
+        verify: [scope, assertSql(`(SELECT status='REEMBOLSADO_MANUALMENTE' AND "resolvidoPorId"=1 FROM pagamento_conciliacoes WHERE "chaveIdempotencia"='pid:5550002') AND (SELECT count(*)=1 FROM pagamento_conciliacao_historico h JOIN pagamento_conciliacoes c ON c.id=h."conciliacaoId" WHERE c."chaveIdempotencia"='pid:5550002' AND h.acao='STATUS_ALTERADO')`)] },
     ],
     final: [scope, assertSql(`NOT EXISTS (SELECT 1 FROM produtos WHERE estoque<0) AND NOT EXISTS (SELECT 1 FROM estoque_movimentos r LEFT JOIN estoque_movimentos d ON r."debitoOrigemId"=d.id WHERE r.tipo='DEVOLUCAO' AND (d.id IS NULL OR d.quantidade<>r.quantidade OR d."itemId"<>r."itemId"))`)],
   };

@@ -305,3 +305,30 @@ export async function getPedidos(params) {
 export async function getPedidoById(id) {
   return request(`/pedidos/${id}`)
 }
+
+// ─────────────────────────────────────────────
+// CONCILIAÇÃO FINANCEIRA — admin (somente ADMIN; nenhum reembolso automático)
+// ─────────────────────────────────────────────
+export async function adminGetConciliacoes(params = {}) {
+  const qs = new URLSearchParams()
+  for (const key of ['page', 'limit', 'status', 'tipo', 'verificacao', 'pedidoId']) {
+    if (params[key]) qs.set(key, params[key])
+  }
+  const query = qs.toString()
+  return request(`/conciliacoes${query ? `?${query}` : ''}`)
+}
+
+export async function adminGetConciliacoesResumo() {
+  return request('/conciliacoes/resumo')
+}
+
+export async function adminGetConciliacao(id) {
+  return request(`/conciliacoes/${id}`)
+}
+
+export async function adminUpdateStatusConciliacao(id, { status, observacao }) {
+  return request(`/conciliacoes/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status, observacao }),
+  })
+}

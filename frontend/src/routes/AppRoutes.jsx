@@ -41,6 +41,8 @@ import ProdutoForm     from '../admin/pages/Produtos/ProdutoForm'
 import AgendamentosAdmin from '../admin/pages/Agendamentos/Agendamentos'
 import Pedidos         from '../admin/pages/Pedidos/Pedidos'
 import PedidoDetail    from '../admin/pages/Pedidos/PedidoDetail'
+import Conciliacoes    from '../admin/pages/Conciliacoes/Conciliacoes'
+import ConciliacaoDetail from '../admin/pages/Conciliacoes/ConciliacaoDetail'
 import Clientes        from '../admin/pages/Clientes/Clientes'
 
 export default function AppRoutes() {
@@ -108,6 +110,8 @@ export default function AppRoutes() {
 
         <Route path="pedidos" element={<Pedidos />} />
         <Route path="pedidos/:id" element={<PedidoDetail />} />
+        <Route path="conciliacoes" element={<Conciliacoes />} />
+        <Route path="conciliacoes/:id" element={<ConciliacaoDetail />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="clientes/:id" element={<ComingSoon title="Detalhe do Cliente" />} />
         <Route path="agendamentos" element={<AgendamentosAdmin />} />

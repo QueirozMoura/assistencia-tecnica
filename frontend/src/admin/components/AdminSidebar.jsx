@@ -44,6 +44,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Conciliação',
+    to: '/admin/conciliacoes',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M3 5h9M3 9h12M3 13h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M12.5 12.5l1.5 1.5 2.5-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
     label: 'Agendamentos',
     to: '/admin/agendamentos',
     icon: (

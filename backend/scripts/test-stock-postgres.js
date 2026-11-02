@@ -102,7 +102,8 @@ async function main() {
   }
   function requireSuccess(result, name) { if (!result.ok) throw new Error(`PostgreSQL check failed: ${name}. Sensitive connection details withheld.`); }
   const baseline = await readFile(new URL('../test/fixtures/stock-baseline.sql', import.meta.url), 'utf8');
-  const migration = await readFile(new URL('../prisma/migrations/20261102200000_order_stock_ledger/migration.sql', import.meta.url), 'utf8');
+  const migration = [await readFile(new URL('../prisma/migrations/20261102200000_order_stock_ledger/migration.sql', import.meta.url), 'utf8'),
+    await readFile(new URL('../prisma/migrations/20261102210000_pagamento_conciliacoes/migration.sql', import.meta.url), 'utf8')].join('\n'); // both migrations, in deploy order
   let sequential = 0, concurrent = 0;
   const started = Date.now();
   for (let round = 1; round <= rounds; round++) {
@@ -110,7 +111,7 @@ async function main() {
     const suite = stockPostgresSuite(schema, baseline, migration);
     requireSuccess(await execute(suite.baseline), 'isolated baseline');
     requireSuccess(await execute(suite.migration), 'ledger migration');
-    console.log(JSON.stringify({ round, schema, migration: 'applied only to new isolated schema' }));
+    console.log(JSON.stringify({ round, schema, migrations: 'ledger + reconciliation applied only to new isolated schema' }));
     for (const step of suite.steps) {
       const result = await execute(step.statements);
       if (step.expectedError) {

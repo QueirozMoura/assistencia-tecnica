@@ -11,6 +11,7 @@ import dashboardRoutes from "./dashboard.routes.js";
 import clientAuthRoutes from "./clientAuth.routes.js";
 import webhookRoutes from "./webhook.routes.js";
 import pagamentoRoutes from "./pagamento.routes.js";
+import conciliacaoRoutes from "./conciliacao.routes.js";
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.use("/client-auth", clientAuthRoutes);
 router.use("/webhook", webhookRoutes);
 router.use("/webhooks", webhookRoutes);
 router.use("/pagamentos", pagamentoRoutes);
+router.use("/conciliacoes", conciliacaoRoutes);
 
 export default router;
