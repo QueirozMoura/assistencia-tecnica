@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { FINAL_STATUSES, isMoneyConfirmed, label, nextStatuses, requiresNote, STATUS_LABELS, TIPO_LABELS, verificationTone } from '../src/utils/conciliacao.js'
+import { FINAL_STATUSES, isMoneyConfirmed, label, nextStatuses, pendingIndicator, requiresNote, STATUS_LABELS, TIPO_LABELS, verificationTone } from '../src/utils/conciliacao.js'
 
 test('only a provider-confirmed approved payment is shown as money received', () => {
   assert.equal(isMoneyConfirmed({ verificacao: 'CONFIRMADO_PELO_PROVEDOR', statusProvedor: 'approved' }), true)
@@ -25,4 +25,11 @@ test('every status and type has a readable label, tones separate confirmed from 
   assert.equal(verificationTone('CONFIRMADO_PELO_PROVEDOR'), 'confirmed')
   assert.equal(verificationTone('NAO_VERIFICADO'), 'warning')
   assert.equal(verificationTone('SUSPEITO'), 'danger')
+})
+
+test('sidebar indicator: hidden without open items, urgent only when the provider confirmed money', () => {
+  for (const resumo of [null, undefined, {}, { abertas: 0 }, { abertas: -1 }, { abertas: 'x' }]) assert.equal(pendingIndicator(resumo), null)
+  assert.deepEqual(pendingIndicator({ abertas: 3, abertasConfirmadasPeloProvedor: 0 }), { count: 3, text: '3', urgent: false, title: '3 pendência(s) de conciliação aberta(s)' })
+  const urgent = pendingIndicator({ abertas: 150, abertasConfirmadasPeloProvedor: 2 })
+  assert.equal(urgent.text, '99+'); assert.equal(urgent.urgent, true); assert.match(urgent.title, /2 com pagamento confirmado/)
 })

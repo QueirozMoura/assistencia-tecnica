@@ -351,3 +351,37 @@ test("a rolled-back webhook transaction leaves no queue entry (the provider will
   prisma.pedido.findUnique = original;
   assert.ok(thrown); assert.equal(all().length, 0);
 });
+
+// --- Approved decision: in_process (and other non-final provider states) is never money received ---
+for (const status of ["pending", "in_process", "authorized", "in_mediation"]) {
+  test(`provider status ${status} keeps the order pending, queues nothing, and a later approval still applies`, async () => {
+    nextPayment.status = status;
+    const first = await webhook(`${status}-1`);
+    assert.equal(first.updated, true);
+    assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "PENDING"); assert.equal(order.paidAt, null);
+    assert.equal(increments, 0); assert.equal(stock, 3); assert.equal(all().length, 0);
+    assert.equal(order.paymentId, "1", "the payment under way is tracked for the next notifications");
+    await webhook(`${status}-2`); // new notification of the same state: followed, still not money
+    assert.equal(order.status, "PENDENTE"); assert.equal(order.paidAt, null); assert.equal(all().length, 0);
+    nextPayment.status = "approved";
+    assert.equal((await webhook(`${status}-approved`)).updated, true);
+    assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.ok(order.paidAt);
+    assert.equal(all().length, 0, "a normal approval needs no reconciliation");
+  });
+}
+test("in_process never becomes money on a cancelled or already paid order and is not queued", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  nextPayment.status = "in_process";
+  assert.equal((await webhook("late-in-process")).reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION");
+  assert.equal(all().length, 0); assert.equal(order.status, "CANCELADO"); assert.equal(order.paidAt, null);
+  order.status = "PAGO"; order.paymentStatus = "PAID"; order.paidAt = new Date().toISOString();
+  assert.equal((await webhook("paid-in-process")).reason, "PAYMENT_STATE_REGRESSION");
+  assert.equal(all().length, 0); assert.equal(order.status, "PAGO");
+});
+test("in_process with a different amount or preference is not queued (only approved events can be money)", async () => {
+  nextPayment.status = "in_process"; nextPayment.transaction_amount = 99;
+  assert.equal((await webhook("in-process-amount")).reason, "PAYMENT_AMOUNT_MISMATCH");
+  nextPayment.transaction_amount = 10; nextPayment.preference_id = "other-preference";
+  assert.equal((await webhook("in-process-preference")).reason, "PAYMENT_PREFERENCE_MISMATCH");
+  assert.equal(all().length, 0);
+});

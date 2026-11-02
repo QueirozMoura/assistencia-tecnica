@@ -210,8 +210,7 @@ local está preparada. **Atualização de 02/11/2026 (tarde):** a concorrência 
 PostgreSQL e a validação Prisma/REST completa **foram executadas e aprovadas no
 projeto isolado de ensaio** (ver "Validação em PostgreSQL real e REST" abaixo).
 A aplicação em jfq-development **continua pendente de autorização específica**
-e de decisões listadas nos riscos. Nenhuma migration foi aplicada ao
-jfq-development ou à produção. Não iniciar esta versão contra um banco sem a nova migration:
+e de decisões listadas nos riscos. As duas migrations foram aplicadas ao jfq-development em 02/11/2026 (ver "Implantação ... EXECUTADA"); produção não foi tocada. Não iniciar esta versão contra um banco sem a nova migration:
 o novo Prisma Client espera as colunas e funções adicionadas.
 
 ### Diagnóstico e decisão aplicada
@@ -819,6 +818,57 @@ não remover tabelas/triggers, não desfazer saldos em lote e não voltar ao có
 de cancelamento. O histórico de conciliação nunca é apagado (triggers o impedem).
 No dev o custo é baixo (poucos dados), mas o procedimento deve ser ensaiado como se fosse
 produção, que terá plano próprio e nova autorização.
+
+### Implantação das duas migrations no jfq-development — EXECUTADA em 02/11/2026
+
+Autorizada pelo usuário (backup e aplicação exclusivamente no jfq-development). Produção não foi tocada.
+
+**Decisões incorporadas antes do deploy.** (1) Indicador de pendências no painel (badge no menu "Conciliação",
+vermelho quando há pagamento confirmado pelo Mercado Pago; interno, sem e-mail ou mensagem externa). (2) `in_process`,
+`pending`, `authorized` e `in_mediation` nunca são dinheiro: o pedido fica PENDENTE, nada entra na fila e as novas
+notificações seguem sendo acompanhadas até a aprovação. (3) Assinatura inválida continua 401, com log de segurança
+`SECURITY_WEBHOOK_REJECTED` (só motivo e flags; sem assinatura, segredo, corpo ou query) e **nunca** cria pendência.
+Testes: 183 backend + 30 frontend; REST isolado 42/42.
+
+**Backups (antes de qualquer escrita).** Branch Neon `backup-pre-ledger-20261102-1835` (`br-rough-resonance-b8p68wjh`,
+pai `main`, sem expiração; contagens idênticas ao snapshot). `pg_dump` custom em `~/backups/` (0600, fora do
+repositório; 43 365 bytes; SHA-256 registrado e reverificado antes do deploy; `pg_restore --list` com 113 entradas;
+linhas do dump = snapshot). Ensaio de restauração: schema do dump restaurado em transação com ROLLBACK no próprio dev
+(12 tabelas, 3 enums, 95 constraints, nenhum resíduo). Dados do dev **não** foram copiados a outro projeto (há
+dados que não são sintéticos). A branch e o dump devem ser mantidos até o fim da janela de observação.
+
+**Portões e aplicação.** Identidade confirmada pelo console e pelo servidor (projeto autumn-rain-12939944, branch
+br-jolly-pine-b8g7sy9k, endpoint ep-summer-bar-b8esi79j). Pré-verificação 6/6, sem drift. A primeira checagem de
+escritores **falhou** (um `nodemon` do usuário usava o banco); a implantação só prosseguiu depois que o usuário parou o
+processo e foram reconfirmados porta 3000 livre e 0 sessões no banco. Um único comando com `set -e` aplicou as duas
+migrations, na ordem, por `npm run db:migrate:local`: `20261102200000_order_stock_ledger` e
+`20261102210000_pagamento_conciliacoes`, ambas com sucesso.
+
+**Pós-verificação (11/11).** 10 migrations finalizadas e idênticas, 10 funções, 9 triggers, 14 CHECKs, 3 tabelas e 4
+colunas novas; dados de negócio idênticos ao snapshot; ledger e fila vazios; pedido histórico sem versão.
+
+**Backend e frontend.** Backend atualizado iniciado depois da pós-verificação (`node src/server.js`, sem nodemon),
+conectado ao dev. Frontend de desenvolvimento no Vite (127.0.0.1:5173, mesmos argumentos usados pelo usuário).
+
+**Smoke com dados fictícios (sem pagamento real, sem chamada externa).** `npm run smoke:ledger:dev` 11/11: pedido legado
+reserva estoque com um débito versionado; mesma `creationKey` repete sem novo débito; estoque insuficiente recusado;
+checkout Mercado Pago bloqueado sem credencial (503) sem deixar pedido ou reserva; cancelamento devolve uma vez,
+é idempotente e não reabre; exclusão de pedido com histórico recusada; webhook sem assinatura válida 401 e nenhuma
+pendência; consistência do banco. `npm run test:local` (regressão existente) 27/27. Log do backend: só as recusas
+esperadas; log de segurança sem dados sensíveis. Estado final do dev: ledger com 2 movimentos (1 débito e 1
+devolução), fila de conciliação vazia, 2 pedidos (1 versionado, 1 histórico), nenhum estoque negativo.
+Ficam no dev, como histórico imutável, 2 clientes, 2 categorias, 2 produtos e 1 pedido sintéticos do smoke (o primeiro
+rodou parcialmente por um erro de variável no script de teste, já corrigido, e criou um conjunto extra).
+
+**Painel de conciliação.** API ADMIN-only validada pelo smoke (401 sem token ou com token inválido; 200 e fila vazia com
+o administrador de desenvolvimento); a rota `/admin/conciliacoes` redireciona ao login sem sessão. **A conferência
+visual autenticada do painel e do indicador não foi feita** (não se digitam senhas de administrador no navegador):
+pendente de verificação manual do usuário.
+
+**Riscos restantes.** Checkout Mercado Pago de teste ainda não exercitado no dev (sem credencial de teste); o fluxo está
+validado no ensaio com provedor simulado. Reservas abandonadas sem expiração, preferência externa órfã e chaves de
+idempotência ausentes seguem como riscos conhecidos. Backend e frontend em segundo plano nesta sessão. Alertas
+externos (e-mail/mensagem) de pendências não existem por decisão. Produção exigirá plano e autorização próprios.
 
 ### Condições para liberação e riscos restantes
 

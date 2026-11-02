@@ -52,3 +52,13 @@ export function verificationTone(verificacao) {
   if (verificacao === 'SUSPEITO') return 'danger'
   return 'warning'
 }
+
+// Sidebar indicator: open items; urgent when the provider itself confirmed money for any of them.
+// Internal indicator only: nothing is sent outside the panel.
+export function pendingIndicator(resumo) {
+  const count = Number(resumo?.abertas)
+  if (!Number.isFinite(count) || count <= 0) return null
+  const confirmed = Number(resumo?.abertasConfirmadasPeloProvedor) || 0
+  return { count, text: count > 99 ? '99+' : String(count), urgent: confirmed > 0,
+    title: `${count} pendência(s) de conciliação aberta(s)${confirmed > 0 ? `, ${confirmed} com pagamento confirmado pelo Mercado Pago` : ''}` }
+}

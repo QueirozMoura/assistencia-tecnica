@@ -5,6 +5,7 @@ import ErrorState from '../../../components/ui/ErrorState'
 import { adminGetConciliacao, adminUpdateStatusConciliacao } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
 import { useAsyncData } from '../../../hooks/useAsyncData'
+import { CONCILIACAO_CHANGED_EVENT } from '../../../hooks/useConciliacaoPendentes'
 import { ACAO_LABELS, STATUS_LABELS, TIPO_LABELS, label, nextStatuses, requiresNote } from '../../../utils/conciliacao'
 import { VerificacaoBadge } from './ConciliacaoBadges'
 
@@ -41,6 +42,7 @@ export default function ConciliacaoDetail() {
       await adminUpdateStatusConciliacao(id, { status, observacao: observacao.trim() || undefined })
       setStatus('')
       setObservacao('')
+      window.dispatchEvent(new Event(CONCILIACAO_CHANGED_EVENT))
       reload()
     } catch (err) {
       setFormError(err?.message || 'Não foi possível atualizar a pendência.')

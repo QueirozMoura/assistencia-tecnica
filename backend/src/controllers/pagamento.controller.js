@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import * as pedidoService from "../services/pedido.service.js";
+import { buildSuspiciousAttemptLog } from "../utils/logSanitizer.js";
 import {
   createMercadoPagoPreference,
   processMercadoPagoWebhook,
@@ -60,6 +61,19 @@ export async function criarPreferencia(req, res, next) {
   }
 }
 
+// Security log for a rejected webhook: reason and presence flags only. Never the signature, the secret, the body
+// or the query string (its data.id is attacker-controlled). A rejected notification creates NO financial pending item.
+function logRejectedWebhook(req, reason, signatureHeader, requestId) {
+  const entry = buildSuspiciousAttemptLog({
+    event: "SECURITY_WEBHOOK_REJECTED",
+    req,
+    details: { provider: "mercadopago", reason, hasSignature: Boolean(signatureHeader), hasRequestId: Boolean(requestId) },
+  });
+  entry.path = String(req.originalUrl || req.url || "").split("?")[0];
+  entry.userAgent = entry.userAgent ? String(entry.userAgent).slice(0, 120) : null;
+  logger.warn(JSON.stringify(entry));
+}
+
 export async function webhookMercadoPago(req, res, next) {
   try {
     const signatureHeader = req.webhookSignature || req.get("x-signature") || "";
@@ -67,6 +81,7 @@ export async function webhookMercadoPago(req, res, next) {
     const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
     const dataId = String(req.query?.["data.id"] ?? req.body?.data?.id ?? "");
     if (req.body?.data?.id != null && String(req.body.data.id).toLowerCase() !== dataId.toLowerCase()) {
+      logRejectedWebhook(req, "DATA_ID_MISMATCH", signatureHeader, requestId);
       return res.status(401).json({ success: false, message: "ID do webhook divergente." });
     }
 
@@ -85,10 +100,7 @@ export async function webhookMercadoPago(req, res, next) {
     });
 
     if (!validation.valid) {
-      logger.warn("Webhook Mercado Pago rejeitado por assinatura inválida", {
-        provider: "mercadopago",
-        reason: validation.reason,
-      });
+      logRejectedWebhook(req, validation.reason, signatureHeader, requestId);
 
       return res.status(401).json({
         success: false,

@@ -174,6 +174,16 @@ fictício, compatibilidade e rollback) está em AUDITORIA-FUNCIONAL.md. **Decis�
 admin para itens novos, política para estados `in_process` e para rejeições de assinatura, e autorização expressa
 para criar o backup e aplicar.
 
+### Implantação no jfq-development — executada (02/11/2026)
+
+Backup validado (branch Neon `backup-pre-ledger-20261102-1835` + `pg_dump` 0600 fora do repositório) e portões
+aprovados; as duas migrations (ledger e `pagamento_conciliacoes`) foram aplicadas, nesta ordem, **somente** no
+jfq-development, depois de o usuário parar o `nodemon` que usava o banco. Pós-verificação 11/11 com dados idênticos ao
+snapshot; backend atualizado e frontend no ar; smoke fictício 11/11 e regressão `test:local` 27/27. Indicador de
+pendências implementado (interno); `in_process` nunca é dinheiro; assinatura inválida só gera log de segurança.
+**Pendente:** conferência visual autenticada do painel pelo usuário, checkout Mercado Pago de teste (sem credencial no
+dev) e plano/autorização próprios para produção. Detalhes em AUDITORIA-FUNCIONAL.md.
+
 ### Próxima etapa para liberação segura
 
 1. ~~Executar runner e testes de serviços no ensaio~~ — **concluído** (acima).

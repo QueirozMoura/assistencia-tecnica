@@ -1,5 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useConciliacaoPendentes } from '../../hooks/useConciliacaoPendentes'
+import { pendingIndicator } from '../../utils/conciliacao'
 
 const NAV_ITEMS = [
   {
@@ -46,6 +48,7 @@ const NAV_ITEMS = [
   {
     label: 'Conciliação',
     to: '/admin/conciliacoes',
+    indicator: 'conciliacao',
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
         <path d="M3 5h9M3 9h12M3 13h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -79,6 +82,7 @@ const NAV_ITEMS = [
 export default function AdminSidebar({ collapsed, onToggle }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const indicators = { conciliacao: pendingIndicator(useConciliacaoPendentes()) }
 
   function handleLogout() {
     logout()
@@ -132,8 +136,19 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                   ${collapsed ? 'justify-center' : ''}`
                 }
               >
-                <span className="flex-shrink-0">{item.icon}</span>
+                <span className="relative flex-shrink-0">
+                  {item.icon}
+                  {collapsed && indicators[item.indicator] && (
+                    <span aria-hidden="true" className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ${indicators[item.indicator].urgent ? 'bg-[#f04438]' : 'bg-[#f79009]'}`} />
+                  )}
+                </span>
                 {!collapsed && <span className="truncate">{item.label}</span>}
+                {!collapsed && indicators[item.indicator] && (
+                  <span title={indicators[item.indicator].title} aria-label={indicators[item.indicator].title}
+                    className={`ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${indicators[item.indicator].urgent ? 'bg-[#f04438]' : 'bg-[#f79009]'}`}>
+                    {indicators[item.indicator].text}
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}

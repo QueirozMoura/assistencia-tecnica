@@ -18,7 +18,9 @@
     "db:studio": "npx prisma studio",
     "db:reset": "npx prisma migrate reset --force && node prisma/seed.js",
     "test:stock:postgres": "node scripts/test-stock-postgres.js",
-    "test:rest:isolated": "node scripts/test-rest-isolated.js"
+    "test:rest:isolated": "node scripts/test-rest-isolated.js",
+    "smoke:ledger:dev": "node scripts/smoke-ledger-dev.js",
+    "verify:dev-deploy": "node scripts/verify-dev-deploy.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
