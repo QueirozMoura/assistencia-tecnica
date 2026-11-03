@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import StatsCard from '../../components/admin/StatsCard'
@@ -7,6 +7,7 @@ import ErrorState from '../../components/ui/ErrorState'
 import EmptyState from '../../components/ui/EmptyState'
 import { getDashboard } from '../../services/adminApi'
 import { formatPrice } from '../../utils/formatPrice'
+import { useAsyncData } from '../../hooks/useAsyncData'
 
 function DashboardStatusRow({ label, value }) {
   return (
@@ -27,52 +28,9 @@ function DashboardSectionSkeleton() {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  async function fetchStats(source = 'manual') {
-    const startedAt = Date.now()
-    console.debug('[Dashboard] fetchStats:start', { source, startedAt })
-    try {
-      setLoading(true)
-      setError('')
-      const response = await getDashboard()
-      console.debug('[Dashboard] fetchStats:success', {
-        source,
-        elapsedMs: Date.now() - startedAt,
-        response,
-      })
-      setStats(response?.data || null)
-    } catch (err) {
-      console.debug('[Dashboard] fetchStats:error', {
-        source,
-        elapsedMs: Date.now() - startedAt,
-        err,
-      })
-      setError(err?.message || 'Erro ao carregar dados do dashboard.')
-      setStats(null)
-    } finally {
-      setLoading(false)
-      console.debug('[Dashboard] fetchStats:finally', {
-        source,
-        elapsedMs: Date.now() - startedAt,
-      })
-    }
-  }
-
-
-  useEffect(() => {
-    console.debug('[Dashboard] state:loading', loading)
-  }, [loading])
-
-  useEffect(() => {
-    console.debug('[Dashboard] state:error', error)
-  }, [error])
-
-  useEffect(() => {
-    console.debug('[Dashboard] state:stats', stats)
-  }, [stats])
+  // Loads on open (it used to wait for a manual "Atualizar dados" click) and reloads on demand.
+  const load = useCallback(async () => (await getDashboard())?.data || null, [])
+  const { data: stats, loading, error, reload: fetchStats } = useAsyncData(load, null)
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours()

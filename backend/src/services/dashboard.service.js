@@ -48,14 +48,14 @@ export async function getDashboardStats() {
       _count: { status: true },
     }),
 
-    // Receita total (soma de pedidos PAGO + ENVIADO + ENTREGUE)
+    // Receita total (soma de pedidos PAGO + PREPARANDO + ENVIADO + ENTREGUE: todos já pagos)
     prisma.pedido.aggregate({
       _sum: {
         valorTotal: true,
       },
       where: {
         status: {
-          in: ["PAGO", "ENVIADO", "ENTREGUE"],
+          in: ["PAGO", "PREPARANDO", "ENVIADO", "ENTREGUE"],
         },
       },
     }),
@@ -91,6 +91,7 @@ export async function getDashboardStats() {
       porStatus: {
         PENDENTE:  pedidosStatus.PENDENTE  ?? 0,
         PAGO:      pedidosStatus.PAGO      ?? 0,
+        PREPARANDO: pedidosStatus.PREPARANDO ?? 0,
         ENVIADO:   pedidosStatus.ENVIADO   ?? 0,
         ENTREGUE:  pedidosStatus.ENTREGUE  ?? 0,
         CANCELADO: pedidosStatus.CANCELADO ?? 0,

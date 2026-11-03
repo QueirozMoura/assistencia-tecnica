@@ -16,14 +16,14 @@ export default function CartDrawer({
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 z-50 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 z-[65] backdrop-blur-sm"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[65] shadow-2xl flex flex-col transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
