@@ -33,13 +33,14 @@ function CardSkeleton() {
 
 function FilterSection({ title, id, children, openSection, setOpenSection }) {
   return (
-    <div className="border-b border-[#e5e8ee] pb-4 mb-4">
+    <div className="border-b border-[#eef1f6] pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0">
       <button
         onClick={() => setOpenSection((s) => ({ ...s, [id]: !s[id] }))}
-        className="flex items-center justify-between w-full text-sm font-semibold text-[#181c20] mb-3"
+        aria-expanded={!!openSection[id]}
+        className="flex items-center justify-between w-full text-sm font-semibold text-[#003366] mb-2.5 rounded-md hover:text-[#0070ea] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
       >
         {title}
-        {openSection[id] ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+        {openSection[id] ? <ChevronUp size={15} className="text-[#737780]" /> : <ChevronDown size={15} className="text-[#737780]" />}
       </button>
       {openSection[id] && children}
     </div>
@@ -165,9 +166,9 @@ export default function Catalog() {
         <div className="flex gap-8">
           {/* ── Sidebar ── */}
           <aside className={`w-full lg:w-64 lg:flex-shrink-0 ${filtersOpen ? 'block' : 'hidden'} lg:block`}>
-            <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="font-semibold text-[#181c20]">Filtros</h2>
+            <div className="bg-white rounded-2xl border border-[#e5e8ee] shadow-[0_1px_3px_rgba(0,51,102,0.06)] p-4 lg:sticky lg:top-[9.5rem] lg:max-h-[calc(100vh-10.5rem)] lg:overflow-y-auto">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#eef1f6]">
+                <h2 className="font-bold text-[#003366]">Filtros</h2>
                 {hasFilters && (
                   <button
                     onClick={clearAll}
@@ -187,16 +188,16 @@ export default function Catalog() {
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-0.5">
                     {categorias.map((cat) => (
-                      <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group">
+                      <label key={cat.id} className="flex items-center gap-2.5 cursor-pointer group rounded-lg px-2 py-1.5 -mx-2 hover:bg-[#f5f9ff] has-[:checked]:bg-[#e8f1ff] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#0070ea]/40 transition-colors">
                         <input
                           type="checkbox"
                           checked={selectedCategories.includes(cat.slug)}
                           onChange={() => toggleCategory(cat.slug)}
-                          className="w-4 h-4 rounded border-[#c3c6d1] accent-[#0070ea]"
+                          className="w-4 h-4 rounded border-[#c3c6d1] accent-[#0070ea] cursor-pointer"
                         />
-                        <span className="text-sm text-[#43474f] group-hover:text-[#181c20] transition-colors">
+                        <span className="text-sm text-[#43474f] group-hover:text-[#003366] group-has-[:checked]:text-[#003366] group-has-[:checked]:font-medium transition-colors">
                           {cat.nome}
                         </span>
                       </label>
@@ -207,17 +208,17 @@ export default function Catalog() {
 
               {/* Faixa de Preço */}
               <FilterSection openSection={openSection} setOpenSection={setOpenSection} title="Faixa de Preço" id="price">
-                <div className="space-y-2">
+                <div className="space-y-0.5">
                   {priceRanges.map((range) => (
-                    <label key={range.label} className="flex items-center gap-2.5 cursor-pointer group">
+                    <label key={range.label} className="flex items-center gap-2.5 cursor-pointer group rounded-lg px-2 py-1.5 -mx-2 hover:bg-[#f5f9ff] has-[:checked]:bg-[#e8f1ff] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#0070ea]/40 transition-colors">
                       <input
                         type="radio"
                         name="price"
                         checked={selectedPriceRange === range.label}
                         onChange={() => { setSelectedPriceRange(range.label); setPage(1) }}
-                        className="w-4 h-4 border-[#c3c6d1] accent-[#0070ea]"
+                        className="w-4 h-4 border-[#c3c6d1] accent-[#0070ea] cursor-pointer"
                       />
-                      <span className="text-sm text-[#43474f] group-hover:text-[#181c20] transition-colors">
+                      <span className="text-sm text-[#43474f] group-hover:text-[#003366] group-has-[:checked]:text-[#003366] group-has-[:checked]:font-medium transition-colors">
                         {range.label}
                       </span>
                     </label>
@@ -307,7 +308,7 @@ export default function Catalog() {
 
             {/* Loading skeleton */}
             {loadingProds && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
                 {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                   <CardSkeleton key={i} />
                 ))}
@@ -330,7 +331,7 @@ export default function Catalog() {
 
             {/* Products grid */}
             {!loadingProds && !errorProds && products.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
                 {products.map((product) => (
                   <ProductCard
                     key={product.id}
