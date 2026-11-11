@@ -75,12 +75,12 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
   return (
     <article className="bg-white rounded-2xl overflow-hidden flex flex-col h-full group border border-[#e5e8ee] shadow-[0_1px_3px_rgba(0,51,102,0.06)] hover:border-[#b7d2f8] hover:shadow-[0_12px_28px_-14px_rgba(0,51,102,0.28)] transition-[border-color,box-shadow] duration-300">
       {/* Image */}
-      <div className="relative aspect-[4/3] bg-[#f5f7fb] overflow-hidden">
+      <div className="relative aspect-square sm:aspect-[4/3] bg-[#f5f7fb] overflow-hidden">
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.03]"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
@@ -166,12 +166,14 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
 
         {/* Price */}
         <div className="mt-auto pt-3 sm:pt-4">
-          {product.originalPrice != null && product.originalPrice > product.price && (
-            <p className="text-xs text-[#737780] line-through">
-              {formatPrice(product.originalPrice)}
-            </p>
-          )}
-          <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#003366] leading-none">{formatPrice(product.price)}</p>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-h-[2.75rem] sm:min-h-[2rem] content-end">
+            <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#003366] leading-none">{formatPrice(product.price)}</p>
+            {product.originalPrice != null && product.originalPrice > product.price && (
+              <p className="text-xs text-[#737780] line-through">
+                {formatPrice(product.originalPrice)}
+              </p>
+            )}
+          </div>
 
           {/* Parcelamento — só renderiza se o campo existir */}
           {product.installments != null && product.installments > 1 && (

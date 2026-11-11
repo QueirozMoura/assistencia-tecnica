@@ -19,13 +19,16 @@ const ITEMS_PER_PAGE = 9
 // Skeleton de card para loading
 function CardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] animate-pulse">
-      <div className="h-52 bg-[#e5e8ee]" />
-      <div className="p-4 space-y-3">
-        <div className="h-3 bg-[#e5e8ee] rounded w-1/3" />
-        <div className="h-4 bg-[#e5e8ee] rounded w-3/4" />
-        <div className="h-4 bg-[#e5e8ee] rounded w-1/2" />
-        <div className="h-8 bg-[#e5e8ee] rounded-xl mt-4" />
+    <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] flex flex-col h-full animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div className="aspect-square sm:aspect-[4/3] bg-[#eef1f6]" />
+      <div className="p-3 sm:p-5 flex flex-col flex-1">
+        <div className="h-3 bg-[#eef1f6] rounded w-1/3 mb-2" />
+        <div className="h-3.5 bg-[#eef1f6] rounded w-11/12 mb-1.5" />
+        <div className="h-3.5 bg-[#eef1f6] rounded w-2/3" />
+        <div className="mt-auto pt-3 sm:pt-4">
+          <div className="h-6 sm:h-7 bg-[#e3eaf5] rounded w-1/2" />
+        </div>
+        <div className="h-11 bg-[#e3eaf5] rounded-xl mt-3 sm:mt-4" />
       </div>
     </div>
   )
@@ -367,7 +370,7 @@ export default function Catalog() {
 
             {/* Loading skeleton */}
             {loadingProds && (
-              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
+              <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5" role="status" aria-label="Carregando produtos">
                 {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                   <CardSkeleton key={i} />
                 ))}
@@ -376,15 +379,38 @@ export default function Catalog() {
 
             {/* Empty state */}
             {!loadingProds && !errorProds && products.length === 0 && (
-              <div className="text-center py-20">
-                <div className="w-16 h-16 bg-[#f1f4f9] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search size={24} className="text-[#c3c6d1]" />
+              <div className="flex flex-col items-center text-center rounded-2xl border border-dashed border-[#c3d4ea] bg-white px-6 py-14 sm:py-20">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#e8f1ff] rounded-full flex items-center justify-center mb-4">
+                  <Search size={24} className="text-[#0070ea]" />
                 </div>
-                <h3 className="font-semibold text-[#181c20] mb-2">Nenhum produto encontrado</h3>
-                <p className="text-sm text-[#737780] mb-4">Tente ajustar os filtros ou buscar por outro termo.</p>
-                <button onClick={clearAll} className="text-[#0070ea] text-sm font-medium hover:underline">
-                  Limpar filtros
-                </button>
+                <h3 className="text-lg font-bold text-[#003366] mb-1.5">
+                  {searchQuery ? 'Nenhum resultado para a sua busca' : 'Nenhum produto encontrado'}
+                </h3>
+                <p className="text-sm text-[#43474f] max-w-sm mb-5">
+                  {searchQuery
+                    ? `Não encontramos produtos para "${searchQuery}"${hasFilters ? ' com os filtros selecionados' : ''}. Confira a grafia ou tente um termo mais simples.`
+                    : hasFilters
+                      ? 'Nenhum produto corresponde aos filtros selecionados. Remova algum filtro para ver mais opções.'
+                      : 'Não há produtos disponíveis no momento. Volte em breve.'}
+                </p>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                  {hasFilters && (
+                    <button
+                      onClick={clearAll}
+                      className="h-11 px-6 rounded-xl bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+                    >
+                      Limpar filtros
+                    </button>
+                  )}
+                  {searchQuery && (
+                    <Link
+                      to="/catalogo"
+                      className="inline-flex h-11 items-center justify-center px-6 rounded-xl border border-[#c3d4ea] text-sm font-semibold text-[#003366] hover:border-[#0070ea] hover:text-[#0070ea] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+                    >
+                      Ver todos os produtos
+                    </Link>
+                  )}
+                </div>
               </div>
             )}
 
