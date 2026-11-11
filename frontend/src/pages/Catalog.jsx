@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useOutletContext } from 'react-router-dom'
-import { SlidersHorizontal, X, ChevronDown, ChevronUp, Search, AlertCircle } from 'lucide-react'
+import { SlidersHorizontal, X, ChevronDown, ChevronUp, Search, AlertCircle, ArrowUpDown } from 'lucide-react'
 import ProductCard from '../components/ui/ProductCard'
 import { getProdutos, getCategorias } from '../services/api'
 import { useAsyncData } from '../hooks/useAsyncData'
@@ -121,46 +121,54 @@ export default function Catalog() {
   return (
     <div className="bg-[#f7f9ff] min-h-screen">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-[#003366] to-[#0059bb] py-10">
+      <div className="bg-[#003366] py-5 sm:py-7">
         <div className="container-max">
-          <nav className="text-xs text-[#8fa8c8] mb-3 flex items-center gap-1">
+          <nav aria-label="Breadcrumb" className="text-xs text-[#9db6d6] mb-2 flex items-center gap-1.5">
             <Link to="/" className="hover:text-white transition-colors">Início</Link>
-            <span>/</span>
-            <span className="text-white">Catálogo</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-white" aria-current="page">Catálogo</span>
           </nav>
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
-            {searchQuery ? `Resultados para "${searchQuery}"` : 'Catálogo de Produtos'}
-          </h1>
-          <p className="text-[#8fa8c8] text-sm">
-            {loadingProds
-              ? 'Carregando produtos...'
-              : `${meta.total} produto${meta.total !== 1 ? 's' : ''} encontrado${meta.total !== 1 ? 's' : ''}`
-            }
-          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h1 className="text-xl sm:text-2xl md:text-[1.75rem] font-bold leading-tight text-white">
+              {searchQuery ? `Resultados para "${searchQuery}"` : 'Catálogo de Produtos'}
+            </h1>
+            <p className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[#d6e6ff]">
+              {loadingProds
+                ? 'Carregando produtos...'
+                : `${meta.total} produto${meta.total !== 1 ? 's' : ''} encontrado${meta.total !== 1 ? 's' : ''}`
+              }
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="container-max py-8">
+      <div className="container-max py-6 sm:py-8">
         {/* Mobile filter toggle */}
-        <div className="flex flex-col gap-3 mb-5 lg:hidden">
+        <div className="grid grid-cols-2 gap-2.5 mb-4 lg:hidden">
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
-            className="flex items-center justify-center gap-2 bg-white border border-[#e5e8ee] px-4 py-2.5 rounded-xl text-sm font-medium text-[#43474f] shadow-sm"
+            aria-expanded={filtersOpen}
+            className="flex h-11 items-center justify-center gap-2 bg-white border border-[#d8dce5] px-3 rounded-xl text-sm font-medium text-[#003366] hover:border-[#0070ea] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
           >
             <SlidersHorizontal size={16} />
             Filtros
             {hasFilters && <span className="w-2 h-2 bg-[#0070ea] rounded-full" />}
           </button>
-          <select
-            value={sortBy}
-            onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-            className="w-full bg-white border border-[#e5e8ee] px-3 py-2.5 rounded-xl text-sm text-[#43474f] outline-none"
-          >
-            <option value="relevancia">Relevância</option>
-            <option value="menor-preco">Menor Preço</option>
-            <option value="maior-preco">Maior Preço</option>
-            <option value="nome">Nome A-Z</option>
-          </select>
+          <div className="relative">
+            <ArrowUpDown size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#737780]" />
+            <select
+              value={sortBy}
+              onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
+              aria-label="Ordenar produtos"
+              className="h-11 w-full appearance-none bg-white border border-[#d8dce5] pl-9 pr-8 rounded-xl text-sm font-medium text-[#003366] outline-none hover:border-[#0070ea] focus-visible:border-[#0070ea] focus-visible:ring-2 focus-visible:ring-[#0070ea]/25 transition-colors"
+            >
+              <option value="relevancia">Relevância</option>
+              <option value="menor-preco">Menor Preço</option>
+              <option value="maior-preco">Maior Preço</option>
+              <option value="nome">Nome A-Z</option>
+            </select>
+            <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#737780]" />
+          </div>
         </div>
 
         <div className="flex gap-8">
@@ -239,32 +247,83 @@ export default function Catalog() {
           {/* ── Products Grid ── */}
           <div className="flex-1 min-w-0">
             {/* Sort bar (desktop) */}
-            <div className="hidden lg:flex items-center justify-between mb-5">
+            <div className="hidden lg:flex items-center justify-between mb-5 pb-4 border-b border-[#e5e8ee]">
               <p className="text-sm text-[#737780]">
                 {loadingProds ? (
                   <span className="inline-block w-40 h-4 bg-[#e5e8ee] rounded animate-pulse" />
                 ) : (
                   <>
                     Exibindo{' '}
-                    <span className="font-medium text-[#181c20]">{products.length}</span> de{' '}
-                    <span className="font-medium text-[#181c20]">{meta.total}</span> produtos
+                    <span className="font-semibold text-[#003366]">{products.length}</span> de{' '}
+                    <span className="font-semibold text-[#003366]">{meta.total}</span> produtos
                   </>
                 )}
               </p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[#737780]">Ordenar por:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
-                  className="bg-white border border-[#e5e8ee] px-3 py-2 rounded-xl text-sm text-[#43474f] outline-none focus:border-[#0070ea] transition-colors"
-                >
-                  <option value="relevancia">Relevância</option>
-                  <option value="menor-preco">Menor Preço</option>
-                  <option value="maior-preco">Maior Preço</option>
-                  <option value="nome">Nome A-Z</option>
-                </select>
+              <div className="flex items-center gap-2.5">
+                <label htmlFor="catalog-sort" className="text-sm text-[#737780]">Ordenar por</label>
+                <div className="relative">
+                  <ArrowUpDown size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#737780]" />
+                  <select
+                    id="catalog-sort"
+                    value={sortBy}
+                    onChange={(e) => { setSortBy(e.target.value); setPage(1) }}
+                    className="h-10 appearance-none bg-white border border-[#d8dce5] pl-9 pr-9 rounded-xl text-sm font-medium text-[#003366] outline-none hover:border-[#0070ea] focus-visible:border-[#0070ea] focus-visible:ring-2 focus-visible:ring-[#0070ea]/25 transition-colors cursor-pointer"
+                  >
+                    <option value="relevancia">Relevância</option>
+                    <option value="menor-preco">Menor Preço</option>
+                    <option value="maior-preco">Maior Preço</option>
+                    <option value="nome">Nome A-Z</option>
+                  </select>
+                  <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#737780]" />
+                </div>
               </div>
             </div>
+
+            {/* Chips de filtros ativos */}
+            {hasFilters && (
+              <div className="flex flex-wrap items-center gap-2 mb-5" aria-label="Filtros ativos">
+                {selectedCategories.map((slug) => {
+                  const nome = categorias.find((c) => c.slug === slug)?.nome || slug
+                  return (
+                    <span
+                      key={`cat-${slug}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-[#b7d2f8] bg-[#e8f1ff] pl-3 pr-1 py-1 text-xs font-medium text-[#003366]"
+                    >
+                      {nome}
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(slug)}
+                        aria-label={`Remover filtro ${nome}`}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#003366] hover:bg-[#0070ea] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea]"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )
+                })}
+                {selectedPriceRange && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#b7d2f8] bg-[#e8f1ff] pl-3 pr-1 py-1 text-xs font-medium text-[#003366]">
+                    {selectedPriceRange}
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedPriceRange(null); setPage(1) }}
+                      aria-label={`Remover filtro ${selectedPriceRange}`}
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-[#003366] hover:bg-[#0070ea] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea]"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  className="px-2 py-1 text-xs font-medium text-[#737780] hover:text-[#0070ea] hover:underline transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea] rounded"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
+
 
             {/* Active filters chips */}
             {hasFilters && (
