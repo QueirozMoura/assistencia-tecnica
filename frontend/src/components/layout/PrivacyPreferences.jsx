@@ -140,11 +140,11 @@ export default function CookieConsent({
         <div
           role="region"
           aria-label="Aviso de cookies"
-          className="fixed bottom-3 left-3 right-3 z-[60] sm:bottom-5 sm:left-5 sm:right-auto sm:w-[380px]"
+          className="fixed bottom-3 left-3 right-[4.75rem] z-[60] sm:bottom-5 sm:left-5 sm:right-auto sm:w-[380px]"
         >
-          <div className="rounded-2xl bg-white border border-[#e5e8ee] shadow-[0_16px_40px_-12px_rgba(0,51,102,0.3)] p-4 sm:p-5">
-            <h2 className="text-sm font-bold text-[#003366]">Nós usamos cookies</h2>
-            <p className="text-[13px] text-[#43474f] mt-1.5 leading-relaxed">
+          <div className="rounded-2xl bg-white border border-[#e5e8ee] shadow-[0_16px_40px_-12px_rgba(0,51,102,0.3)] p-3 sm:p-5">
+            <h2 className="text-[13px] sm:text-sm font-bold text-[#003366]">Nós usamos cookies</h2>
+            <p className="text-xs sm:text-[13px] text-[#43474f] mt-1 sm:mt-1.5 leading-relaxed">
               Usamos cookies essenciais para o site funcionar e, com seu consentimento, cookies de
               estatísticas e marketing. Veja a{' '}
               <Link to="/politica-de-privacidade" className="text-[#0070ea] hover:underline font-medium focus-visible:outline-2 focus-visible:outline-[#0070ea] rounded">
@@ -153,18 +153,18 @@ export default function CookieConsent({
               .
             </p>
 
-            <div className="mt-3.5 grid grid-cols-2 gap-2">
+            <div className="mt-2.5 sm:mt-3.5 grid grid-cols-2 gap-1.5 sm:gap-2">
               <button
                 type="button"
                 onClick={onAcceptAll}
-                className="h-10 rounded-lg bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+                className="h-9 sm:h-10 rounded-lg bg-[#0070ea] text-white text-[13px] sm:text-sm font-semibold hover:bg-[#0059bb] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
               >
                 Aceitar todos
               </button>
               <button
                 type="button"
                 onClick={onAcceptEssential}
-                className="h-10 rounded-lg border border-[#c3d4ea] text-[#003366] text-sm font-semibold hover:border-[#0070ea] hover:bg-[#f5f9ff] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+                className="h-9 sm:h-10 rounded-lg border border-[#c3d4ea] text-[#003366] text-[13px] sm:text-sm font-semibold hover:border-[#0070ea] hover:bg-[#f5f9ff] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
               >
                 Só essenciais
               </button>
@@ -174,7 +174,7 @@ export default function CookieConsent({
                   setDraftPreferences(normalizeCookiePreferences(currentPreferences || COOKIE_DEFAULT_PREFERENCES))
                   onOpenSettings?.()
                 }}
-                className="col-span-2 h-8 rounded-lg text-[13px] font-semibold text-[#0070ea] hover:bg-[#e9f3ff] transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea]"
+                className="col-span-2 h-7 sm:h-8 rounded-lg text-[13px] font-semibold text-[#0070ea] hover:bg-[#e9f3ff] transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea]"
               >
                 Configurar cookies
               </button>
