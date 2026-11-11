@@ -73,14 +73,14 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
     : null
 
   return (
-    <article className="bg-white rounded-2xl overflow-hidden premium-shadow flex flex-col group border border-transparent hover:border-[#cce0ff] transition-all duration-300">
+    <article className="bg-white rounded-2xl overflow-hidden flex flex-col h-full group border border-[#e5e8ee] shadow-[0_1px_3px_rgba(0,51,102,0.06)] hover:border-[#b7d2f8] hover:shadow-[0_12px_28px_-14px_rgba(0,51,102,0.28)] transition-[border-color,box-shadow] duration-300">
       {/* Image */}
-      <div className="relative h-52 bg-[#f1f4f9] overflow-hidden">
+      <div className="relative aspect-[4/3] bg-[#f5f7fb] overflow-hidden">
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
@@ -95,24 +95,23 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
           </div>
         )}
 
-        {/* Overlay actions */}
-        <div className="absolute inset-0 bg-[#003366]/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-          <button
-            onClick={() => onToggleWishlist && onToggleWishlist(raw)}
-            className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all ${
-              isWishlisted
-                ? 'bg-[#0070ea] text-white'
-                : 'bg-white text-[#43474f] hover:bg-[#0070ea] hover:text-white'
-            }`}
-            aria-label={isWishlisted ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
-            title={isWishlisted ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
-          >
-            <Heart size={15} fill={isWishlisted ? 'currentColor' : 'none'} />
-          </button>
-        </div>
+        {/* Wishlist (always visible, works on touch) */}
+        <button
+          onClick={() => onToggleWishlist && onToggleWishlist(raw)}
+          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea] ${
+            isWishlisted
+              ? 'bg-[#0070ea] border-[#0070ea] text-white'
+              : 'bg-white/95 border-[#e5e8ee] text-[#43474f] hover:text-[#0070ea] hover:border-[#0070ea]'
+          }`}
+          aria-label={isWishlisted ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
+          aria-pressed={!!isWishlisted}
+          title={isWishlisted ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
+        >
+          <Heart size={16} fill={isWishlisted ? 'currentColor' : 'none'} />
+        </button>
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
           {product.badge && (
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${badgeColors[product.badgeColor] || badgeColors.secondary}`}>
               {product.badge}
@@ -136,19 +135,19 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
         {product.brand && (
-          <p className="text-xs font-semibold text-[#0070ea] mb-1">{product.brand}</p>
+          <p className="text-xs font-medium text-[#0070ea] mb-1.5 truncate">{product.brand}</p>
         )}
-        <Link to={`/produto/${product.slug}`}>
-          <h3 className="font-semibold text-[#181c20] text-sm leading-snug line-clamp-2 hover:text-[#0070ea] transition-colors mb-2">
+        <Link to={`/produto/${product.slug}`} className="focus-visible:outline-2 focus-visible:outline-[#0070ea] rounded">
+          <h3 className="font-semibold text-[#181c20] text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-[#0070ea] transition-colors">
             {product.name}
           </h3>
         </Link>
 
         {/* Rating — só renderiza se o campo existir */}
         {product.rating != null && (
-          <div className="flex items-center gap-1.5 mb-3">
+          <div className="flex items-center gap-1.5 mt-2">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
@@ -166,17 +165,17 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         )}
 
         {/* Price */}
-        <div className="mt-auto">
+        <div className="mt-auto pt-4">
           {product.originalPrice != null && product.originalPrice > product.price && (
             <p className="text-xs text-[#737780] line-through">
               {formatPrice(product.originalPrice)}
             </p>
           )}
-          <p className="text-xl font-bold text-[#003366]">{formatPrice(product.price)}</p>
+          <p className="text-2xl font-extrabold tracking-tight text-[#003366] leading-none">{formatPrice(product.price)}</p>
 
           {/* Parcelamento — só renderiza se o campo existir */}
           {product.installments != null && product.installments > 1 && (
-            <p className="text-xs text-[#43474f] mt-0.5">
+            <p className="text-xs text-[#43474f] mt-1.5">
               Em até {product.installments}x de{' '}
               <span className="font-semibold text-[#0070ea]">
                 {formatPrice(product.price / product.installments)}
@@ -190,14 +189,14 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         <button
           onClick={() => product.inStock && onAddToCart && onAddToCart(product)}
           disabled={!product.inStock}
-          className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+          className={`mt-4 w-full flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea] ${
             product.inStock
-              ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:scale-95'
+              ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:bg-[#004a9c]'
               : 'bg-[#e5e8ee] text-[#737780] cursor-not-allowed'
           }`}
         >
-          <ShoppingCart size={15} />
-          {product.inStock ? 'Adicionar ao Carrinho' : 'Indisponível'}
+          <ShoppingCart size={16} />
+          {product.inStock ? 'Adicionar ao carrinho' : 'Indisponível'}
         </button>
       </div>
     </article>
