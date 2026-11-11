@@ -201,3 +201,10 @@ body::-webkit-scrollbar {
 .aspect-product {
   aspect-ratio: 4 / 3;
 }
+
+/* Página de produto (mobile): reserva espaço no fim da página enquanto a barra de compra fixa está visível */
+@media (max-width: 639.98px) {
+  body {
+    padding-bottom: var(--buybar-offset, 0px);
+  }
+}

@@ -1,5 +1,5 @@
 import { useAsyncData } from '../hooks/useAsyncData'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, Link, useOutletContext } from 'react-router-dom'
 import {
   Star, ShoppingCart, Heart, Shield, Truck, RotateCcw,
@@ -34,7 +34,7 @@ function DetailSkeleton() {
 
 export default function ProductDetail() {
   const { slug } = useParams()
-  const { cart, wishlist } = useOutletContext()
+  const { cart, wishlist, cookieBannerOpen } = useOutletContext()
 
   const [qty, setQty]             = useState(1)
   const [activeImg, setActiveImg] = useState(0)
@@ -60,6 +60,32 @@ export default function ProductDetail() {
   }, [slug])
   const { data, loading, error } = useAsyncData(loadProduct, { product: null, related: [] })
   const { product, related } = data
+
+  // ── Barra de compra fixa (mobile): aparece quando o botão principal sai da tela ──
+  const mainBuyRef = useRef(null)
+  const [showBuyBar, setShowBuyBar] = useState(false)
+  useEffect(() => {
+    const el = mainBuyRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowBuyBar(!entry.isIntersecting),
+      { rootMargin: '-130px 0px 0px 0px' } // desconta o Header fixo
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [product, loading])
+
+  // A barra só aparece com produto disponível e sem o aviso de cookies aberto
+  const buyBarActive = showBuyBar && !cookieBannerOpen && product != null && product.estoque > 0 && product.ativo !== false
+
+  // Enquanto a barra estiver visível (somente nesta página): sobe o WhatsApp e
+  // reserva espaço no fim da página (ver regra com --buybar-offset em index.css)
+  useEffect(() => {
+    const root = document.documentElement
+    if (buyBarActive) root.style.setProperty('--buybar-offset', 'calc(4.25rem + env(safe-area-inset-bottom))')
+    else root.style.removeProperty('--buybar-offset')
+    return () => root.style.removeProperty('--buybar-offset')
+  }, [buyBarActive])
 
   // ── Loading ────────────────────────────────────────────────
   if (loading) return <DetailSkeleton />
@@ -149,15 +175,15 @@ export default function ProductDetail() {
         </Link>
 
         {/* Main Grid */}
-        <div className="grid lg:grid-cols-2 gap-10 mb-12">
+        <div className="grid lg:grid-cols-2 gap-5 lg:gap-10 mb-8 lg:mb-12">
           {/* Gallery */}
           <div>
-            <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] mb-3 aspect-square">
+            <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] mb-2 lg:mb-3 aspect-[4/3] lg:aspect-square bg-[#f5f7fb]">
               {imagens.length > 0 ? (
                 <img
                   src={imagens[activeImg]}
                   alt={nome}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain lg:object-cover"
                   onError={(e) => { e.currentTarget.style.display = 'none' }}
                 />
               ) : (
@@ -178,7 +204,7 @@ export default function ProductDetail() {
                     key={i}
                     onClick={() => setActiveImg(i)}
                     aria-label={`Ver imagem ${i + 1} de ${imagens.length}`}
-                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors flex-shrink-0 ${
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition-colors flex-shrink-0 ${
                       i === activeImg ? 'border-[#0070ea]' : 'border-[#e5e8ee]'
                     }`}
                   >
@@ -199,7 +225,7 @@ export default function ProductDetail() {
             {marca && (
               <p className="text-sm font-semibold text-[#0070ea] mb-1">{marca}</p>
             )}
-            <h1 className="text-2xl font-bold text-[#003366] leading-tight mb-3">{nome}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#003366] leading-tight mb-2 sm:mb-3">{nome}</h1>
 
             {/* Rating — só exibe se existir no banco */}
             {avaliacao != null && (
@@ -222,7 +248,7 @@ export default function ProductDetail() {
             )}
 
             {/* Price */}
-            <div className="bg-[#f7f9ff] rounded-xl p-4 sm:p-5 mb-4 sm:mb-5 border border-[#e5e8ee]">
+            <div className="bg-[#f7f9ff] rounded-xl p-3 sm:p-5 mb-3 sm:mb-5 border border-[#e5e8ee]">
               {precoPromo != null && precoPromo < preco && (
                 <p className="text-xs sm:text-sm text-[#737780] line-through">{formatPrice(preco)}</p>
               )}
@@ -239,9 +265,6 @@ export default function ProductDetail() {
                   sem juros
                 </p>
               )}
-              <p className="text-[11px] sm:text-xs text-[#1a6b3c] font-medium mt-1">
-                À vista: {formatPrice(precoPromo ?? preco)}
-              </p>
             </div>
 
             {/* Features — só exibe se existir no banco */}
@@ -260,30 +283,31 @@ export default function ProductDetail() {
             )}
 
             {/* Qty + Add to Cart */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 mb-4">
-              <div className="w-full sm:w-auto inline-flex items-center border border-[#e5e8ee] rounded-xl overflow-hidden bg-white">
+            <div className="flex flex-wrap items-center sm:flex-nowrap gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+              <div className="order-1 sm:order-none inline-flex items-center border border-[#e5e8ee] rounded-xl overflow-hidden bg-white">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="h-10 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
+                  className="h-11 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Diminuir quantidade"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="h-10 flex-1 sm:flex-none sm:w-12 text-sm font-semibold text-[#181c20] inline-flex items-center justify-center">
+                <span className="h-11 sm:h-10 w-12 text-sm font-semibold text-[#181c20] inline-flex items-center justify-center">
                   {qty}
                 </span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
-                  className="h-10 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
+                  className="h-11 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Aumentar quantidade"
                 >
                   <Plus size={14} />
                 </button>
               </div>
               <button
+                ref={mainBuyRef}
                 onClick={() => inStock && cart.addItem && cart.addItem(product, qty)}
                 disabled={!inStock}
-                className={`w-full sm:flex-1 h-10 sm:h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-semibold transition-all ${
+                className={`order-3 sm:order-none w-full sm:w-auto sm:flex-1 h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-semibold transition-all ${
                   inStock
                     ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:scale-[0.99]'
                     : 'bg-[#e5e8ee] text-[#737780] cursor-not-allowed'
@@ -295,7 +319,7 @@ export default function ProductDetail() {
               <button
                 onClick={() => wishlist.toggle && wishlist.toggle(product)}
                 aria-label={wishlist.isWishlisted(product.id) ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
-                className={`w-full sm:w-auto h-10 sm:h-11 px-4 sm:px-3 rounded-xl border transition-all inline-flex items-center justify-center ${
+                className={`order-2 sm:order-none ml-auto sm:ml-0 w-11 sm:w-auto h-11 px-0 sm:px-3 rounded-xl border transition-all inline-flex items-center justify-center ${
                   wishlist.isWishlisted(product.id)
                     ? 'border-[#0070ea] bg-[#cce0ff] text-[#0070ea]'
                     : 'border-[#e5e8ee] text-[#43474f] hover:border-[#0070ea]'
@@ -306,13 +330,13 @@ export default function ProductDetail() {
             </div>
 
             {/* Guarantees */}
-            <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { icon: Shield,   title: '12 meses',    sub: 'Garantia' },
-                { icon: Truck,    title: 'Frete Grátis', sub: 'Acima de R$ 299' },
+                { icon: Truck,    title: 'Frete grátis', sub: 'Acima de R$ 799' },
                 { icon: RotateCcw, title: '7 dias',     sub: 'Troca fácil' },
               ].map(({ icon: Icon, title, sub }) => (
-                <div key={title} className="bg-[#f7f9ff] rounded-xl p-2.5 sm:p-3 text-center border border-[#e5e8ee]">
+                <div key={title} className="bg-[#f7f9ff] rounded-xl p-2 sm:p-3 text-center border border-[#e5e8ee]">
                   <Icon size={16} className="text-[#0070ea] mx-auto mb-1" />
                   <p className="text-xs font-semibold text-[#181c20] leading-tight">{title}</p>
                   <p className="text-[11px] sm:text-xs text-[#737780] leading-tight mt-0.5">{sub}</p>
@@ -411,7 +435,17 @@ export default function ProductDetail() {
         {related.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-[#003366] mb-6">Produtos Relacionados</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div
+              className={`grid grid-cols-2 gap-3 sm:gap-5 ${
+                related.length === 1
+                  ? 'lg:grid-cols-1 lg:max-w-[calc(25%-0.9375rem)] lg:mx-auto'
+                  : related.length === 2
+                    ? 'lg:grid-cols-2 lg:max-w-[calc(50%-0.625rem)] lg:mx-auto'
+                    : related.length === 3
+                      ? 'lg:grid-cols-3 lg:max-w-[calc(75%-0.3125rem)] lg:mx-auto'
+                      : 'lg:grid-cols-4'
+              }`}
+            >
               {related.map((p) => (
                 <ProductCard
                   key={p.id}
@@ -424,6 +458,32 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Barra de compra fixa (somente mobile) */}
+      <div
+        aria-hidden={!buyBarActive}
+        className={`sm:hidden fixed inset-x-0 bottom-0 z-[55] bg-white border-t border-[#e5e8ee] px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-[transform,visibility] duration-200 ${
+          buyBarActive
+            ? 'translate-y-0 visible shadow-[0_-6px_16px_-8px_rgba(0,51,102,0.25)]'
+            : 'translate-y-full invisible'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 leading-tight">
+            <p className="text-lg font-bold text-[#003366] truncate">{formatPrice(precoPromo ?? preco)}</p>
+            {qty > 1 && <p className="text-[11px] text-[#737780]">Quantidade: {qty}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={() => inStock && cart.addItem && cart.addItem(product, qty)}
+            tabIndex={buyBarActive ? 0 : -1}
+            className="h-11 flex-shrink-0 inline-flex items-center justify-center gap-2 px-6 rounded-xl bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] active:bg-[#004a9c] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+          >
+            <ShoppingCart size={16} />
+            Adicionar
+          </button>
+        </div>
       </div>
     </div>
   )

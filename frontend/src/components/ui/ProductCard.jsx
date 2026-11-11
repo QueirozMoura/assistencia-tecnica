@@ -80,7 +80,7 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.03]"
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />

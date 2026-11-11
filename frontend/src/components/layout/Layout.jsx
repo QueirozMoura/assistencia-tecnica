@@ -48,7 +48,7 @@ export default function Layout() {
       />
 
       <main className="flex-1">
-        <Outlet context={{ cart, wishlist }} />
+        <Outlet context={{ cart, wishlist, cookieBannerOpen: shouldShowCookieBanner }} />
       </main>
 
       <Footer onOpenCookieSettings={() => setCookieSettingsOpen(true)} />
