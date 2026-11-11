@@ -23,8 +23,8 @@ export default function CartDrawer({
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[65] shadow-2xl flex flex-col transition-transform duration-300 ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[65] flex flex-col transition-transform duration-300 ${
+          open ? "translate-x-0 shadow-2xl" : "translate-x-full"
         }`}
       >
         {/* Header */}
