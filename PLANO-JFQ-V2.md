@@ -184,6 +184,18 @@ pendências implementado (interno); `in_process` nunca é dinheiro; assinatura i
 **Pendente:** conferência visual autenticada do painel pelo usuário, checkout Mercado Pago de teste (sem credencial no
 dev) e plano/autorização próprios para produção. Detalhes em AUDITORIA-FUNCIONAL.md.
 
+### Auditoria do painel, sandbox do Mercado Pago e segurança (02/11/2026, noite)
+
+Painel administrativo validado no navegador (conciliação: listagem, filtros, detalhe, resolução manual auditada e indicador
+do menu); bug do Dashboard (PREPARANDO ausente em contagem e receita) corrigido com teste; 215 testes locais, lint, build e
+`prisma validate` aprovados. Mercado Pago: aplicação JfqAssistencia (Checkout Pro) compatível, mas **as páginas de
+credenciais e contas de teste exigem validação de identidade por telefone do titular**; nada foi lido, criado ou alterado
+lá. **Checkout de teste não concluído**: faltam credenciais de teste no `.env` (token, User ID da vendedora de teste e
+segredo de webhook), conta compradora de teste e uma URL pública HTTPS para o webhook real. Roteiro pronto em
+`npm run sandbox:checkout`. Segurança: `backend/create-admin.js` (senha fixa, rastreado desde 054367c) removido da árvore e
+trocado por script interativo sem credenciais; **trocar a senha exposta e decidir sobre o histórico do Git** (nada foi
+commitado nem reescrito). Detalhes em AUDITORIA-FUNCIONAL.md.
+
 ### Próxima etapa para liberação segura
 
 1. ~~Executar runner e testes de serviços no ensaio~~ — **concluído** (acima).

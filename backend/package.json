@@ -20,7 +20,8 @@
     "test:stock:postgres": "node scripts/test-stock-postgres.js",
     "test:rest:isolated": "node scripts/test-rest-isolated.js",
     "smoke:ledger:dev": "node scripts/smoke-ledger-dev.js",
-    "verify:dev-deploy": "node scripts/verify-dev-deploy.js"
+    "verify:dev-deploy": "node scripts/verify-dev-deploy.js",
+    "sandbox:checkout": "node scripts/sandbox-checkout-local.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

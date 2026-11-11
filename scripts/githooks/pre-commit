@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Bloqueia commits que adicionem credenciais. Ativar uma vez: git config core.hooksPath scripts/githooks
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "AVISO: gitleaks não instalado; verificação de segredos ignorada (instale: sudo dnf install gitleaks, ou binário oficial)." >&2
+  exit 0
+fi
+gitleaks git --staged --config .gitleaks.toml --redact --no-banner || { echo "Commit bloqueado: possível segredo no que foi preparado (valores ocultos)." >&2; exit 1; }

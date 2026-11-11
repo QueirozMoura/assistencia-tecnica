@@ -113,119 +113,69 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
 
       {/* Main Navbar */}
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          scrolled
-            ? 'bg-white shadow-md'
-            : 'bg-white border-b border-[#c3c6d1]'
+        className={`sticky top-0 z-50 w-full bg-white transition-shadow duration-300 ${
+          scrolled ? 'shadow-[0_4px_20px_-8px_rgba(0,51,102,0.25)]' : 'border-b border-[#e5e8ee]'
         }`}
       >
-        <div className="container-max flex items-center justify-between h-16 gap-2 sm:gap-4">
+        {/* Row 1: logo, search, account, wishlist, cart */}
+        <div className="container-max flex items-center gap-3 sm:gap-6 h-16 lg:h-20">
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={mobileOpen}
+            className="lg:hidden -ml-2 p-2 rounded-lg hover:bg-[#f1f4f9] transition-colors text-[#003366] focus-visible:outline-2 focus-visible:outline-[#0070ea]"
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0 min-w-0">
-            <div className="w-9 h-9 bg-[#003366] rounded-lg flex items-center justify-center flex-shrink-0">
-              <Wrench size={18} className="text-white" />
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 min-w-0" aria-label="JFQ Assistência - Início">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#003366] to-[#0070ea] rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Wrench size={20} className="text-white" />
             </div>
-            <div className="leading-tight min-w-0">
-              <span className="block font-bold text-[#003366] text-sm sm:text-lg leading-none">JFQ</span>
-              <span className="block font-bold text-[#0070ea] text-sm sm:text-lg leading-none">Assistência</span>
+            <div className="leading-none min-w-0">
+              <span className="block font-extrabold text-[#003366] text-lg tracking-tight">JFQ</span>
+              <span className="block font-semibold text-[#0070ea] text-[11px] sm:text-xs tracking-wide mt-0.5">Assistência Técnica</span>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <div
-                key={link.to}
-                className="relative"
-                onMouseEnter={() => link.mega && setMegaOpen(link.label)}
-                onMouseLeave={() => setMegaOpen(null)}
-              >
-                <NavLink
-                  to={link.to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'text-[#0070ea] bg-blue-50'
-                        : 'text-[#43474f] hover:text-[#003366] hover:bg-gray-50'
-                    }`
-                  }
-                >
-                  {link.label}
-                  {link.mega && <ChevronDown size={14} className={`transition-transform ${megaOpen === link.label ? 'rotate-180' : ''}`} />}
-                </NavLink>
-
-                {/* Mega Menu */}
-                {link.mega && megaOpen === link.label && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-[#e5e8ee] py-2 z-50">
-                    {link.mega.map((item) => (
-                      <Link
-                        key={item.to}
-                        to={item.to}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#43474f] hover:bg-blue-50 hover:text-[#0070ea] transition-colors"
-                        onClick={() => setMegaOpen(null)}
-                      >
-                        <item.icon size={15} className="text-[#0070ea]" />
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-
-          {/* Search + Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-            {/* Search Bar (desktop) */}
-            <form onSubmit={handleSearch} className="hidden sm:flex items-center bg-[#f1f4f9] rounded-full px-4 py-2 gap-2 w-40 sm:w-48 lg:w-64 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white transition-all">
-              <Search size={15} className="text-[#737780] flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Buscar produtos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm text-[#181c20] placeholder-[#737780] outline-none w-full"
-              />
-            </form>
-
-            {/* Wishlist */}
-            <Link
-              to="/catalogo"
-              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
-              title="Lista de Desejos"
-            >
-              <Heart size={20} />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0070ea] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Cart */}
+          {/* Search Bar (desktop) */}
+          <form
+            onSubmit={handleSearch}
+            role="search"
+            className="hidden lg:flex flex-1 max-w-2xl mx-auto items-center h-12 bg-[#f1f4f9] rounded-full pl-5 pr-1.5 gap-3 border border-transparent hover:border-[#c3d4ea] focus-within:border-[#0070ea] focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(0,112,234,0.12)] transition-all"
+          >
+            <Search size={18} className="text-[#737780] flex-shrink-0" />
+            <input
+              type="search"
+              aria-label="Buscar produtos"
+              placeholder="Buscar produtos, peças e acessórios..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent text-sm text-[#181c20] placeholder-[#737780] outline-none w-full"
+            />
             <button
-              onClick={onCartOpen}
-              className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
-              title="Carrinho"
+              type="submit"
+              className="h-9 px-5 rounded-full bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors flex-shrink-0"
             >
-              <ShoppingCart size={20} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#0070ea] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
+              Buscar
             </button>
+          </form>
 
+          {/* Actions */}
+          <div className="flex items-center gap-1 sm:gap-2 ml-auto lg:ml-0 flex-shrink-0">
             {isAuthenticated ? (
               <div className="relative hidden md:block" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen((prev) => !prev)}
-                  className="flex items-center gap-2 rounded-full border border-[#e5e8ee] bg-white pl-1 pr-3 py-1.5 hover:bg-gray-50 transition-colors"
+                  aria-expanded={profileOpen}
+                  className="flex items-center gap-2 rounded-full border border-[#e5e8ee] bg-white pl-1 pr-3 py-1 hover:border-[#0070ea] hover:bg-[#f7f9ff] transition-colors"
                 >
                   <span className="w-8 h-8 rounded-full bg-[#0070ea] text-white text-sm font-bold flex items-center justify-center">
                     {avatarInitial}
                   </span>
-                  <span className="hidden lg:block text-sm font-medium text-[#43474f] max-w-[110px] truncate">
+                  <span className="hidden xl:block text-sm font-medium text-[#43474f] max-w-[110px] truncate">
                     {firstName || 'Minha Conta'}
                   </span>
                   <ChevronDown
@@ -276,56 +226,140 @@ export default function Navbar({ cartCount = 0, wishlistCount = 0, onCartOpen })
                 </div>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 mr-1">
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center h-10 px-4 py-2 rounded-lg text-sm leading-5 font-semibold text-[#43474f] bg-white border border-[#d8dce5] hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 h-10 px-3 rounded-lg text-sm font-semibold text-[#003366] hover:bg-[#f1f4f9] transition-colors whitespace-nowrap"
                 >
+                  <User size={17} />
                   Entrar
                 </Link>
                 <Link
                   to="/cadastro"
-                  className="inline-flex items-center justify-center h-10 px-4 py-2 rounded-lg text-sm leading-5 font-semibold text-white bg-[#0070ea] hover:bg-[#0059bb] transition-colors whitespace-nowrap"
+                  className="inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-semibold text-[#0070ea] border border-[#0070ea] hover:bg-[#0070ea] hover:text-white transition-colors whitespace-nowrap"
                 >
                   Criar conta
                 </Link>
               </div>
             )}
 
+            {/* Wishlist */}
+            <Link
+              to="/catalogo"
+              className="relative p-2.5 rounded-full hover:bg-[#f1f4f9] transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
+              title="Lista de Desejos"
+              aria-label="Lista de desejos"
+            >
+              <Heart size={21} />
+              {wishlistCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-[#0070ea] text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Cart */}
+            <button
+              onClick={onCartOpen}
+              className="relative p-2.5 rounded-full hover:bg-[#f1f4f9] transition-colors text-[#43474f] hover:text-[#003366] flex-shrink-0"
+              title="Carrinho"
+              aria-label="Abrir carrinho"
+            >
+              <ShoppingCart size={21} />
+              {cartCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-[#0070ea] text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile/tablet search: always visible */}
+        <div className="container-max lg:hidden pb-3">
+          <form
+            onSubmit={handleSearch}
+            role="search"
+            className="flex items-center h-11 bg-[#f1f4f9] rounded-full pl-4 pr-1.5 gap-2 border border-transparent focus-within:border-[#0070ea] focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(0,112,234,0.12)] transition-all"
+          >
+            <Search size={17} className="text-[#737780] flex-shrink-0" />
+            <input
+              type="search"
+              aria-label="Buscar produtos"
+              placeholder="Buscar produtos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent text-sm text-[#181c20] placeholder-[#737780] outline-none w-full"
+            />
+            <button
+              type="submit"
+              aria-label="Buscar"
+              className="h-8 w-8 rounded-full bg-[#0070ea] text-white flex items-center justify-center hover:bg-[#0059bb] transition-colors flex-shrink-0"
+            >
+              <Search size={15} />
+            </button>
+          </form>
+        </div>
+
+        {/* Row 2: navigation (desktop) */}
+        <div className="hidden lg:block border-t border-[#eef1f6]">
+          <div className="container-max flex items-center justify-between h-12">
+            <nav className="flex items-center gap-1" aria-label="Principal">
+              {navLinks.map((link) => (
+                <div
+                  key={link.to}
+                  className="relative"
+                  onMouseEnter={() => link.mega && setMegaOpen(link.label)}
+                  onMouseLeave={() => setMegaOpen(null)}
+                >
+                  <NavLink
+                    to={link.to}
+                    className={({ isActive }) =>
+                      `relative flex items-center gap-1 px-3.5 h-12 text-sm font-medium transition-colors after:absolute after:left-3.5 after:right-3.5 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors ${
+                        isActive
+                          ? 'text-[#0070ea] after:bg-[#0070ea]'
+                          : 'text-[#43474f] hover:text-[#003366] after:bg-transparent hover:after:bg-[#c3d4ea]'
+                      }`
+                    }
+                  >
+                    {link.label}
+                    {link.mega && <ChevronDown size={14} className={`transition-transform ${megaOpen === link.label ? 'rotate-180' : ''}`} />}
+                  </NavLink>
+
+                  {/* Mega Menu */}
+                  {link.mega && megaOpen === link.label && (
+                    <div className="absolute top-full left-0 w-60 bg-white rounded-xl shadow-xl border border-[#e5e8ee] py-2 z-50">
+                      {link.mega.map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#43474f] hover:bg-blue-50 hover:text-[#0070ea] transition-colors"
+                          onClick={() => setMegaOpen(null)}
+                        >
+                          <item.icon size={15} className="text-[#0070ea]" />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+
             {/* CTA Agendar */}
             <Link
               to="/agendamento"
-              className="hidden xl:inline-flex items-center justify-center h-10 gap-2 bg-[#0070ea] text-white px-4 py-2 rounded-lg text-sm leading-5 font-semibold hover:bg-[#0059bb] transition-colors whitespace-nowrap flex-shrink-0"
+              className="inline-flex items-center justify-center h-9 gap-2 bg-[#003366] text-white px-4 rounded-full text-sm font-semibold hover:bg-[#0070ea] transition-colors whitespace-nowrap"
             >
               <Wrench size={14} />
-              Agendar
+              Agendar visita técnica
             </Link>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 rounded-full hover:bg-gray-100 transition-colors text-[#43474f]"
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="lg:hidden bg-white border-t border-[#e5e8ee] px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            {/* Mobile Search */}
-            <form onSubmit={handleSearch} className="flex items-center bg-[#f1f4f9] rounded-full px-4 py-2.5 gap-2 mb-4">
-              <Search size={15} className="text-[#737780]" />
-              <input
-                type="text"
-                placeholder="Buscar produtos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm text-[#181c20] placeholder-[#737780] outline-none w-full"
-              />
-            </form>
-
+          <div className="lg:hidden bg-white border-t border-[#e5e8ee] px-4 py-4 space-y-1 max-h-[calc(100vh-7.5rem)] overflow-y-auto">
             {navLinks.map((link) => (
               <div key={link.to}>
                 <NavLink

@@ -1,0 +1,20 @@
+# Configuração do Gitleaks para o JFQ. Estende as regras padrão (Mercado Pago APP_USR, Postgres/Neon, Google, Resend, Telegram, etc.).
+title = "JFQ gitleaks"
+
+[extend]
+useDefault = true
+
+# Regra extra: token do Mercado Pago (APP_USR-<app>-<data>-<hash>-<vendedor>) e credenciais de teste (TEST-...).
+[[rules]]
+id = "mercadopago-access-token"
+description = "Access token do Mercado Pago"
+regex = '''\b(?:APP_USR|TEST)-\d{10,}-\d{6}-[0-9a-f]{32}-\d+'''
+keywords = ["app_usr", "test-"]
+
+[allowlist]
+description = "Valores sintéticos de teste e exemplos sem segredo"
+paths = [
+  '''backend/test/.*\.test\.js''',
+  '''backend/\.env\.example''',
+  '''frontend/\.env\.example''',
+]

@@ -870,6 +870,65 @@ validado no ensaio com provedor simulado. Reservas abandonadas sem expiração, 
 idempotência ausentes seguem como riscos conhecidos. Backend e frontend em segundo plano nesta sessão. Alertas
 externos (e-mail/mensagem) de pendências não existem por decisão. Produção exigirá plano e autorização próprios.
 
+### Auditoria do painel, Mercado Pago sandbox e segurança — 02/11/2026 (noite)
+
+**Painel administrativo (navegador autenticado pelo usuário, 127.0.0.1:5173).** Validado: menu **Conciliação** presente;
+listagem com cartões (abertas, abertas confirmadas pelo Mercado Pago, resolvidas) e itens classificados; filtro por
+verificação (Suspeito → 1 item); detalhe com evidência completa; validação do formulário (status final sem justificativa é
+bloqueado com mensagem); resolução manual de ponta a ponta (status final, responsável, data, histórico auditável, formulário
+removido) e **indicador do menu atualizado de 5 para 4 imediatamente**; Dashboard, Pedidos, Produtos, Categorias, Clientes e
+Agendamentos respondem 200; console sem erros e nenhuma requisição com falha (a lista usada para o teste foi criada com 5 itens
+**sintéticos** rotulados `SINTETICO-UI-TEST-n`, ligados ao pedido sintético #2; um deles foi resolvido na interface como falso
+positivo; nenhum dado real foi alterado).
+
+**Bugs encontrados e corrigidos.** (1) Dashboard: `porStatus` omitia **PREPARANDO** (a tela mostrava sempre 0) e a receita
+ignorava pedidos PREPARANDO, já pagos — corrigido em `dashboard.service.js` com teste de regressão (`dashboard.test.js`). (2)
+`console.debug` de depuração no Dashboard removido. (3) Segurança: ver abaixo.
+
+**Mercado Pago Developers (conta do titular, sessão autenticada).** Existe uma aplicação: **JfqAssistencia** (2402364799457121),
+produto **Checkout Pro**, compatível com o backend (`POST /checkout/preferences` + `init_point`). O menu da aplicação oferece
+"Credenciais de teste", "Contas de teste", "Cartões de teste", Webhooks e, separadas, "Credenciais de produção". **Toda página
+sensível da aplicação (credenciais e contas de teste) redireciona para "Valide que esta é a sua conta" (confirmação por
+telefone); a etapa foi interrompida e aguarda o titular.** Nenhuma credencial foi lida, exibida ou gravada; nenhuma conta de
+teste foi criada; nada foi alterado no Mercado Pago. Documentação oficial conferida (fluxo de testes do Checkout Pro): conta
+compradora de teste, login em janela anônima, cartões de teste com o resultado definido pelo nome do titular (`APRO`
+aprovado, `OTHE` recusado, `CONT` pendente, `FUND`, `SECU`, `EXPI`), CVV 123, validade 11/30. O pagamento no checkout
+hospedado exige digitar a senha da conta compradora e o cartão de teste no site do Mercado Pago: **deve ser feito por uma
+pessoa**.
+
+**Configuração local.** `backend/.env`: `MERCADO_PAGO_MODE=test`, transportes de e-mail/Telegram em mock e webhook público
+desabilitado já estão corretos; **vazios**: `MERCADO_PAGO_ACCESS_TOKEN`, `MP_ACCESS_TOKEN`, `MERCADO_PAGO_TEST_SELLER_ID`,
+`MERCADO_PAGO_WEBHOOK_SECRET`, `MERCADO_PAGO_NOTIFICATION_URL`. Nada foi escrito no `.env` (0600, fora do Git). O backend recusa
+operar se a conta não for de teste: confere o User ID e a tag `test_user` pela API antes de criar preferência.
+
+**Checkout de teste: NÃO concluído (bloqueado por credenciais).** Sem token de teste, `POST /api/pedidos/com-pagamento` devolve
+503 e não deixa pedido nem reserva (validado no smoke). Foi preparado `backend/scripts/sandbox-checkout-local.js`
+(`npm run sandbox:checkout`): `start` cria cliente/produto/pedido sintéticos e a preferência de teste e imprime o link do
+checkout; `webhook --payment-id` reenvia localmente uma notificação assinada (o status vem da consulta autenticada à API, não do
+replay); `status --order` mostra pedido, estoque, ledger e pendências. Recusa rodar sem as 3 credenciais de teste. Como o
+Mercado Pago não alcança `localhost`, **o webhook real ponta a ponta exige uma URL pública HTTPS (túnel), que não foi criada
+nem configurada sem autorização**.
+
+**Segurança — `backend/create-admin.js` (senha e e-mail fixos no código, rastreado no Git desde o commit 054367c).** O arquivo
+não era usado (nenhuma referência em `package.json`, scripts ou documentação) e foi **removido da árvore de trabalho**
+(exclusão pendente de commit; o histórico do Git **não** foi reescrito). Substituído por `backend/scripts/create-admin.js`:
+interativo, sem credenciais no código, senha digitada sem eco (mín. 12 caracteres), exige digitar de volta o host do banco de
+destino, recusa produção sem `--allow-production` e nunca sobrescreve conta existente. Varredura de padrões de credencial nos
+arquivos rastreados: nenhuma outra ocorrência real. **Ação necessária do titular:** considerar comprometida a senha que esteve
+no repositório e trocá-la onde possa estar em uso (inclusive produção); decidir sobre limpeza do histórico (reescrita exige
+autorização e coordenação). Também preparado `backend/scripts/reset-dev-admin-password.js` (redefinição interativa da conta
+ADMIN do dev, não executado).
+
+**Testes e validação.** Backend 185 e frontend 30 aprovados (215); lint, build, `prisma validate` e `git diff --check`
+aprovados; varredura de credenciais no diff: 0. O REST isolado (42/42) e os smokes do dev (11/11 e 27/27) da etapa anterior
+seguem válidos: o código de pedidos, webhook e conciliação não mudou.
+
+**O que falta para a implantação em produção.** Concluir o checkout de teste (credenciais de teste, conta compradora, pagamento
+`APRO` e uma recusa, URL pública de notificação para o webhook real); plano e autorização próprios para a migration e o deploy
+em produção (backup, janela, rollback); trocar credenciais expostas e decidir sobre o histórico do Git; política de reservas
+abandonadas, preferência órfã e idempotência de checkout; observabilidade e alerta de pendências; revisão final do diff e
+commits (nada foi commitado).
+
 ### Condições para liberação e riscos restantes
 
 1. ~~Executar o runner fora do isolamento e exigir três disputas...~~ **Cumprido em
