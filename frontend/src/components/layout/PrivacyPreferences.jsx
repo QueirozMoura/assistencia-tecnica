@@ -137,48 +137,47 @@ export default function CookieConsent({
   return (
     <>
       {shouldShowBanner && (
-        <div className="fixed inset-x-0 bottom-0 z-[60] p-4 md:p-6">
-          <div className="mx-auto max-w-5xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="px-5 py-5 md:px-6 md:py-6 flex flex-col lg:flex-row lg:items-center gap-5">
-              <div className="flex-1">
-                <h2 className="text-base md:text-lg font-bold text-slate-900">Nós usamos cookies</h2>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Utilizamos cookies essenciais para funcionamento do site e, com seu consentimento,
-                  cookies de estatísticas e marketing. Você pode gerenciar suas preferências quando quiser.
-                  Veja nossa{' '}
-                  <Link to="/politica-de-privacidade" className="text-[#0070ea] hover:underline font-medium">
-                    Política de Privacidade
-                  </Link>
-                  .
-                </p>
-              </div>
+        <div
+          role="region"
+          aria-label="Aviso de cookies"
+          className="fixed bottom-3 left-3 right-3 z-[60] sm:bottom-5 sm:left-5 sm:right-auto sm:w-[380px]"
+        >
+          <div className="rounded-2xl bg-white border border-[#e5e8ee] shadow-[0_16px_40px_-12px_rgba(0,51,102,0.3)] p-4 sm:p-5">
+            <h2 className="text-sm font-bold text-[#003366]">Nós usamos cookies</h2>
+            <p className="text-[13px] text-[#43474f] mt-1.5 leading-relaxed">
+              Usamos cookies essenciais para o site funcionar e, com seu consentimento, cookies de
+              estatísticas e marketing. Veja a{' '}
+              <Link to="/politica-de-privacidade" className="text-[#0070ea] hover:underline font-medium focus-visible:outline-2 focus-visible:outline-[#0070ea] rounded">
+                Política de Privacidade
+              </Link>
+              .
+            </p>
 
-              <div className="w-full lg:w-auto grid sm:grid-cols-3 gap-2.5">
-                <button
-                  type="button"
-                  onClick={onAcceptAll}
-                  className="px-4 py-2.5 rounded-lg bg-[#0070ea] text-white font-semibold hover:bg-[#0059bb] transition-colors"
-                >
-                  Aceitar todos
-                </button>
-                <button
-                  type="button"
-                  onClick={onAcceptEssential}
-                  className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
-                >
-                  Apenas essenciais
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDraftPreferences(normalizeCookiePreferences(currentPreferences || COOKIE_DEFAULT_PREFERENCES))
-                    onOpenSettings?.()
-                  }}
-                  className="px-4 py-2.5 rounded-lg border border-[#0070ea] text-[#0070ea] font-semibold hover:bg-[#e9f3ff] transition-colors"
-                >
-                  Configurar cookies
-                </button>
-              </div>
+            <div className="mt-3.5 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={onAcceptAll}
+                className="h-10 rounded-lg bg-[#0070ea] text-white text-sm font-semibold hover:bg-[#0059bb] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+              >
+                Aceitar todos
+              </button>
+              <button
+                type="button"
+                onClick={onAcceptEssential}
+                className="h-10 rounded-lg border border-[#c3d4ea] text-[#003366] text-sm font-semibold hover:border-[#0070ea] hover:bg-[#f5f9ff] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
+              >
+                Só essenciais
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDraftPreferences(normalizeCookiePreferences(currentPreferences || COOKIE_DEFAULT_PREFERENCES))
+                  onOpenSettings?.()
+                }}
+                className="col-span-2 h-8 rounded-lg text-[13px] font-semibold text-[#0070ea] hover:bg-[#e9f3ff] transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea]"
+              >
+                Configurar cookies
+              </button>
             </div>
           </div>
         </div>
