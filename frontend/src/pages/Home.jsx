@@ -292,8 +292,8 @@ export default function Home() {
                       </h3>
                       <p
                         className={`mt-1 text-sm leading-snug text-[#d6e6ff] ${
-                          featured ? "" : "hidden sm:block"
-                        } line-clamp-2`}
+                          featured ? "line-clamp-2" : "hidden sm:line-clamp-2"
+                        }`}
                       >
                         {cat.subtitle}
                       </p>
@@ -366,7 +366,7 @@ export default function Home() {
 
           {/* Products grid */}
           {!loadingProducts && !errorProducts && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}

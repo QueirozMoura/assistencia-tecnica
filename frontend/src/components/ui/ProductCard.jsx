@@ -98,7 +98,7 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         {/* Wishlist (always visible, works on touch) */}
         <button
           onClick={() => onToggleWishlist && onToggleWishlist(raw)}
-          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea] ${
+          className={`absolute top-2 right-2 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-sm border transition-colors focus-visible:outline-2 focus-visible:outline-[#0070ea] ${
             isWishlisted
               ? 'bg-[#0070ea] border-[#0070ea] text-white'
               : 'bg-white/95 border-[#e5e8ee] text-[#43474f] hover:text-[#0070ea] hover:border-[#0070ea]'
@@ -111,7 +111,7 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         </button>
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col items-start gap-1.5">
           {product.badge && (
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${badgeColors[product.badgeColor] || badgeColors.secondary}`}>
               {product.badge}
@@ -135,12 +135,12 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
       </div>
 
       {/* Content */}
-      <div className="p-4 sm:p-5 flex flex-col flex-1">
+      <div className="p-3 sm:p-5 flex flex-col flex-1">
         {product.brand && (
           <p className="text-xs font-medium text-[#0070ea] mb-1.5 truncate">{product.brand}</p>
         )}
         <Link to={`/produto/${product.slug}`} className="focus-visible:outline-2 focus-visible:outline-[#0070ea] rounded">
-          <h3 className="font-semibold text-[#181c20] text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-[#0070ea] transition-colors">
+          <h3 className="font-semibold text-[#181c20] text-sm sm:text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-[#0070ea] transition-colors">
             {product.name}
           </h3>
         </Link>
@@ -165,13 +165,13 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         )}
 
         {/* Price */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-3 sm:pt-4">
           {product.originalPrice != null && product.originalPrice > product.price && (
             <p className="text-xs text-[#737780] line-through">
               {formatPrice(product.originalPrice)}
             </p>
           )}
-          <p className="text-2xl font-extrabold tracking-tight text-[#003366] leading-none">{formatPrice(product.price)}</p>
+          <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#003366] leading-none">{formatPrice(product.price)}</p>
 
           {/* Parcelamento — só renderiza se o campo existir */}
           {product.installments != null && product.installments > 1 && (
@@ -188,15 +188,21 @@ export default function ProductCard({ product: raw, onAddToCart, onToggleWishlis
         {/* Button */}
         <button
           onClick={() => product.inStock && onAddToCart && onAddToCart(product)}
+          aria-label={product.inStock ? `Adicionar ${product.name} ao carrinho` : undefined}
           disabled={!product.inStock}
-          className={`mt-4 w-full flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea] ${
+          className={`mt-3 sm:mt-4 w-full flex items-center justify-center gap-1.5 sm:gap-2 h-11 rounded-xl text-[13px] sm:text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea] ${
             product.inStock
               ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:bg-[#004a9c]'
               : 'bg-[#e5e8ee] text-[#737780] cursor-not-allowed'
           }`}
         >
           <ShoppingCart size={16} />
-          {product.inStock ? 'Adicionar ao carrinho' : 'Indisponível'}
+          {product.inStock ? (
+            <>
+              <span className="sm:hidden">Adicionar</span>
+              <span className="hidden sm:inline">Adicionar ao carrinho</span>
+            </>
+          ) : 'Indisponível'}
         </button>
       </div>
     </article>
