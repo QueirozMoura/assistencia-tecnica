@@ -130,103 +130,74 @@ export default function Home() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_right,_#dcecff_0%,_#f5f9ff_40%,_#ffffff_100%)] pt-14 pb-16 sm:pt-16 sm:pb-18 lg:pt-20 lg:pb-24">
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#0070ea]/10 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#003366]/10 blur-3xl" />
-
-        <div className="container-max relative z-10">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#f5f9ff] to-white py-10 sm:py-14 lg:py-16">
+        <div className="container-max">
+          <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
             {/* Left */}
             <div className="text-center lg:text-left">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#cce0ff] bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#003366] shadow-sm">
-                <Wrench size={14} className="text-[#0070ea]" />
-                Assistência Técnica Especializada
-              </span>
-
-              <h1 className="mt-5 text-4xl font-bold leading-tight text-[#003366] sm:text-[2.7rem] lg:text-5xl">
-                Cuidando dos seus
-                <span className="block text-[#0070ea]">
-                  Eletrodomésticos do
-
-                </span>
-                Jeito Certo
-              </h1>
-
-              <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#43474f] sm:text-lg lg:mx-0">
-                Compre com segurança, agende assistência com rapidez e conte com
-                atendimento especializado para manter seus equipamentos sempre
-                em alta performance.
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-[#0070ea]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0070ea]" />
+                Assistência técnica especializada
               </p>
 
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+              <h1 className="mt-3 text-[2rem] font-extrabold leading-[1.12] tracking-tight text-[#003366] sm:text-4xl lg:text-[2.9rem]">
+                Eletrodomésticos com
+                <span className="text-[#0070ea]"> cuidado de especialista</span>
+              </h1>
+
+              <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-[#43474f] lg:mx-0 lg:max-w-lg">
+                Compre com segurança, agende assistência com rapidez e mantenha
+                seus equipamentos sempre em alta performance.
+              </p>
+
+              <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center lg:justify-start">
                 <Link
                   to="/catalogo"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0070ea] px-6 py-3.5 font-semibold text-white shadow-lg shadow-[#0070ea]/25 transition-all hover:-translate-y-0.5 hover:bg-[#0059bb] sm:w-auto"
+                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#0070ea] px-7 py-3.5 text-[15px] font-semibold text-white shadow-md shadow-[#0070ea]/20 transition-colors hover:bg-[#0059bb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
                 >
-                  Comprar Agora
-                  <ArrowRight size={16} />
+                  Ver produtos
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <Link
                   to="/agendamento"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#b7d2f8] bg-white px-6 py-3.5 font-semibold text-[#003366] shadow-sm transition-all hover:border-[#0070ea] hover:text-[#0070ea] sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#c3d4ea] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#003366] transition-colors hover:border-[#0070ea] hover:bg-[#f5f9ff] hover:text-[#0070ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea]"
                 >
                   <Phone size={16} />
-                  Agendar Assistência
+                  Agendar assistência
                 </Link>
               </div>
 
-              <div className="mt-7 grid gap-2.5 sm:grid-cols-3 sm:gap-3">
+              <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[#43474f] lg:justify-start">
                 {[
-                  "Atendimento especializado",
-                  "Garantia nos serviços",
+                  "Garantia de 90 dias",
+                  "Atendimento em 24h",
                   "Produtos originais",
                 ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-[#e5e8ee] bg-white px-3 py-2 text-sm text-[#43474f] shadow-sm lg:justify-start"
-                  >
+                  <li key={item} className="flex items-center gap-1.5">
                     <CheckCircle size={15} className="text-[#0070ea]" />
-                    <span>{item}</span>
-                  </div>
+                    {item}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Right */}
-            <div className="relative mx-auto w-full max-w-[620px]">
-              <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white p-2 shadow-[0_20px_60px_-25px_rgba(0,51,102,0.35)]">
-                <div className="relative overflow-hidden rounded-[1.35rem]">
-                  <img
-                    src={heroImg}
-                    alt="Assistência técnica premium em eletrodomésticos"
-                    className="h-[280px] w-full object-cover sm:h-[360px] lg:h-[450px]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#003366]/35 via-transparent to-[#0070ea]/10" />
-                </div>
+            <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
+              <div className="overflow-hidden rounded-2xl border border-[#e5e8ee] bg-white p-2 shadow-[0_24px_50px_-28px_rgba(0,51,102,0.4)]">
+                <img
+                  src={heroImg}
+                  alt="Assistência técnica premium em eletrodomésticos"
+                  className="h-[240px] w-full rounded-xl object-cover sm:h-[320px] lg:h-[400px]"
+                />
               </div>
 
-              <div className="absolute -left-3 top-5 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-left-5 sm:px-5">
-                <p className="text-xl font-bold leading-none text-[#003366] sm:text-2xl">
-                  +1000
-                </p>
-                <p className="mt-1 text-xs font-medium text-[#5d6672]">
-                  clientes atendidos
-                </p>
-              </div>
-
-              <div className="absolute -right-3 top-1/2 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-right-5 sm:px-5">
-                <p className="text-sm font-bold text-[#003366] sm:text-base">
-                  Garantia de 90 dias
-                </p>
-                <p className="text-xs text-[#5d6672]">em serviços prestados</p>
-              </div>
-
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-2xl border border-[#dbe9ff] bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:bottom-5 sm:px-5">
-                <div className="flex items-center gap-2">
-                  <Clock size={15} className="text-[#0070ea]" />
-                  <p className="text-sm font-semibold text-[#003366]">
-                    Atendimento rápido
-                  </p>
+              <div className="absolute -bottom-4 left-4 flex items-center gap-3 rounded-xl border border-[#e5e8ee] bg-white px-4 py-3 shadow-lg sm:left-6">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8f1ff]">
+                  <Users size={17} className="text-[#0070ea]" />
+                </span>
+                <div className="leading-tight">
+                  <p className="text-base font-bold text-[#003366]">+1000</p>
+                  <p className="text-xs text-[#5d6672]">clientes atendidos</p>
                 </div>
               </div>
             </div>
