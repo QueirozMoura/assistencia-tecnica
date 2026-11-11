@@ -178,12 +178,12 @@ export default function ProductDetail() {
         <div className="grid lg:grid-cols-2 gap-5 lg:gap-10 mb-8 lg:mb-12">
           {/* Gallery */}
           <div>
-            <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] mb-2 lg:mb-3 aspect-[4/3] lg:aspect-square bg-[#f5f7fb]">
+            <div className="bg-white rounded-2xl overflow-hidden border border-[#e5e8ee] mb-2 lg:mb-3 aspect-[4/3] lg:aspect-[5/4] bg-[#f5f7fb]">
               {imagens.length > 0 ? (
                 <img
                   src={imagens[activeImg]}
                   alt={nome}
-                  className="w-full h-full object-contain lg:object-cover"
+                  className="w-full h-full object-contain lg:object-cover lg:object-[center_30%]"
                   onError={(e) => { e.currentTarget.style.display = 'none' }}
                 />
               ) : (
@@ -221,11 +221,11 @@ export default function ProductDetail() {
           </div>
 
           {/* Info */}
-          <div>
+          <div className="lg:flex lg:flex-col lg:justify-center lg:bg-white lg:rounded-2xl lg:border lg:border-[#e5e8ee] lg:p-8">
             {marca && (
-              <p className="text-sm font-semibold text-[#0070ea] mb-1">{marca}</p>
+              <p className="text-sm font-semibold text-[#0070ea] mb-1 lg:mb-2">{marca}</p>
             )}
-            <h1 className="text-xl sm:text-2xl font-bold text-[#003366] leading-tight mb-2 sm:mb-3">{nome}</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#003366] leading-tight mb-2 sm:mb-3 lg:mb-5">{nome}</h1>
 
             {/* Rating — só exibe se existir no banco */}
             {avaliacao != null && (
@@ -248,11 +248,11 @@ export default function ProductDetail() {
             )}
 
             {/* Price */}
-            <div className="bg-[#f7f9ff] rounded-xl p-3 sm:p-5 mb-3 sm:mb-5 border border-[#e5e8ee]">
+            <div className="bg-[#f7f9ff] rounded-xl p-3 sm:p-5 lg:p-6 mb-3 sm:mb-5 lg:mb-7 border border-[#e5e8ee]">
               {precoPromo != null && precoPromo < preco && (
                 <p className="text-xs sm:text-sm text-[#737780] line-through">{formatPrice(preco)}</p>
               )}
-              <p className="text-2xl sm:text-3xl font-bold text-[#003366] leading-tight">
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#003366] leading-tight">
                 {formatPrice(precoPromo ?? preco)}
               </p>
               {parcelas != null && parcelas > 1 && (
@@ -283,21 +283,21 @@ export default function ProductDetail() {
             )}
 
             {/* Qty + Add to Cart */}
-            <div className="flex flex-wrap items-center sm:flex-nowrap gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+            <div className="flex flex-wrap items-center sm:flex-nowrap gap-2.5 sm:gap-3 mb-3 sm:mb-4 lg:mb-5">
               <div className="order-1 sm:order-none inline-flex items-center border border-[#e5e8ee] rounded-xl overflow-hidden bg-white">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="h-11 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
+                  className="h-11 w-10 sm:h-10 sm:w-9 lg:h-12 lg:w-10 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Diminuir quantidade"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="h-11 sm:h-10 w-12 text-sm font-semibold text-[#181c20] inline-flex items-center justify-center">
+                <span className="h-11 sm:h-10 lg:h-12 w-12 text-sm font-semibold text-[#181c20] inline-flex items-center justify-center">
                   {qty}
                 </span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
-                  className="h-11 w-10 sm:h-10 sm:w-9 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
+                  className="h-11 w-10 sm:h-10 sm:w-9 lg:h-12 lg:w-10 text-[#43474f] hover:bg-[#f1f4f9] transition-colors inline-flex items-center justify-center"
                   aria-label="Aumentar quantidade"
                 >
                   <Plus size={14} />
@@ -307,7 +307,7 @@ export default function ProductDetail() {
                 ref={mainBuyRef}
                 onClick={() => inStock && cart.addItem && cart.addItem(product, qty)}
                 disabled={!inStock}
-                className={`order-3 sm:order-none w-full sm:w-auto sm:flex-1 h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-semibold transition-all ${
+                className={`order-3 sm:order-none w-full sm:w-auto sm:flex-1 h-11 lg:h-12 lg:text-sm xl:text-base lg:whitespace-nowrap flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-semibold transition-all ${
                   inStock
                     ? 'bg-[#0070ea] text-white hover:bg-[#0059bb] active:scale-[0.99]'
                     : 'bg-[#e5e8ee] text-[#737780] cursor-not-allowed'
@@ -319,7 +319,7 @@ export default function ProductDetail() {
               <button
                 onClick={() => wishlist.toggle && wishlist.toggle(product)}
                 aria-label={wishlist.isWishlisted(product.id) ? 'Remover da lista de desejos' : 'Adicionar à lista de desejos'}
-                className={`order-2 sm:order-none ml-auto sm:ml-0 w-11 sm:w-auto h-11 px-0 sm:px-3 rounded-xl border transition-all inline-flex items-center justify-center ${
+                className={`order-2 sm:order-none ml-auto sm:ml-0 w-11 sm:w-auto h-11 lg:h-12 px-0 sm:px-3 lg:px-4 rounded-xl border transition-all inline-flex items-center justify-center ${
                   wishlist.isWishlisted(product.id)
                     ? 'border-[#0070ea] bg-[#cce0ff] text-[#0070ea]'
                     : 'border-[#e5e8ee] text-[#43474f] hover:border-[#0070ea]'
@@ -330,15 +330,15 @@ export default function ProductDetail() {
             </div>
 
             {/* Guarantees */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:pt-1">
               {[
                 { icon: Shield,   title: '12 meses',    sub: 'Garantia' },
                 { icon: Truck,    title: 'Frete grátis', sub: 'Acima de R$ 799' },
                 { icon: RotateCcw, title: '7 dias',     sub: 'Troca fácil' },
               ].map(({ icon: Icon, title, sub }) => (
-                <div key={title} className="bg-[#f7f9ff] rounded-xl p-2 sm:p-3 text-center border border-[#e5e8ee]">
+                <div key={title} className="bg-[#f7f9ff] rounded-xl p-2 sm:p-3 lg:p-4 text-center border border-[#e5e8ee]">
                   <Icon size={16} className="text-[#0070ea] mx-auto mb-1" />
-                  <p className="text-xs font-semibold text-[#181c20] leading-tight">{title}</p>
+                  <p className="text-xs lg:text-sm font-semibold text-[#181c20] leading-tight">{title}</p>
                   <p className="text-[11px] sm:text-xs text-[#737780] leading-tight mt-0.5">{sub}</p>
                 </div>
               ))}

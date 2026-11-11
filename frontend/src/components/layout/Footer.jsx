@@ -158,11 +158,11 @@ export default function Footer({ onOpenCookieSettings }) {
                   type="email"
                   placeholder="Seu e-mail"
                   aria-label="Seu e-mail para newsletter"
-                  className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-[#8fa8c8] outline-none focus:border-[#0070ea] transition-colors"
+                  className="flex-1 min-w-0 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-[#8fa8c8] outline-none focus:border-[#0070ea] transition-colors"
                 />
                 <button
                   type="submit"
-                  className="bg-[#0070ea] text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-[#0059bb] transition-colors"
+                  className="flex-shrink-0 bg-[#0070ea] text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-[#0059bb] transition-colors"
                 >
                   OK
                 </button>
