@@ -206,8 +206,8 @@ export default function Home() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="bg-white border-b border-[#e5e8ee]">
-        <div className="container-max py-10">
+      <section className="bg-white">
+        <div className="container-max py-8 sm:py-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, i) => {
               const Icon = statIcons[i];
@@ -229,7 +229,7 @@ export default function Home() {
       </section>
 
       {/* ── BENEFÍCIOS ── */}
-      <section className="py-16 bg-[#f7f9ff]">
+      <section className="py-10 sm:py-14 lg:py-16 bg-gradient-to-b from-white to-[#f7f9ff]">
         <div className="container-max">
           <SectionHeader
             badge="Por que nos escolher"
@@ -254,7 +254,7 @@ export default function Home() {
       </section>
 
       {/* ── CATEGORIAS ── */}
-      <section className="py-16 bg-white">
+      <section className="py-10 sm:py-14 lg:py-16 bg-gradient-to-b from-[#f7f9ff] to-white">
         <div className="container-max">
           <SectionHeader
             badge="Nosso Catálogo"
@@ -313,9 +313,9 @@ export default function Home() {
       </section>
 
       {/* ── PRODUTOS EM DESTAQUE ── */}
-      <section className="py-16 bg-[#f7f9ff]">
+      <section className="py-10 sm:py-14 lg:py-16 bg-gradient-to-b from-white to-[#f7f9ff]">
         <div className="container-max">
-          <div className="flex items-end justify-between mb-10">
+          <div className="flex items-end justify-between">
             <SectionHeader
               badge="Destaques"
               title="Produtos em Destaque"
@@ -391,7 +391,7 @@ export default function Home() {
       </section>
 
       {/* ── ASSISTÊNCIA TÉCNICA ── */}
-      <section className="py-16 bg-white">
+      <section className="py-10 sm:py-14 lg:py-16 bg-gradient-to-b from-[#f7f9ff] to-white">
         <div className="container-max">
           <SectionHeader
             badge="Assistência Técnica"
@@ -415,7 +415,7 @@ export default function Home() {
       </section>
 
       {/* ── MARCAS ── */}
-      <section className="py-14 bg-[#f7f9ff] border-y border-[#e5e8ee]">
+      <section className="py-10 sm:py-12 bg-gradient-to-b from-white to-[#f7f9ff]">
         <div className="container-max">
           <SectionHeader
             badge="Marcas Atendidas"
@@ -456,7 +456,7 @@ export default function Home() {
       </section>
 
       {/* ── DEPOIMENTOS ── */}
-      <section className="py-16 bg-[#001e40]" id="depoimentos">
+      <section className="py-10 sm:py-14 lg:py-16 bg-[#001e40]" id="depoimentos">
         <div className="container-max">
           <SectionHeader
             badge="Depoimentos"
@@ -504,7 +504,7 @@ export default function Home() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-16 bg-white">
+      <section className="py-10 sm:py-14 lg:py-16 bg-white">
         <div className="container-max">
           <SectionHeader
             badge="Dúvidas Frequentes"
@@ -548,7 +548,7 @@ export default function Home() {
       </section>
 
       {/* ── NEWSLETTER ── */}
-      <section className="py-16 bg-gradient-to-r from-[#003366] to-[#0070ea]">
+      <section className="py-10 sm:py-14 lg:py-16 bg-gradient-to-r from-[#003366] to-[#0070ea]">
         <div className="container-max text-center">
           <span className="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
             Newsletter
@@ -591,7 +591,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section className="py-12 bg-[#f7f9ff] border-t border-[#e5e8ee]">
+      <section className="py-10 sm:py-12 bg-[#f7f9ff]">
         <div className="container-max text-center">
           <h2 className="text-xl font-bold text-[#003366] mb-2">
             Precisa de assistência técnica agora?
