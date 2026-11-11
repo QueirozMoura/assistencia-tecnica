@@ -180,14 +180,6 @@ export default function Catalog() {
             <div className="bg-white rounded-2xl border border-[#e5e8ee] shadow-[0_1px_3px_rgba(0,51,102,0.06)] p-4 lg:sticky lg:top-[9.5rem] lg:max-h-[calc(100vh-10.5rem)] lg:overflow-y-auto">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#eef1f6]">
                 <h2 className="font-bold text-[#003366]">Filtros</h2>
-                {hasFilters && (
-                  <button
-                    onClick={clearAll}
-                    className="text-xs text-[#0070ea] hover:underline font-medium"
-                  >
-                    Limpar tudo
-                  </button>
-                )}
               </div>
 
               {/* Categorias */}
@@ -327,31 +319,6 @@ export default function Catalog() {
               </div>
             )}
 
-
-            {/* Active filters chips */}
-            {hasFilters && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {selectedCategories.map((slug) => {
-                  const cat = categorias.find((c) => c.slug === slug)
-                  return (
-                    <span key={slug} className="flex items-center gap-1.5 bg-[#cce0ff] text-[#003366] text-xs font-medium px-3 py-1.5 rounded-full">
-                      {cat?.nome ?? slug}
-                      <button onClick={() => toggleCategory(slug)} aria-label="Remover filtro">
-                        <X size={12} />
-                      </button>
-                    </span>
-                  )
-                })}
-                {selectedPriceRange && (
-                  <span className="flex items-center gap-1.5 bg-[#cce0ff] text-[#003366] text-xs font-medium px-3 py-1.5 rounded-full">
-                    {selectedPriceRange}
-                    <button onClick={() => { setSelectedPriceRange(null); setPage(1) }} aria-label="Remover filtro de preço">
-                      <X size={12} />
-                    </button>
-                  </span>
-                )}
-              </div>
-            )}
 
             {/* Error state */}
             {errorProds && !loadingProds && (

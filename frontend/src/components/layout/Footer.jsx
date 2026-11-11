@@ -37,13 +37,13 @@ export default function Footer({ onOpenCookieSettings }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-[#0070ea] rounded-lg flex items-center justify-center">
-                <Wrench size={18} className="text-white" />
+            <Link to="/" className="inline-flex items-center gap-2.5 mb-4" aria-label="JFQ Assistência Técnica - Início">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#0059bb] to-[#0070ea] rounded-xl flex items-center justify-center shadow-sm ring-1 ring-white/15">
+                <Wrench size={20} className="text-white" />
               </div>
-              <div className="leading-tight">
-                <span className="block font-bold text-white text-lg leading-none">Eletro</span>
-                <span className="block font-bold text-[#a7c8ff] text-lg leading-none">Center</span>
+              <div className="leading-none">
+                <span className="block font-extrabold text-white text-lg tracking-tight">JFQ</span>
+                <span className="block font-semibold text-[#a7c8ff] text-xs tracking-wide mt-0.5">Assistência Técnica</span>
               </div>
             </Link>
             <p className="text-[#8fa8c8] text-sm leading-relaxed mb-6">
@@ -175,7 +175,7 @@ export default function Footer({ onOpenCookieSettings }) {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container-max py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-[#8fa8c8]">
-          <p>© {new Date().getFullYear()} JFQ assistência. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} JFQ Assistência Técnica. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
             <Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
             <span>|</span>
