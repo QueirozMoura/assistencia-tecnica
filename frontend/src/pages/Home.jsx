@@ -93,7 +93,7 @@ const categoryCards = [
     subtitle: "Secagem rápida e eficiente",
     to: "/catalogo?categoria=centrifugas",
     image: catCentrifuga,
-    span: "lg:col-span-2",
+    span: "",
     textSize: "text-lg",
   },
   {
@@ -261,32 +261,53 @@ export default function Home() {
             title="Compre por Categoria"
             subtitle="Encontre o equipamento ideal para a sua necessidade com os melhores preços e condições."
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:h-[520px]">
-            {categoryCards.map((cat) => (
-              <Link
-                key={cat.title}
-                to={cat.to}
-                className={`relative overflow-hidden rounded-2xl group ${cat.span}`}
-              >
-                <img
-                  src={cat.image}
-                  alt={cat.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 min-h-[200px]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001e40]/80 via-[#001e40]/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-5">
-                  <h3
-                    className={`font-bold text-white ${cat.textSize} leading-tight`}
-                  >
-                    {cat.title}
-                  </h3>
-                  <p className="text-[#a7c8ff] text-sm mt-1">{cat.subtitle}</p>
-                  <div className="flex items-center gap-1 text-white text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Ver produtos <ArrowRight size={12} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-3 lg:gap-4 lg:h-[500px]">
+            {categoryCards.map((cat, i) => {
+              const featured = i === 0;
+              return (
+                <Link
+                  key={cat.title}
+                  to={cat.to}
+                  className={`group relative overflow-hidden rounded-2xl border border-[#e5e8ee] bg-[#f1f4f9] shadow-[0_1px_3px_rgba(0,51,102,0.08)] transition-shadow duration-300 hover:shadow-[0_14px_30px_-14px_rgba(0,51,102,0.4)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0070ea] ${
+                    featured
+                      ? "col-span-2 h-[220px] sm:h-[280px] lg:col-span-2 lg:row-span-2 lg:h-auto"
+                      : "h-[160px] sm:h-[190px] lg:h-auto"
+                  }`}
+                >
+                  <img
+                    src={cat.image}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#001e40]/85 via-[#001e40]/25 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-5">
+                    <div className="min-w-0">
+                      <h3
+                        className={`font-bold leading-tight text-white ${
+                          featured ? "text-xl sm:text-2xl lg:text-3xl" : "text-base sm:text-lg"
+                        }`}
+                      >
+                        {cat.title}
+                      </h3>
+                      <p
+                        className={`mt-1 text-sm leading-snug text-[#d6e6ff] ${
+                          featured ? "" : "hidden sm:block"
+                        } line-clamp-2`}
+                      >
+                        {cat.subtitle}
+                      </p>
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white text-[#003366] shadow-sm transition-colors group-hover:bg-[#0070ea] group-hover:text-white"
+                    >
+                      <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                    </span>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
