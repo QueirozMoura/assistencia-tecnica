@@ -6,7 +6,8 @@ import { cartTotal } from '../utils/cart'
 import { clientCreatePedidoComPagamento } from '../services/clientApi'
 import { formatPrice } from '../utils/formatPrice'
 import { useFreteQuote } from '../hooks/useFreteQuote'
-import { formatCep, isCepValido } from '../utils/frete'
+import { formatCep, isCepValido, normalizarTexto, somenteDigitosCep } from '../utils/frete'
+import { consultarCep } from '../services/viaCep'
 
 function FreteLinha({ quote }) {
   if (quote.status === 'ok') {
@@ -136,7 +137,7 @@ function CustomerForm({ customer, onChange, fieldErrors }) {
   )
 }
 
-function AddressForm({ address, onChange, fieldErrors, quote }) {
+function AddressForm({ address, onChange, onCepChange, fieldErrors, quote, cepLookup, cepDivergente }) {
   const getInputClassName = (field) =>
     `h-11 px-3 rounded-xl border bg-white outline-none ${
       fieldErrors[field] ? 'border-[#d14343] focus:border-[#d14343]' : 'border-[#c3c6d1] focus:border-[#0070ea]'
@@ -151,7 +152,7 @@ function AddressForm({ address, onChange, fieldErrors, quote }) {
           <input
             type="text"
             value={address.cep}
-            onChange={(e) => onChange('cep', formatCep(e.target.value))}
+            onChange={(e) => onCepChange(e.target.value)}
             className={getInputClassName('cep')}
             placeholder="00000-000"
             inputMode="numeric"
@@ -162,7 +163,24 @@ function AddressForm({ address, onChange, fieldErrors, quote }) {
           {!fieldErrors.cep && address.cep && !isCepValido(address.cep) ? (
             <span className="text-xs text-[#737780]">Digite os 8 números do CEP.</span>
           ) : null}
-          {!fieldErrors.cep && quote?.status === 'ok' ? (
+          {!fieldErrors.cep && cepLookup?.status === 'loading' ? (
+            <span className="text-xs text-[#737780]">Buscando endereço...</span>
+          ) : null}
+          {!fieldErrors.cep && cepLookup?.status === 'found' && !cepDivergente ? (
+            <span className="text-xs text-[#43474f]">Endereço preenchido pelo CEP. Informe o número e confira os dados.</span>
+          ) : null}
+          {!fieldErrors.cep && cepLookup?.status === 'notfound' ? (
+            <span className="text-xs text-[#a33a3a]">CEP não encontrado na consulta. Confira os números ou preencha o endereço manualmente.</span>
+          ) : null}
+          {!fieldErrors.cep && cepLookup?.status === 'error' ? (
+            <span className="text-xs text-[#737780]">Não foi possível consultar o endereço agora. Preencha os campos manualmente.</span>
+          ) : null}
+          {cepDivergente ? (
+            <span className="text-xs text-[#d14343]">
+              A consulta de CEP indica {cepLookup.endereco.cidade}/{cepLookup.endereco.estado}, diferente do município atendido para este CEP ({quote.data.cidade}). Confira o CEP.
+            </span>
+          ) : null}
+          {!fieldErrors.cep && quote?.status === 'ok' && !cepDivergente ? (
             <span className="text-xs text-[#1a6b3c]">
               Entregamos neste CEP{quote.data.municipio ? ` (${quote.data.municipio})` : ''}.
             </span>
@@ -299,6 +317,69 @@ export default function Checkout() {
   const freteQuote = useFreteQuote(address.cep, items)
   const freteOk = freteQuote.status === 'ok'
 
+  // Consulta de CEP (ViaCEP): apenas preenche o endereço. A cobertura é decidida pelo backend; aqui só
+  // BLOQUEAMOS quando a consulta indica um município diferente do atendido para o CEP (nunca autorizamos).
+  const [cepLookup, setCepLookup] = useState({ status: 'idle', cep: '', endereco: null })
+  const cepLookupSeq = useRef(0)
+  const autoPreenchido = useRef({}) // valores preenchidos pela consulta (para limpar se o CEP mudar)
+  const cepDigitos = somenteDigitosCep(address.cep)
+  const lookupAtual = cepLookup.cep === cepDigitos ? cepLookup : { status: 'idle', cep: '', endereco: null }
+  const cepDivergente =
+    lookupAtual.status === 'found' &&
+    freteOk &&
+    Boolean(freteQuote.data?.cidade) &&
+    Boolean(lookupAtual.endereco?.cidade) &&
+    normalizarTexto(lookupAtual.endereco.cidade) !== normalizarTexto(freteQuote.data.cidade)
+
+  const handleCepChange = (value) => {
+    const formatado = formatCep(value)
+    // Ao mudar o CEP, remove os campos que a consulta anterior preencheu e o cliente não alterou,
+    // para não manter rua/bairro/cidade de outro CEP.
+    const anterior = autoPreenchido.current
+    autoPreenchido.current = {}
+    setAddress((prev) => {
+      const next = { ...prev, cep: formatado }
+      for (const campo of ['rua', 'bairro', 'cidade', 'estado']) {
+        if (anterior[campo] && prev[campo] === anterior[campo]) next[campo] = ''
+      }
+      return next
+    })
+    setFieldErrors((prev) => {
+      if (!prev.cep) return prev
+      const next = { ...prev }
+      delete next.cep
+      return next
+    })
+
+    const digitos = somenteDigitosCep(formatado)
+    const seq = ++cepLookupSeq.current
+    if (digitos.length !== 8) {
+      setCepLookup({ status: 'idle', cep: '', endereco: null })
+      return
+    }
+    setCepLookup({ status: 'loading', cep: digitos, endereco: null })
+    consultarCep(digitos).then((resultado) => {
+      if (seq !== cepLookupSeq.current) return // CEP mudou durante a consulta
+      setCepLookup({ status: resultado.status, cep: digitos, endereco: resultado.endereco ?? null })
+      if (resultado.status !== 'found') return
+      const { rua, bairro, cidade, estado } = resultado.endereco
+      autoPreenchido.current = { rua, bairro, cidade, estado }
+      // Preenche só o que a consulta retornou; número e complemento continuam manuais.
+      setAddress((prev) => ({
+        ...prev,
+        rua: rua || prev.rua,
+        bairro: bairro || prev.bairro,
+        cidade: cidade || prev.cidade,
+        estado: estado || prev.estado,
+      }))
+      setFieldErrors((prev) => {
+        const next = { ...prev }
+        for (const campo of ['rua', 'bairro', 'cidade', 'estado']) delete next[campo]
+        return next
+      })
+    })
+  }
+
   const handleCustomerChange = (field, value) => {
     setCustomer((prev) => ({ ...prev, [field]: value }))
     setFieldErrors((prev) => {
@@ -386,6 +467,12 @@ export default function Checkout() {
       return
     }
 
+    if (cepDivergente) {
+      setFieldErrors({ cep: 'CEP diverge do município atendido.' })
+      setErrorMessage('A consulta de CEP indica outro município. Confira o CEP informado.')
+      return
+    }
+
     if (!freteOk) {
       setErrorMessage(
         freteQuote.status === 'unavailable'
@@ -461,7 +548,7 @@ export default function Checkout() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <section className="xl:col-span-2 space-y-6">
             <CustomerForm customer={customer} onChange={handleCustomerChange} fieldErrors={fieldErrors} />
-            <AddressForm address={address} onChange={handleAddressChange} fieldErrors={fieldErrors} quote={freteQuote} />
+            <AddressForm address={address} onChange={handleAddressChange} onCepChange={handleCepChange} fieldErrors={fieldErrors} quote={freteQuote} cepLookup={lookupAtual} cepDivergente={cepDivergente} />
 
             <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
               <h2 className="text-lg font-bold text-[#003366] mb-4">Observações</h2>
@@ -499,13 +586,16 @@ export default function Checkout() {
               <button
                 type="button"
                 onClick={handleProceed}
-                disabled={cartIsEmpty || isSubmitting || !freteOk}
+                disabled={cartIsEmpty || isSubmitting || !freteOk || cepDivergente}
                 className={`w-full h-11 rounded-xl text-white font-semibold transition-colors ${
-                  cartIsEmpty || isSubmitting || !freteOk ? 'bg-[#9aa0a9] cursor-not-allowed' : 'bg-[#0070ea] hover:bg-[#0059bb]'
+                  cartIsEmpty || isSubmitting || !freteOk || cepDivergente ? 'bg-[#9aa0a9] cursor-not-allowed' : 'bg-[#0070ea] hover:bg-[#0059bb]'
                 }`}
               >
                 {isSubmitting ? 'Processando...' : 'Ir para Pagamento'}
               </button>
+              {!cartIsEmpty && cepDivergente && !isSubmitting ? (
+                <p className="text-xs text-[#d14343] text-center">Confira o CEP: a consulta indica outro município.</p>
+              ) : null}
               {!cartIsEmpty && !freteOk && !isSubmitting ? (
                 <p className="text-xs text-[#737780] text-center">
                   {freteQuote.status === 'unavailable'

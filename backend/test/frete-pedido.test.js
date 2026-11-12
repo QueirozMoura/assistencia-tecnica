@@ -16,6 +16,7 @@ const freteRouter = (await import("../src/routes/frete.routes.js")).default;
 const orderRouter = (await import("../src/routes/pedido.routes.js")).default;
 
 const CEP_OK = "01310-100"; // São Paulo (capital)
+const END = { cidade: "São Paulo", estado: "SP" }; // endereço coerente com CEP_OK
 const CEP_FORA = "09600-000"; // São Bernardo do Campo: fora da cobertura
 const customer = { id: 1, nome: "Cliente fictício", email: "frete@example.invalid" };
 const originalFetch = globalThis.fetch;
@@ -202,7 +203,7 @@ const somaMP = (body) => body.items.reduce((sum, item) => sum + Math.round(item.
 test("pedido com pagamento: abaixo de R$ 799 grava frete de R$ 50 e envia linha de frete ao Mercado Pago", async () => {
   await comMercadoPago(async () => {
     const c = prepararCheckout();
-    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 2, quantidade: 1 }, { produtoId: 3, quantidade: 1 }] });
+    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...END, cep: CEP_OK, itens: [{ produtoId: 2, quantidade: 1 }, { produtoId: 3, quantidade: 1 }] });
     // 299,99 (promocional) + 99,99 = 399,98 + 50,00
     assert.equal(c.pedido.valorFrete, 50);
     assert.equal(c.pedido.valorTotal, 449.98);
@@ -215,7 +216,7 @@ test("pedido com pagamento: abaixo de R$ 799 grava frete de R$ 50 e envia linha 
 test("pedido com pagamento: igual a R$ 799,00 ainda cobra frete", async () => {
   await comMercadoPago(async () => {
     const c = prepararCheckout();
-    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 6, quantidade: 1 }] });
+    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...END, cep: CEP_OK, itens: [{ produtoId: 6, quantidade: 1 }] });
     assert.equal(c.pedido.valorFrete, 50);
     assert.equal(c.pedido.valorTotal, 849);
     assert.equal(somaMP(c.preferencia), 84900);
@@ -225,7 +226,7 @@ test("pedido com pagamento: igual a R$ 799,00 ainda cobra frete", async () => {
 test("pedido com pagamento: acima de R$ 799,00 tem frete grátis e não envia linha de frete", async () => {
   await comMercadoPago(async () => {
     const c = prepararCheckout();
-    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: "06000-000", itens: [{ produtoId: 1, quantidade: 2 }] });
+    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cidade: "Osasco", estado: "SP", cep: "06000-000", itens: [{ produtoId: 1, quantidade: 2 }] });
     assert.equal(c.pedido.valorFrete, 0);
     assert.equal(c.pedido.valorTotal, 1000);
     assert.equal(c.preferencia.items.length, 1);
@@ -238,7 +239,7 @@ test("pedido com pagamento: ignora total/frete/preço enviados pelo cliente", as
   await comMercadoPago(async () => {
     const c = prepararCheckout();
     await orders.criarPedidoComPagamento({
-      clienteAutenticadoId: 1, cep: CEP_OK, valorTotal: 1, valorFrete: 0, subtotal: 1,
+      clienteAutenticadoId: 1, ...END, cep: CEP_OK, valorTotal: 1, valorFrete: 0, subtotal: 1,
       itens: [{ produtoId: 3, quantidade: 1, precoUnitario: 0.01 }],
     });
     assert.equal(c.pedido.valorFrete, 50);
@@ -262,8 +263,8 @@ test("pedido: CEP fora da cobertura ou inválido é recusado antes de criar pedi
 test("pedido: produto indisponível continua sendo recusado", async () => {
   await comMercadoPago(async () => {
     prepararCheckout();
-    await assert.rejects(() => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 4, quantidade: 1 }] }), { statusCode: 400, message: /inativo/ });
-    await assert.rejects(() => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 5, quantidade: 1 }] }), { statusCode: 400, message: /Estoque insuficiente/ });
+    await assert.rejects(() => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...END, cep: CEP_OK, itens: [{ produtoId: 4, quantidade: 1 }] }), { statusCode: 400, message: /inativo/ });
+    await assert.rejects(() => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...END, cep: CEP_OK, itens: [{ produtoId: 5, quantidade: 1 }] }), { statusCode: 400, message: /Estoque insuficiente/ });
   });
 });
 
@@ -275,7 +276,7 @@ test("pedido sem pagamento (legado) também inclui frete no total", async () => 
     pedido: { create: async ({ data }) => { salvo = data; return { id: 1, ...data }; } },
     $queryRaw: async () => [{ count: 1 }],
   }));
-  await orders.criarPedido({ clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 1 }] });
+  await orders.criarPedido({ clienteAutenticadoId: 1, ...END, cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 1 }] });
   assert.equal(salvo.valorFrete, 50);
   assert.equal(salvo.valorTotal, 149.99);
 });
@@ -284,7 +285,7 @@ test("pedido sem pagamento (legado) também inclui frete no total", async () => 
 test("idempotência: repetir a mesma chave retorna o pedido existente sem recalcular nem criar outro", async () => {
   await comMercadoPago(async () => {
     const { creationIdentity } = await import("../src/services/orderCreation.service.js");
-    const dados = { clienteAutenticadoId: 1, cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
+    const dados = { clienteAutenticadoId: 1, ...END, cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
     const existente = { id: 55, status: "PENDENTE", paymentStatus: "PENDING", checkoutInitPoint: "https://mp.example/ck", paidAt: null,
       creationHash: creationIdentity({ ...dados, cep: "01310100" }, true).hash, valorFrete: 50, valorTotal: 149.99 };
     stub(prisma.pedido, "findFirst", async () => existente);
@@ -302,7 +303,7 @@ test("idempotência: repetir a mesma chave retorna o pedido existente sem recalc
 
 test("idempotência: mesma chave com outro CEP é conflito (409)", async () => {
   const { creationIdentity } = await import("../src/services/orderCreation.service.js");
-  const original = { cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
+  const original = { ...END, cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
   stub(prisma.pedido, "findFirst", async () => ({ id: 55, creationHash: creationIdentity({ ...original, cep: "01310100" }, true).hash }));
   await assert.rejects(
     () => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...original, cep: "02000-000" }),
@@ -405,4 +406,80 @@ test("limites: cotação e pedido aceitam até 50 produtos distintos e 999 unida
   assert.equal(pedidoSchema.safeParse({ ...pedido, itens: itens(50) }).success, true);
   assert.equal(pedidoSchema.safeParse({ ...pedido, itens: itens(51) }).success, false);
   assert.equal(pedidoSchema.safeParse({ ...pedido, itens: [{ produtoId: 1, quantidade: 1000 }] }).success, false);
+});
+
+// ---------------------------------------------------------------- Etapa 4.3.7 (CEP x cidade x estado)
+test("endereço: cidade e estado precisam corresponder ao município do CEP (cobertura do backend)", async () => {
+  const { validarEnderecoDeEntrega } = await import("../src/services/resumoPedido.service.js");
+  const ok = (cep, cidade, estado) => validarEnderecoDeEntrega({ cep, cidade, estado });
+  assert.deepEqual(ok("01310-100", "São Paulo", "SP"), { cidade: "São Paulo", uf: "SP" });
+  assert.deepEqual(ok("01310100", "  sao   paulo ", "sp"), { cidade: "São Paulo", uf: "SP" }); // acento, caixa e espaços
+  assert.deepEqual(ok("01310100", "SÃO PAULO", "São Paulo"), { cidade: "São Paulo", uf: "SP" }); // nome do estado
+  assert.deepEqual(ok("06010-000", "Osasco", "SP"), { cidade: "Osasco", uf: "SP" });
+  assert.deepEqual(ok("06800-100", "Embu", "SP"), { cidade: "Embu das Artes", uf: "SP" }); // grafia alternativa configurada
+  assert.deepEqual(ok("09010-000", "Santo Andre", "SP"), { cidade: "Santo André", uf: "SP" });
+  assert.deepEqual(ok("06760-000", "Taboão da Serra", "SP"), { cidade: "Taboão da Serra", uf: "SP" });
+});
+
+test("endereço: divergências são recusadas com ENDERECO_DIVERGENTE (CEP coberto + cidade/estado de fora)", async () => {
+  const { validarEnderecoDeEntrega } = await import("../src/services/resumoPedido.service.js");
+  const falha = (dados) => assert.throws(() => validarEnderecoDeEntrega(dados), { statusCode: 400, code: "ENDERECO_DIVERGENTE" });
+  falha({ cep: "01310-100", cidade: "Campinas", estado: "SP" }); // CEP de São Paulo com outra cidade
+  falha({ cep: "01310-100", cidade: "Osasco", estado: "SP" }); // outra cidade coberta, mas não a do CEP
+  falha({ cep: "06010-000", cidade: "São Paulo", estado: "SP" }); // CEP de Osasco informado como São Paulo
+  falha({ cep: "01310-100", cidade: "São Paulo", estado: "RJ" }); // estado divergente
+  falha({ cep: "06800-100", cidade: "Embu-Guaçu", estado: "SP" }); // município vizinho com nome parecido
+  falha({ cep: "01310-100", cidade: "São Paulo" }); // estado ausente
+  falha({ cep: "01310-100", estado: "SP" }); // cidade ausente
+  falha({ cep: "01310-100", cidade: "São Paulo de Outro", estado: "SP" });
+  const msg = (() => { try { validarEnderecoDeEntrega({ cep: "01310100", cidade: "Campinas", estado: "SP" }); } catch (e) { return e.message; } })();
+  assert.match(msg, /01310-100 pertence a São Paulo\/SP/);
+});
+
+test("endereço: CEP fora da cobertura continua sendo recusado, mesmo com cidade 'coberta' informada", async () => {
+  const { validarEnderecoDeEntrega } = await import("../src/services/resumoPedido.service.js");
+  assert.throws(() => validarEnderecoDeEntrega({ cep: CEP_FORA, cidade: "São Paulo", estado: "SP" }), { statusCode: 400, code: "ENTREGA_INDISPONIVEL" });
+  assert.throws(() => validarEnderecoDeEntrega({ cep: "abc", cidade: "São Paulo", estado: "SP" }), { statusCode: 400, code: "CEP_INVALIDO" });
+});
+
+test("pedido: endereço divergente é recusado antes de criar pedido, reservar estoque ou chamar o Mercado Pago", async () => {
+  await comMercadoPago(async () => {
+    const capturado = prepararCheckout();
+    const base = { clienteAutenticadoId: 1, cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 1 }] };
+    for (const fn of [orders.criarPedidoComPagamento, orders.criarPedido]) {
+      await assert.rejects(() => fn({ ...base, cidade: "Campinas", estado: "SP" }), { statusCode: 400, code: "ENDERECO_DIVERGENTE" });
+      await assert.rejects(() => fn({ ...base, cidade: "São Paulo", estado: "MG" }), { statusCode: 400, code: "ENDERECO_DIVERGENTE" });
+      await assert.rejects(() => fn(base), { statusCode: 400, code: "ENDERECO_DIVERGENTE" }); // sem cidade/estado
+    }
+    assert.equal(capturado.pedido, null, "nenhum pedido criado");
+    assert.equal(capturado.fetchCalls, 0, "Mercado Pago não chamado");
+  });
+});
+
+test("pedido: endereço correto mantém frete, total e soma do Mercado Pago (cidade com grafia alternativa)", async () => {
+  await comMercadoPago(async () => {
+    const capturado = prepararCheckout();
+    await orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, cep: "06800-100", cidade: "Embu", estado: "sp", itens: [{ produtoId: 3, quantidade: 1 }] });
+    assert.equal(capturado.pedido.valorFrete, 50);
+    assert.equal(capturado.pedido.valorTotal, 149.99);
+    assert.equal(somaMP(capturado.preferencia), Math.round(capturado.pedido.valorTotal * 100));
+  });
+});
+
+test("idempotência: cidade/estado fazem parte da intenção (mesma chave com outra cidade é conflito)", async () => {
+  const { creationIdentity } = await import("../src/services/orderCreation.service.js");
+  const original = { ...END, cep: "01310100", creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
+  stub(prisma.pedido, "findFirst", async () => ({ id: 55, creationHash: creationIdentity(original, true).hash }));
+  // Mesma chave com cidade diferente-mas-válida para o CEP (grafia alternativa) é outra intenção: 409, sem recriar.
+  await assert.rejects(
+    () => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...original, cidade: "SAO PAULO" }),
+    { statusCode: 409 },
+  );
+});
+
+test("cotação: resposta inclui cidade/uf canônicas do CEP (usadas pelo frontend para conferir o endereço)", async () => {
+  stubProdutos();
+  const r = await cotarFrete({ cep: "06010-000", itens: [{ produtoId: 3, quantidade: 1 }] });
+  assert.equal(r.cidade, "Osasco");
+  assert.equal(r.uf, "SP");
 });

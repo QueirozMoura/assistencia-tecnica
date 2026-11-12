@@ -15,6 +15,17 @@ export function normalizarCep(cep) {
   return match ? `${match[1]}${match[2]}` : null;
 }
 
+/** Compara nomes ignorando acentos, maiúsculas, pontuação e espaços repetidos ("São Paulo" = "sao  paulo."). */
+export function normalizarTexto(valor) {
+  if (typeof valor !== "string") return "";
+  return valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 /** Converte um valor em reais (number ou string decimal) para centavos inteiros, ou null se inválido. */
 export function reaisParaCentavos(valor) {
   if (typeof valor === "string" && !/^\d+(\.\d{1,2})?$/.test(valor.trim())) return null;
@@ -60,6 +71,8 @@ export function calcularFrete({ cep, subtotal, faixas = FAIXAS_CEP_ATENDIDAS } =
     ok: true,
     cep: cepNormalizado,
     municipio: faixa.municipio ?? null,
+    cidade: faixa.cidade ?? null,
+    uf: faixa.uf ?? null,
     valorCentavos,
     valor: valorCentavos / 100,
     gratis,

@@ -4,6 +4,11 @@
  * Formato de cada faixa: CEP com 8 dígitos, sem hífen, limites inclusivos.
  *   { inicio: "01000000", fim: "05999999", municipio: "São Paulo (capital)" }
  * Para um CEP único, use inicio igual a fim.
+ * `cidade` e `uf` identificam o município da faixa e são usados para conferir o endereço informado
+ * no pedido (cidade/estado precisam corresponder ao CEP). `aliases` (opcional) lista grafias
+ * alternativas comuns do município; a comparação ignora acentos, maiúsculas e pontuação.
+ * Isto é a ÚNICA fonte de verdade da cobertura: consultas externas de CEP (ViaCEP) só ajudam o
+ * preenchimento no frontend e nunca autorizam entrega.
  *
  * MUNICÍPIOS ATENDIDOS (confirmados pela JFQ): São Paulo (capital), Osasco,
  * Taboão da Serra, Embu das Artes e Santo André. Nenhum outro município
@@ -41,10 +46,10 @@
  *     precisariam ser removidos ou excluídos aqui (não há informação sobre isso).
  */
 export const FAIXAS_CEP_ATENDIDAS = [
-  { inicio: "01000000", fim: "05999999", municipio: "São Paulo (capital)" },
-  { inicio: "08000000", fim: "08499999", municipio: "São Paulo (capital)" },
-  { inicio: "06000000", fim: "06299999", municipio: "Osasco" },
-  { inicio: "06750000", fim: "06799999", municipio: "Taboão da Serra" },
-  { inicio: "06800000", fim: "06849999", municipio: "Embu das Artes" },
-  { inicio: "09000000", fim: "09299999", municipio: "Santo André" },
+  { inicio: "01000000", fim: "05999999", municipio: "São Paulo (capital)", cidade: "São Paulo", uf: "SP" },
+  { inicio: "08000000", fim: "08499999", municipio: "São Paulo (capital)", cidade: "São Paulo", uf: "SP" },
+  { inicio: "06000000", fim: "06299999", municipio: "Osasco", cidade: "Osasco", uf: "SP" },
+  { inicio: "06750000", fim: "06799999", municipio: "Taboão da Serra", cidade: "Taboão da Serra", uf: "SP" },
+  { inicio: "06800000", fim: "06849999", municipio: "Embu das Artes", cidade: "Embu das Artes", uf: "SP", aliases: ["Embu"] },
+  { inicio: "09000000", fim: "09299999", municipio: "Santo André", cidade: "Santo André", uf: "SP" },
 ];

@@ -339,7 +339,7 @@ test("order total ignores client price/total and conditionally reserves stock in
     pedido: { create: async ({ data }) => { saved = data; return { id: 1, ...data }; } },
     $queryRaw: async (sql, id, source) => { assert.equal(id, 1); assert.equal(source, "CRIACAO_LEGADO"); return [{ count: 1 }]; },
   }));
-  await orders.criarPedido({ clienteId: 99, clienteAutenticadoId: 1, cep: "01310-100", itens: [{ produtoId: 1, quantidade: 3, precoUnitario: 0.01 }], valorTotal: 0.03, valorFrete: 0 });
+  await orders.criarPedido({ clienteId: 99, clienteAutenticadoId: 1, cep: "01310-100", cidade: "São Paulo", estado: "SP", itens: [{ produtoId: 1, quantidade: 3, precoUnitario: 0.01 }], valorTotal: 0.03, valorFrete: 0 });
   assert.equal(saved.clienteId, 1);
   // Subtotal 3 x 10,10 = 30,30 (abaixo de R$ 799) + frete fixo de R$ 50,00; frete e total enviados pelo cliente são ignorados.
   assert.equal(saved.valorFrete, 50);
@@ -381,7 +381,7 @@ test("Mercado Pago checkout uses authenticated identity and server prices in the
       assert.equal(body.payer.email, customer.email);
       return { ok: true, status: 201, json: async () => ({ id: "fixture-preference", init_point: "https://www.mercadopago.com.br/checkout/fixture" }) };
     };
-    const result = await orders.criarPedidoComPagamento({ clienteId: 999, clienteAutenticadoId: 1, cep: "01310-100", valorTotal: 0.03, valorFrete: 0, itens: [{ produtoId: 1, quantidade: 3, precoUnitario: 0.01 }] });
+    const result = await orders.criarPedidoComPagamento({ clienteId: 999, clienteAutenticadoId: 1, cep: "01310-100", cidade: "São Paulo", estado: "SP", valorTotal: 0.03, valorFrete: 0, itens: [{ produtoId: 1, quantidade: 3, precoUnitario: 0.01 }] });
     assert.equal(saved.clienteId, 1);
     assert.equal(saved.valorFrete, 50);
     assert.equal(saved.valorTotal, 80.3);
@@ -510,7 +510,7 @@ test("creation key cannot be reused after changing item quantities", async () =>
   await assert.rejects(() => orders.criarPedido({ clienteAutenticadoId: 1, creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] }), { statusCode: 409 });
 });
 test("new order writes explicit ledger version and intent identity before its single debit", async () => {
-  const data = { clienteAutenticadoId: 1, cep: "01310-100", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] };
+  const data = { clienteAutenticadoId: 1, cep: "01310-100", cidade: "São Paulo", estado: "SP", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] };
   stub(prisma.pedido, "findFirst", async () => null);
   stub(prisma.cliente, "findUnique", async () => customer);
   stub(prisma.produto, "findMany", async () => [{ id: 1, ativo: true, estoque: 1, preco: 5 }]);
@@ -529,11 +529,11 @@ test("concurrent intent retry rechecks under lock before creating order", async 
   stub(prisma.cliente, "findUnique", async () => customer);
   // A previous in-flight identical request may already have consumed all availability.
   stub(prisma.produto, "findMany", async () => [{ id: 1, ativo: true, estoque: 0, preco: 5 }]);
-  const request = { clienteAutenticadoId: 1, cep: "01310-100", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] };
+  const request = { clienteAutenticadoId: 1, cep: "01310-100", cidade: "São Paulo", estado: "SP", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] };
   const { creationIdentity } = await import("../src/services/orderCreation.service.js");
   const order = { id: 77, creationHash: creationIdentity({ ...request, cep: "01310100" }, false).hash }; // CEP normalizado para 8 dígitos
   stub(prisma, "$transaction", async callback => callback({ $queryRaw: async () => [{ locked: 1 }], pedido: { findFirst: async () => order } }));
-  assert.equal(await orders.criarPedido({ clienteAutenticadoId: 1, cep: "01310-100", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] }), order);
+  assert.equal(await orders.criarPedido({ clienteAutenticadoId: 1, cep: "01310-100", cidade: "São Paulo", estado: "SP", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] }), order);
 });
 test("orders with persistent stock evidence cannot be deleted via admin service", async () => {
   stub(prisma.pedido, "findUnique", async () => ({ id: 1, status: 'CANCELADO', itens: [] }));

@@ -4,7 +4,7 @@ import { assertOrderTransition, assertOrderPayable, assertOrderCancellable } fro
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
-import { exigirFrete, precoUnitarioDoProduto } from "./resumoPedido.service.js";
+import { exigirFrete, precoUnitarioDoProduto, validarEnderecoDeEntrega } from "./resumoPedido.service.js";
 import { normalizarCep } from "./frete.service.js";
 import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
 import {
@@ -152,6 +152,9 @@ export async function criarPedido(dadosOriginais) {
   const previous = await findCreation(prisma, clienteId, identity);
   if (previous) return previous;
 
+  // Endereço coerente com a cobertura configurada (CEP x cidade x estado); não depende de API externa.
+  validarEnderecoDeEntrega({ cep, cidade, estado });
+
 
   // Verificar cliente
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
@@ -262,6 +265,9 @@ export async function criarPedidoComPagamento(dadosOriginais) {
   const identity = creationIdentity(dados, true);
   const previous = await findCreation(prisma, clienteId, identity);
   if (previous) return prisma.$transaction(tx => replayCheckout(tx, previous));
+
+  // Endereço coerente com a cobertura configurada (CEP x cidade x estado); não depende de API externa.
+  validarEnderecoDeEntrega({ cep, cidade, estado });
 
 
   const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });

@@ -41,3 +41,11 @@ test('resumoValoresPedido trata pedidos antigos sem valorFrete e valores inváli
   assert.deepEqual(resumoValoresPedido({ valorTotal: 100, valorFrete: 500 }), { subtotal: 100, frete: 0, total: 100 })
   assert.deepEqual(resumoValoresPedido(null), { subtotal: 0, frete: 0, total: 0 })
 })
+
+import { normalizarTexto } from '../src/utils/frete.js'
+
+test('normalizarTexto ignora acentos, caixa, pontuação e espaços repetidos', () => {
+  assert.equal(normalizarTexto('  São   Paulo. '), 'sao paulo')
+  assert.equal(normalizarTexto('SANTO ANDRÉ'), normalizarTexto('Santo Andre'))
+  assert.equal(normalizarTexto(null), '')
+})

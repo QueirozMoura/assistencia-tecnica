@@ -1,6 +1,9 @@
 import prisma from "../config/prisma.js";
 import {
   calcularFrete,
+  buscarFaixaCoberta,
+  normalizarCep,
+  normalizarTexto,
   reaisParaCentavos,
   LIMITE_FRETE_GRATIS_CENTAVOS,
   MOTIVO_CEP_INVALIDO,
@@ -28,6 +31,44 @@ const MENSAGENS_FRETE = {
 export function mensagemFrete(motivo) {
   const mensagem = MENSAGENS_FRETE[motivo];
   return typeof mensagem === "function" ? mensagem() : mensagem || "Não foi possível calcular o frete.";
+}
+
+const NOMES_ESTADO = { SP: ["sp", "sao paulo"] };
+
+/**
+ * Confere se cidade e estado informados correspondem ao município do CEP, segundo a cobertura configurada
+ * no backend (nunca uma consulta externa). Lança 400 quando o CEP não é atendido ou há divergência, para
+ * que um CEP coberto não seja usado para entregar em endereço de outro município.
+ * @returns {{ cidade: string, uf: string }} município canônico do CEP
+ */
+export function validarEnderecoDeEntrega({ cep, cidade, estado }) {
+  const cepNormalizado = normalizarCep(cep);
+  if (!cepNormalizado) {
+    throw Object.assign(new Error(mensagemFrete(MOTIVO_CEP_INVALIDO)), { statusCode: 400, code: MOTIVO_CEP_INVALIDO });
+  }
+  const faixa = buscarFaixaCoberta(cepNormalizado);
+  if (!faixa) {
+    throw Object.assign(new Error(mensagemFrete(MOTIVO_ENTREGA_INDISPONIVEL)), {
+      statusCode: 400,
+      code: MOTIVO_ENTREGA_INDISPONIVEL,
+    });
+  }
+
+  const cidadeInformada = normalizarTexto(cidade);
+  const estadoInformado = normalizarTexto(estado);
+  const nomesCidade = [faixa.cidade, ...(faixa.aliases ?? [])].map(normalizarTexto);
+  const nomesEstado = NOMES_ESTADO[faixa.uf] ?? [normalizarTexto(faixa.uf)];
+
+  if (!cidadeInformada || !estadoInformado || !nomesCidade.includes(cidadeInformada) || !nomesEstado.includes(estadoInformado)) {
+    throw Object.assign(
+      new Error(
+        `Cidade ou estado não correspondem ao CEP informado. O CEP ${cepNormalizado.slice(0, 5)}-${cepNormalizado.slice(5)} pertence a ${faixa.cidade}/${faixa.uf}.`,
+      ),
+      { statusCode: 400, code: "ENDERECO_DIVERGENTE" },
+    );
+  }
+
+  return { cidade: faixa.cidade, uf: faixa.uf };
 }
 
 /**
@@ -104,6 +145,8 @@ export async function cotarFrete({ cep, itens }, db = prisma) {
     cep: frete.cep,
     entregaDisponivel: true,
     municipio: frete.municipio,
+    cidade: frete.cidade,
+    uf: frete.uf,
     frete: frete.valor,
     total: (subtotalCentavos + frete.valorCentavos) / 100,
     freteGratis: frete.gratis,

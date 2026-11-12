@@ -46,3 +46,13 @@ export function resumoValoresPedido(pedido) {
     total: totalValido / 100,
   }
 }
+
+/** Normaliza nomes para comparação: sem acentos, minúsculas, sem pontuação ("São Paulo" = "sao paulo"). */
+export function normalizarTexto(valor) {
+  return String(valor ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}

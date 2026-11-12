@@ -6,7 +6,7 @@ import ErrorState from '../../../components/ui/ErrorState'
 import EmptyState from '../../../components/ui/EmptyState'
 import { adminUpdateStatusPedido, getPedidoById } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
-import { resumoValoresPedido } from '../../../utils/frete'
+import { formatCep, resumoValoresPedido } from '../../../utils/frete'
 
 function formatDateTime(date) {
   if (!date) return '—'
@@ -144,7 +144,7 @@ export default function PedidoDetail() {
             <div className="grid grid-cols-1 gap-2 text-sm text-[#334155] md:grid-cols-2">
               <p><span className="font-semibold">Nome:</span> {formatFallback(pedido?.entrega?.nomeDestinatario)}</p>
               <p><span className="font-semibold">Telefone:</span> {formatFallback(pedido?.entrega?.telefoneEntrega)}</p>
-              <p><span className="font-semibold">CEP:</span> {formatFallback(pedido?.entrega?.cep)}</p>
+              <p><span className="font-semibold">CEP:</span> {formatFallback(pedido?.entrega?.cep ? formatCep(pedido.entrega.cep) : null)}</p>
               <p><span className="font-semibold">Rua:</span> {formatFallback(pedido?.entrega?.rua)}</p>
               <p><span className="font-semibold">Número:</span> {formatFallback(pedido?.entrega?.numero)}</p>
               <p><span className="font-semibold">Complemento:</span> {formatFallback(pedido?.entrega?.complemento)}</p>
