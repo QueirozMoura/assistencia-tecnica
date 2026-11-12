@@ -52,6 +52,7 @@ export async function getDashboardStats() {
     prisma.pedido.aggregate({
       _sum: {
         valorTotal: true,
+        valorFrete: true,
       },
       where: {
         status: {
@@ -96,7 +97,12 @@ export async function getDashboardStats() {
         ENTREGUE:  pedidosStatus.ENTREGUE  ?? 0,
         CANCELADO: pedidosStatus.CANCELADO ?? 0,
       },
-     receitaTotal: Number(receitaTotal._sum.valorTotal ?? 0), 
+      // receitaTotal mantém o significado anterior (soma de valorTotal = produtos + frete).
+      // receitaProdutos e receitaFrete separam os dois componentes (produtos = total - frete).
+      receitaTotal: Math.round(Number(receitaTotal._sum.valorTotal ?? 0) * 100) / 100,
+      receitaProdutos:
+        Math.round((Number(receitaTotal._sum.valorTotal ?? 0) - Number(receitaTotal._sum.valorFrete ?? 0)) * 100) / 100,
+      receitaFrete: Math.round(Number(receitaTotal._sum.valorFrete ?? 0) * 100) / 100,
     },
     agendamentos: {
       total: totalAgendamentos,

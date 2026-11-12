@@ -108,10 +108,10 @@ test("cotação: CEP fora da cobertura informa entrega indisponível (sem frete 
 
 test("cotação: produto inativo, sem estoque ou inexistente é recusado", async () => {
   stubProdutos();
-  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 4, quantidade: 1 }] }), { statusCode: 400, message: /inativo/ });
-  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 5, quantidade: 1 }] }), { statusCode: 400, message: /Estoque insuficiente/ });
-  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 101 }] }), { statusCode: 400, message: /Estoque insuficiente/ });
-  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 999, quantidade: 1 }] }), { statusCode: 400, message: /inexistente/ });
+  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 4, quantidade: 1 }] }), { statusCode: 400, message: /indisponíveis/ });
+  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 5, quantidade: 1 }] }), { statusCode: 400, message: /indisponíveis/ });
+  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 101 }] }), { statusCode: 400, message: /indisponíveis/ });
+  await assert.rejects(() => cotarFrete({ cep: CEP_OK, itens: [{ produtoId: 999, quantidade: 1 }] }), { statusCode: 400, message: /indisponíveis/ });
 });
 
 // ---------------------------------------------------------------- endpoint /api/frete/cotacao
@@ -156,7 +156,7 @@ test("endpoint: CEP inválido e carrinho inválido retornam 400 sem consultar o 
 
 test("endpoint: schema aceita CEP com e sem hífen e descarta preços do cliente", () => {
   const ok = freteCotacaoSchema.parse({ cep: " 01310-100 ", itens: [{ produtoId: 1, quantidade: 1, precoUnitario: 1 }] });
-  assert.equal(ok.cep, "01310-100");
+  assert.equal(ok.cep, "01310100"); // sempre normalizado para 8 dígitos
   assert.deepEqual(ok.itens, [{ produtoId: 1, quantidade: 1 }]);
   assert.equal(freteCotacaoSchema.safeParse({ cep: "01310100", itens: [{ produtoId: 1, quantidade: 1 }] }).success, true);
 });
@@ -182,6 +182,7 @@ function prepararCheckout() {
   stubProdutos();
   stub(prisma, "$transaction", async (callback) => callback({
     pedido: {
+      findFirst: async () => null,
       create: async ({ data }) => { capturado.pedido = { id: 1, ...data }; return capturado.pedido; },
       update: async ({ data }) => ({ ...capturado.pedido, ...data }),
     },
@@ -285,7 +286,7 @@ test("idempotência: repetir a mesma chave retorna o pedido existente sem recalc
     const { creationIdentity } = await import("../src/services/orderCreation.service.js");
     const dados = { clienteAutenticadoId: 1, cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
     const existente = { id: 55, status: "PENDENTE", paymentStatus: "PENDING", checkoutInitPoint: "https://mp.example/ck", paidAt: null,
-      creationHash: creationIdentity(dados, true).hash, valorFrete: 50, valorTotal: 149.99 };
+      creationHash: creationIdentity({ ...dados, cep: "01310100" }, true).hash, valorFrete: 50, valorTotal: 149.99 };
     stub(prisma.pedido, "findFirst", async () => existente);
     stub(prisma.pedido, "findUnique", async () => existente);
     stub(prisma.checkoutAccessToken, "updateMany", async () => ({ count: 0 }));
@@ -302,7 +303,7 @@ test("idempotência: repetir a mesma chave retorna o pedido existente sem recalc
 test("idempotência: mesma chave com outro CEP é conflito (409)", async () => {
   const { creationIdentity } = await import("../src/services/orderCreation.service.js");
   const original = { cep: CEP_OK, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }] };
-  stub(prisma.pedido, "findFirst", async () => ({ id: 55, creationHash: creationIdentity(original, true).hash }));
+  stub(prisma.pedido, "findFirst", async () => ({ id: 55, creationHash: creationIdentity({ ...original, cep: "01310100" }, true).hash }));
   await assert.rejects(
     () => orders.criarPedidoComPagamento({ clienteAutenticadoId: 1, ...original, cep: "02000-000" }),
     { statusCode: 409 },
@@ -339,4 +340,69 @@ test("a rota de criação de pedido continua exigindo autenticação do cliente"
   stub(prisma.pedido, "create", async () => { throw new Error("Pedido não deveria ser criado sem autenticação"); });
   const res = await dispatch(orderRouter, "POST", "/com-pagamento", { cep: CEP_OK, itens: [{ produtoId: 3, quantidade: 1 }] });
   assert.equal(res.statusCode, 401);
+});
+
+// ---------------------------------------------------------------- Etapa 4.3.5 (correções da auditoria)
+test("cotação pública: erros de produto não revelam estoque nem nome de produto inativo", async () => {
+  stubProdutos();
+  const casos = [
+    [{ produtoId: 4, quantidade: 1 }], // inativo
+    [{ produtoId: 5, quantidade: 1 }], // sem estoque
+    [{ produtoId: 3, quantidade: 101 }], // acima do estoque (100)
+    [{ produtoId: 999, quantidade: 1 }], // inexistente
+  ];
+  const mensagens = [];
+  for (const itens of casos) {
+    try { await cotarFrete({ cep: CEP_OK, itens }); assert.fail("deveria recusar"); }
+    catch (erro) { mensagens.push(erro.message); assert.equal(erro.statusCode, 400); assert.equal(erro.code, "PRODUTO_INDISPONIVEL"); }
+  }
+  assert.equal(new Set(mensagens).size, 1, "mensagem idêntica para todos os casos (sem distinguir causa)");
+  for (const m of mensagens) { assert.doesNotMatch(m, /Inativo D|Sem estoque E|Peça C|\d/); }
+});
+
+test("CEP: pedidoSchema aceita com e sem hífen, normaliza para 8 dígitos e recusa formatos inválidos", async () => {
+  const { pedidoSchema } = await import("../src/validators/pedido.validator.js");
+  const base = { clienteId: 1, itens: [{ produtoId: 1, quantidade: 1 }], nomeDestinatario: "A", telefoneEntrega: "1", rua: "R", numero: "1", bairro: "B", cidade: "C", estado: "SP" };
+  assert.equal(pedidoSchema.parse({ ...base, cep: "01310-100" }).cep, "01310100");
+  assert.equal(pedidoSchema.parse({ ...base, cep: " 01310100 " }).cep, "01310100");
+  for (const invalido of ["01310 100", "01.310-100", "1310-100", "0131010", "abcde-fgh", "", "01310-1000"]) {
+    assert.equal(pedidoSchema.safeParse({ ...base, cep: invalido }).success, false, `deveria recusar "${invalido}"`);
+  }
+});
+
+test("CEP: com e sem hífen geram o mesmo hash de idempotência e o pedido grava 8 dígitos", async () => {
+  await comMercadoPago(async () => {
+    const capturado = prepararCheckout();
+    const dados = { clienteAutenticadoId: 1, creationKey: "frete-intent-0123456789", itens: [{ produtoId: 3, quantidade: 1 }],
+      nomeDestinatario: "A", telefoneEntrega: "1", rua: "R", numero: "1", bairro: "B", cidade: "São Paulo", estado: "SP" };
+    await orders.criarPedidoComPagamento({ ...dados, cep: "01310-100" });
+    const comHifen = capturado.pedido;
+    assert.equal(comHifen.cep, "01310100");
+    // Mesma chave, mesmo CEP sem hífen: é a mesma intenção (sem 409).
+    stub(prisma.pedido, "findFirst", async () => ({ id: 1, status: "PENDENTE", paymentStatus: "PENDING", checkoutInitPoint: "https://mp.example/ck", paidAt: null, creationHash: comHifen.creationHash }));
+    stub(prisma.pedido, "findUnique", async () => ({ id: 1, status: "PENDENTE", paymentStatus: "PENDING", checkoutInitPoint: "https://mp.example/ck", paidAt: null }));
+    stub(prisma.checkoutAccessToken, "updateMany", async () => ({ count: 0 }));
+    stub(prisma.checkoutAccessToken, "create", async () => ({ id: 1 }));
+    stub(prisma, "$transaction", async (callback) => callback({
+      $queryRaw: async () => [{ id: 1 }], pedido: prisma.pedido, checkoutAccessToken: prisma.checkoutAccessToken,
+    }));
+    for (const cep of ["01310100", "01310-100"]) {
+      const repetido = await orders.criarPedidoComPagamento({ ...dados, cep });
+      assert.equal(repetido.pedidoId, 1);
+    }
+  });
+});
+
+test("limites: cotação e pedido aceitam até 50 produtos distintos e 999 unidades por produto", async () => {
+  const { pedidoSchema, MAX_ITENS_PEDIDO, MAX_QUANTIDADE_POR_ITEM } = await import("../src/validators/pedido.validator.js");
+  assert.equal(MAX_ITENS_PEDIDO, 50);
+  assert.equal(MAX_QUANTIDADE_POR_ITEM, 999);
+  const itens = (n) => Array.from({ length: n }, (_, i) => ({ produtoId: i + 1, quantidade: 1 }));
+  assert.equal(freteCotacaoSchema.safeParse({ cep: CEP_OK, itens: itens(50) }).success, true);
+  assert.equal(freteCotacaoSchema.safeParse({ cep: CEP_OK, itens: itens(51) }).success, false);
+  assert.equal(freteCotacaoSchema.safeParse({ cep: CEP_OK, itens: [{ produtoId: 1, quantidade: 1000 }] }).success, false);
+  const pedido = { clienteId: 1, nomeDestinatario: "A", telefoneEntrega: "1", cep: CEP_OK, rua: "R", numero: "1", bairro: "B", cidade: "C", estado: "SP" };
+  assert.equal(pedidoSchema.safeParse({ ...pedido, itens: itens(50) }).success, true);
+  assert.equal(pedidoSchema.safeParse({ ...pedido, itens: itens(51) }).success, false);
+  assert.equal(pedidoSchema.safeParse({ ...pedido, itens: [{ produtoId: 1, quantidade: 1000 }] }).success, false);
 });

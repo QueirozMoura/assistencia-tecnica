@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { clientListMeusPedidos } from '../services/clientApi'
+import { resumoValoresPedido } from '../utils/frete'
 
 function normalizeStatus(value) {
   return String(value || '').trim().toUpperCase()
@@ -290,6 +291,14 @@ export default function PedidoDetalhes() {
                 <DetailCard label="Data da compra" value={formatDate(pedido.createdAt)} />
                 <DetailCard label="Nome do cliente" value={clienteNome} />
                 <DetailCard label="Valor total" value={formatMoney(pedido.valorTotal)} highlight />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <DetailCard label="Subtotal dos produtos" value={formatMoney(resumoValoresPedido(pedido).subtotal)} />
+                <DetailCard
+                  label="Frete"
+                  value={resumoValoresPedido(pedido).frete > 0 ? formatMoney(resumoValoresPedido(pedido).frete) : 'Grátis'}
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { clientListMeusPedidos } from '../services/clientApi'
+import { resumoValoresPedido } from '../utils/frete'
 
 function formatDate(value) {
   const date = new Date(value)
@@ -247,6 +248,15 @@ export default function MeusPedidos() {
 
                     <div className="lg:col-span-4 flex flex-col justify-between">
                       <div className="rounded-xl border border-[#d6e7ff] bg-[#f2f8ff] p-4 mb-4">
+                        {(() => {
+                          const valores = resumoValoresPedido(pedido)
+                          return (
+                            <div className="mb-2 space-y-0.5 border-b border-[#d6e7ff] pb-2 text-xs text-[#43474f]">
+                              <p className="flex justify-between"><span>Subtotal</span><span>{formatMoney(valores.subtotal)}</span></p>
+                              <p className="flex justify-between"><span>Frete</span><span>{valores.frete > 0 ? formatMoney(valores.frete) : 'Grátis'}</span></p>
+                            </div>
+                          )
+                        })()}
                         <p className="text-xs font-semibold uppercase tracking-wide text-[#5b6472] mb-1">Valor total</p>
                         <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0070ea]">{formatMoney(pedido.valorTotal)}</p>
                       </div>

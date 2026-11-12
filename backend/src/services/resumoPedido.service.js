@@ -58,22 +58,20 @@ export async function cotarFrete({ cep, itens }, db = prisma) {
   const ids = [...new Set(itens.map((i) => i.produtoId))];
   const produtos = await db.produto.findMany({ where: { id: { in: ids } } });
 
-  if (produtos.length !== ids.length) {
-    throw Object.assign(new Error("Produto inexistente no carrinho."), { statusCode: 400 });
-  }
+  // Endpoint público: mensagem única e genérica para produto inexistente, inativo ou sem estoque,
+  // sem revelar nomes de produtos inativos nem quantidades exatas de estoque.
+  const indisponivel = () =>
+    Object.assign(new Error("Um ou mais produtos do carrinho estão indisponíveis. Revise o carrinho."), {
+      statusCode: 400,
+      code: "PRODUTO_INDISPONIVEL",
+    });
+
+  if (produtos.length !== ids.length) throw indisponivel();
 
   let subtotalCentavos = 0;
   for (const item of itens) {
     const produto = produtos.find((p) => p.id === item.produtoId);
-    if (!produto.ativo) {
-      throw Object.assign(new Error(`Produto inativo: "${produto.nome}".`), { statusCode: 400 });
-    }
-    if (produto.estoque < item.quantidade) {
-      throw Object.assign(
-        new Error(`Estoque insuficiente para o produto "${produto.nome}". Disponível: ${produto.estoque}.`),
-        { statusCode: 400 }
-      );
-    }
+    if (!produto.ativo || produto.estoque < item.quantidade) throw indisponivel();
     subtotalCentavos += Math.round(precoUnitarioDoProduto(produto) * 100) * item.quantidade;
   }
 

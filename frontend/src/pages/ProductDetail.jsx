@@ -333,7 +333,7 @@ export default function ProductDetail() {
             <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:pt-1">
               {[
                 { icon: Shield,   title: '12 meses',    sub: 'Garantia' },
-                { icon: Truck,    title: 'Frete grátis', sub: 'Acima de R$ 799' },
+                { icon: Truck,    title: 'Frete grátis', sub: 'Acima de R$ 799 nas regiões atendidas' },
                 { icon: RotateCcw, title: '7 dias',     sub: 'Troca fácil' },
               ].map(({ icon: Icon, title, sub }) => (
                 <div key={title} className="bg-[#f7f9ff] rounded-xl p-2 sm:p-3 lg:p-4 text-center border border-[#e5e8ee]">

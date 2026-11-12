@@ -28,3 +28,16 @@ test('quanto falta para o frete grátis (somente ACIMA de R$ 799,00)', () => {
   assert.equal(faltaParaFreteGratis(0.1 + 0.2), 798.71)
   for (const v of [-1, NaN, 'abc']) assert.equal(faltaParaFreteGratis(v), null, String(v))
 })
+
+import { resumoValoresPedido } from '../src/utils/frete.js'
+
+test('resumoValoresPedido separa subtotal, frete e total', () => {
+  assert.deepEqual(resumoValoresPedido({ valorTotal: '849.00', valorFrete: '50.00' }), { subtotal: 799, frete: 50, total: 849 })
+  assert.deepEqual(resumoValoresPedido({ valorTotal: 899.98, valorFrete: 0 }), { subtotal: 899.98, frete: 0, total: 899.98 })
+})
+
+test('resumoValoresPedido trata pedidos antigos sem valorFrete e valores inválidos', () => {
+  assert.deepEqual(resumoValoresPedido({ valorTotal: 120.5 }), { subtotal: 120.5, frete: 0, total: 120.5 })
+  assert.deepEqual(resumoValoresPedido({ valorTotal: 100, valorFrete: 500 }), { subtotal: 100, frete: 0, total: 100 })
+  assert.deepEqual(resumoValoresPedido(null), { subtotal: 0, frete: 0, total: 0 })
+})

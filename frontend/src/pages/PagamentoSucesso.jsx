@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Package, ShoppingBag } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { formatPrice } from "../utils/formatPrice";
+import { resumoValoresPedido } from "../utils/frete";
 
 export default function PagamentoSucesso() {
   const navigate = useNavigate();
@@ -380,6 +382,12 @@ export default function PagamentoSucesso() {
                 <p className="text-2xl font-extrabold tracking-tight text-[#1a6b3c]">
                   {resumo.valor}
                 </p>
+                {pedido ? (
+                  <p className="mt-1 text-xs text-[#5b6475]">
+                    Produtos {formatPrice(resumoValoresPedido(pedido).subtotal)} · Frete{" "}
+                    {resumoValoresPedido(pedido).frete > 0 ? formatPrice(resumoValoresPedido(pedido).frete) : "Grátis"}
+                  </p>
+                ) : null}
               </div>
 
               <div className="rounded-xl border border-[#e5e8ee] bg-white p-4">

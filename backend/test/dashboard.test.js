@@ -14,7 +14,7 @@ function stub(pedidoGroups) {
   Object.assign(prisma.agendamento, { count, groupBy: async () => [] });
   Object.assign(prisma.pedido, {
     count, groupBy: async () => pedidoGroups,
-    aggregate: async ({ where }) => { revenueWhere = where; return { _sum: { valorTotal: 125.5 } }; },
+    aggregate: async ({ where }) => { revenueWhere = where; return { _sum: { valorTotal: 125.5, valorFrete: 50 } }; },
   });
   return () => revenueWhere;
 }
@@ -30,4 +30,12 @@ test("dashboard revenue never includes pending or cancelled orders", async () =>
   const revenueWhere = stub([]);
   await getDashboardStats();
   for (const status of ["PENDENTE", "CANCELADO"]) assert.ok(!revenueWhere().status.in.includes(status));
+});
+test("dashboard separa receita de produtos e de frete sem alterar receitaTotal", async () => {
+  stub([]);
+  const { pedidos } = await getDashboardStats();
+  assert.equal(pedidos.receitaTotal, 125.5); // soma de valorTotal, como antes
+  assert.equal(pedidos.receitaFrete, 50);
+  assert.equal(pedidos.receitaProdutos, 75.5);
+  assert.equal(pedidos.receitaProdutos + pedidos.receitaFrete, pedidos.receitaTotal);
 });

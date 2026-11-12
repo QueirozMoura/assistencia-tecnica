@@ -5,6 +5,7 @@ import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
 import { exigirFrete, precoUnitarioDoProduto } from "./resumoPedido.service.js";
+import { normalizarCep } from "./frete.service.js";
 import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
 import {
   toPedidoAdminDetailDto,
@@ -36,6 +37,11 @@ function validateOrderItems(itens) {
     }
     ids.add(item.produtoId);
   }
+}
+
+/** CEP com ou sem hífen representa o mesmo endereço: persistência, frete e hash de idempotência usam 8 dígitos. */
+function comCepNormalizado(dados) {
+  return { ...dados, cep: normalizarCep(dados?.cep) ?? dados?.cep };
 }
 
 export async function listarPedidos(query) {
@@ -122,7 +128,8 @@ export async function buscarPedidoPorIdDoCliente(id, clienteId) {
   return toPedidoAdminDetailDto(pedido);
 }
 
-export async function criarPedido(dados) {
+export async function criarPedido(dadosOriginais) {
+  const dados = comCepNormalizado(dadosOriginais);
   const {
     itens,
     observacoes,
@@ -232,7 +239,8 @@ export async function criarPedido(dados) {
   return pedido;
 }
 
-export async function criarPedidoComPagamento(dados) {
+export async function criarPedidoComPagamento(dadosOriginais) {
+  const dados = comCepNormalizado(dadosOriginais);
   const {
     itens,
     observacoes,

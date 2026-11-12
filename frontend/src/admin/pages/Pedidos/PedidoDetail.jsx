@@ -6,6 +6,7 @@ import ErrorState from '../../../components/ui/ErrorState'
 import EmptyState from '../../../components/ui/EmptyState'
 import { adminUpdateStatusPedido, getPedidoById } from '../../../services/adminApi'
 import { formatPrice } from '../../../utils/formatPrice'
+import { resumoValoresPedido } from '../../../utils/frete'
 
 function formatDateTime(date) {
   if (!date) return '—'
@@ -117,6 +118,14 @@ export default function PedidoDetail() {
                 <p className="flex items-center justify-between">
                   <span>Status:</span>
                   <OrderStatusBadge status={pedido?.status} />
+                </p>
+                <p className="flex items-center justify-between">
+                  <span>Subtotal dos produtos:</span>
+                  <strong>{formatPrice(resumoValoresPedido(pedido).subtotal)}</strong>
+                </p>
+                <p className="flex items-center justify-between">
+                  <span>Frete:</span>
+                  <strong>{resumoValoresPedido(pedido).frete > 0 ? formatPrice(resumoValoresPedido(pedido).frete) : 'Grátis'}</strong>
                 </p>
                 <p className="flex items-center justify-between">
                   <span>Valor total:</span>

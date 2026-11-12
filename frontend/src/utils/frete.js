@@ -30,3 +30,19 @@ export function faltaParaFreteGratis(subtotal) {
 export function subtotalGaranteFreteGratis(subtotal) {
   return faltaParaFreteGratis(subtotal) === 0
 }
+
+/**
+ * Separa o valor de um pedido em subtotal de produtos, frete e total.
+ * `valorTotal` já inclui o frete; pedidos antigos (sem `valorFrete`) têm frete 0.
+ */
+export function resumoValoresPedido(pedido) {
+  const total = centavos(pedido?.valorTotal ?? 0)
+  const frete = centavos(pedido?.valorFrete ?? 0)
+  const totalValido = Number.isFinite(total) ? total : 0
+  const freteValido = Number.isFinite(frete) && frete > 0 && frete <= totalValido ? frete : 0
+  return {
+    subtotal: (totalValido - freteValido) / 100,
+    frete: freteValido / 100,
+    total: totalValido / 100,
+  }
+}

@@ -531,7 +531,7 @@ test("concurrent intent retry rechecks under lock before creating order", async 
   stub(prisma.produto, "findMany", async () => [{ id: 1, ativo: true, estoque: 0, preco: 5 }]);
   const request = { clienteAutenticadoId: 1, cep: "01310-100", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] };
   const { creationIdentity } = await import("../src/services/orderCreation.service.js");
-  const order = { id: 77, creationHash: creationIdentity(request, false).hash };
+  const order = { id: 77, creationHash: creationIdentity({ ...request, cep: "01310100" }, false).hash }; // CEP normalizado para 8 dígitos
   stub(prisma, "$transaction", async callback => callback({ $queryRaw: async () => [{ locked: 1 }], pedido: { findFirst: async () => order } }));
   assert.equal(await orders.criarPedido({ clienteAutenticadoId: 1, cep: "01310-100", creationKey: "fixture-intent-legacy", itens: [{ produtoId: 1, quantidade: 1 }] }), order);
 });

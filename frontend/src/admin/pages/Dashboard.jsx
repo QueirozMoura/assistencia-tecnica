@@ -79,7 +79,7 @@ export default function Dashboard() {
         <StatsCard
           title="Receita total"
           value={loading ? '—' : formatPrice(Number(stats?.pedidos?.receitaTotal || 0))}
-          subtitle="Receita acumulada em pedidos"
+          subtitle={loading ? 'Receita acumulada em pedidos' : `Produtos ${formatPrice(Number(stats?.pedidos?.receitaProdutos || 0))} · Frete ${formatPrice(Number(stats?.pedidos?.receitaFrete || 0))}`}
           color="green"
           loading={loading}
           to="/admin/pedidos"
