@@ -385,3 +385,40 @@ test("in_process with a different amount or preference is not queued (only appro
   assert.equal((await webhook("in-process-preference")).reason, "PAYMENT_PREFERENCE_MISMATCH");
   assert.equal(all().length, 0);
 });
+
+// ---------------------------------------------------------------- frete x conciliação do webhook (Etapa 4.3.8, mocks)
+test("webhook com frete: pagamento aprovado no valor de produtos + frete (valorTotal) confirma o pedido", async () => {
+  Object.assign(order, { valorTotal: 134, valorFrete: 50 }); // 2 x R$ 42,00 + frete R$ 50,00
+  Object.assign(nextPayment, { status: "approved", transaction_amount: 134 });
+  assert.equal((await webhook("frete-ok")).updated, true);
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.ok(order.paidAt); assert.equal(all().length, 0);
+});
+test("webhook com frete: pagamento só com o valor dos produtos (sem frete) é divergência não verificada e não paga o pedido", async () => {
+  Object.assign(order, { valorTotal: 134, valorFrete: 50 });
+  Object.assign(nextPayment, { status: "approved", transaction_amount: 84 });
+  const result = await webhook("frete-faltando");
+  assert.equal(result.reason, "PAYMENT_AMOUNT_MISMATCH");
+  const [item] = all();
+  assert.equal(item.tipo, "DIVERGENCIA_VALOR"); assert.equal(item.verificacao, "NAO_VERIFICADO"); assert.equal(item.valorProvedor, 84); assert.equal(item.valorPedido, 134);
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paidAt, null);
+});
+test("webhook com frete grátis: pedido acima de R$ 799 (valorFrete 0) é confirmado pelo valor integral", async () => {
+  Object.assign(order, { valorTotal: 800, valorFrete: 0 });
+  Object.assign(nextPayment, { status: "approved", transaction_amount: 800 });
+  assert.equal((await webhook("frete-gratis")).updated, true);
+  assert.equal(order.status, "PAGO");
+});
+test("webhook com pedido antigo (sem frete, valorFrete 0 por padrão da migração) continua conciliando pelo valorTotal anterior", async () => {
+  Object.assign(order, { valorTotal: 349.9, valorFrete: 0 });
+  Object.assign(nextPayment, { status: "approved", transaction_amount: 349.9 });
+  assert.equal((await webhook("pedido-antigo")).updated, true);
+  assert.equal(order.status, "PAGO");
+});
+test("webhook com frete: valor pago com frete a mais ou a menos (centavos) fora da tolerância é recusado", async () => {
+  Object.assign(order, { valorTotal: 134, valorFrete: 50 });
+  for (const [i, amount] of [133.98, 134.02, 184, 0].entries()) {
+    Object.assign(nextPayment, { status: "approved", transaction_amount: amount });
+    assert.equal((await webhook(`frete-fora-${i}`)).reason, "PAYMENT_AMOUNT_MISMATCH", `valor ${amount}`);
+  }
+  assert.equal(order.status, "PENDENTE");
+});
