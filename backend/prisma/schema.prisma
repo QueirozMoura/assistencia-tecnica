@@ -111,6 +111,7 @@ model Pedido {
   id                   Int                    @id @default(autoincrement())
   clienteId            Int
   valorTotal           Decimal                @db.Decimal(10, 2)
+  valorFrete           Decimal                @default(0) @db.Decimal(10, 2)
   status               StatusPedido           @default(PENDENTE)
   observacoes          String?
   paymentStatus        String?

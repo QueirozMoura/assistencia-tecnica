@@ -69,6 +69,7 @@ export function validateMercadoPagoWebhookSignature({
 export async function createMercadoPagoPreference({
   pedido,
   itens = [],
+  valorFrete = 0,
   payer,
 }) {
   const { accessToken } = await getPaymentCredentials();
@@ -83,13 +84,19 @@ export async function createMercadoPagoPreference({
 
   const body = {
     external_reference: externalReference,
-    items: itens.map((item) => ({
-      id: String(item.produtoId),
-      title: item.nome,
-      quantity: Number(item.quantidade),
-      unit_price: Number(item.precoUnitario),
-      currency_id: "BRL",
-    })),
+    items: [
+      ...itens.map((item) => ({
+        id: String(item.produtoId),
+        title: item.nome,
+        quantity: Number(item.quantidade),
+        unit_price: Number(item.precoUnitario),
+        currency_id: "BRL",
+      })),
+      // Linha de frete somente quando houver frete a cobrar (frete grátis não gera linha).
+      ...(Number(valorFrete) > 0
+        ? [{ id: "frete", title: "Frete", quantity: 1, unit_price: Number(valorFrete), currency_id: "BRL" }]
+        : []),
+    ],
     payer: payer?.email
       ? {
           email: payer.email,
@@ -143,6 +150,21 @@ export async function createMercadoPagoPreference({
       throw Object.assign(
         new Error(`Item inválido para Mercado Pago: unit_price inválido (${item.id}).`),
         { statusCode: 400 },
+      );
+    }
+  }
+
+  // O total enviado ao Mercado Pago (produtos + frete) deve ser idêntico ao valorTotal do pedido,
+  // pois o webhook confere o valor pago com pedido.valorTotal.
+  if (pedido?.valorTotal != null) {
+    const totalItensCentavos = body.items.reduce(
+      (sum, item) => sum + Math.round(item.unit_price * 100) * item.quantity,
+      0,
+    );
+    if (totalItensCentavos !== Math.round(Number(pedido.valorTotal) * 100)) {
+      throw Object.assign(
+        new Error("Total dos itens divergente do valor do pedido. Pagamento não iniciado."),
+        { statusCode: 500 },
       );
     }
   }

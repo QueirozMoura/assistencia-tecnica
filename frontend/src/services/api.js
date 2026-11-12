@@ -102,3 +102,15 @@ export async function getProdutosRelacionados(id, limit = 4) {
 export async function getCategorias() {
   return request('/categorias?ativo=true')
 }
+// ─────────────────────────────────────────────
+// FRETE — público (cotação calculada no servidor)
+// ─────────────────────────────────────────────
+
+/**
+ * Cota o frete para o carrinho. O servidor usa os preços do banco; o frontend só envia CEP e itens.
+ * @param {{ cep: string, itens: Array<{ produtoId: number, quantidade: number }> }} params
+ * @returns {Promise<{ success: boolean, data: Cotacao }>}
+ */
+export async function cotarFrete({ cep, itens }) {
+  return request('/frete/cotacao', { method: 'POST', body: JSON.stringify({ cep, itens }) })
+}

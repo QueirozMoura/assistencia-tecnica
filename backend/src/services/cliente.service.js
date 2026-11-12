@@ -47,6 +47,7 @@ const clienteDetailSelect = {
       id: true,
       status: true,
       valorTotal: true,
+      valorFrete: true,
       paymentStatus: true,
       createdAt: true,
       itens: {

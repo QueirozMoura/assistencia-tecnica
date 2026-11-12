@@ -12,6 +12,7 @@ import clientAuthRoutes from "./clientAuth.routes.js";
 import webhookRoutes from "./webhook.routes.js";
 import pagamentoRoutes from "./pagamento.routes.js";
 import conciliacaoRoutes from "./conciliacao.routes.js";
+import freteRoutes from "./frete.routes.js";
 
 const router = Router();
 
@@ -29,5 +30,6 @@ router.use("/webhook", webhookRoutes);
 router.use("/webhooks", webhookRoutes);
 router.use("/pagamentos", pagamentoRoutes);
 router.use("/conciliacoes", conciliacaoRoutes);
+router.use("/frete", freteRoutes);
 
 export default router;

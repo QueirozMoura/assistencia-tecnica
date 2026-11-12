@@ -34,6 +34,7 @@ export function toPedidoAdminListDto(pedido) {
     id: pedido.id,
     status: pedido.status,
     valorTotal: toNumber(pedido.valorTotal),
+    valorFrete: toNumber(pedido.valorFrete),
     createdAt: pedido.createdAt,
     cliente: {
       nome: pedido?.cliente?.nome || null,
@@ -50,6 +51,7 @@ export function toPedidoAdminDetailDto(pedido) {
     paymentMethod: pedido.paymentMethod || null,
     paidAt: pedido.paidAt || null,
     valorTotal: toNumber(pedido.valorTotal),
+    valorFrete: toNumber(pedido.valorFrete),
     createdAt: pedido.createdAt,
     cliente: {
       id: pedido?.cliente?.id || null,
@@ -76,6 +78,7 @@ export function toPedidoClienteDto(pedido) {
     id: pedido.id,
     createdAt: pedido.createdAt,
     valorTotal: toNumber(pedido.valorTotal),
+    valorFrete: toNumber(pedido.valorFrete),
     status: pedido.status,
     paymentStatus: pedido.paymentStatus || null,
     paymentMethod: pedido.paymentMethod || null,
@@ -130,6 +133,7 @@ export function toPedidoSucessoDto(pedido) {
     paidAt: pedido.paidAt || null,
     status: pedido.status,
     valorTotal: toNumber(pedido.valorTotal),
+    valorFrete: toNumber(pedido.valorFrete),
     dataPedido: pedido.createdAt,
     itens: mapItensResumo(pedido?.itens || []),
     endereco: maskAddress(pedido),

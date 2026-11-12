@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const itemPedidoSchema = z.object({
+export const itemPedidoSchema = z.object({
   produtoId: z
     .number({ required_error: "ID do produto é obrigatório." })
     .int()

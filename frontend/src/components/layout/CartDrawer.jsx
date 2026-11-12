@@ -1,7 +1,8 @@
-import { X, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
+import { X, ShoppingCart, Trash2, Plus, Minus, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatPrice } from "../../utils/formatPrice";
 import { getItemPrice } from "../../hooks/useCart";
+import { faltaParaFreteGratis } from "../../utils/frete";
 
 export default function CartDrawer({
   open,
@@ -129,6 +130,27 @@ export default function CartDrawer({
             <p className="text-xs text-[#737780]">
               Em até 12x de {formatPrice(total / 12)} sem juros
             </p>
+            {(() => {
+              const falta = faltaParaFreteGratis(total);
+              if (falta === null) return null;
+              return falta === 0 ? (
+                <p className="flex items-start gap-1.5 text-xs text-[#1a6b3c] font-medium">
+                  <Truck size={14} className="flex-shrink-0 mt-px" />
+                  <span>
+                    Você ganhou frete grátis!{" "}
+                    <span className="font-normal text-[#43474f]">Válido para CEPs atendidos pela entrega JFQ.</span>
+                  </span>
+                </p>
+              ) : (
+                <p className="flex items-start gap-1.5 text-xs text-[#43474f]">
+                  <Truck size={14} className="flex-shrink-0 mt-px text-[#0070ea]" />
+                  <span>
+                    Faltam <strong className="text-[#003366]">{formatPrice(falta)}</strong> para ganhar frete grátis
+                    em CEPs atendidos.
+                  </span>
+                </p>
+              );
+            })()}
             <Link
               to="/checkout"
               onClick={onClose}

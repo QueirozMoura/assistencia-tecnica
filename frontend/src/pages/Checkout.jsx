@@ -5,9 +5,24 @@ import { getItemPrice } from '../hooks/useCart'
 import { cartTotal } from '../utils/cart'
 import { clientCreatePedidoComPagamento } from '../services/clientApi'
 import { formatPrice } from '../utils/formatPrice'
+import { useFreteQuote } from '../hooks/useFreteQuote'
+import { formatCep, isCepValido } from '../utils/frete'
 
-function OrderSummary({ items, subtotal }) {
-  const total = subtotal
+function FreteLinha({ quote }) {
+  if (quote.status === 'ok') {
+    return quote.data.freteGratis
+      ? <span className="font-semibold text-[#1a6b3c]">Grátis</span>
+      : <span className="font-semibold text-[#181c20]">{formatPrice(quote.data.frete)}</span>
+  }
+  if (quote.status === 'loading') return <span className="text-[#737780]">Calculando...</span>
+  if (quote.status === 'unavailable') return <span className="text-[#a33a3a]">Indisponível</span>
+  if (quote.status === 'error') return <span className="text-[#a33a3a]">Erro ao calcular</span>
+  return <span className="text-[#737780]">Informe o CEP</span>
+}
+
+function OrderSummary({ items, subtotal, quote }) {
+  // O total exibido usa a cotação do servidor; sem cotação válida, mostra só o subtotal.
+  const total = quote.status === 'ok' ? quote.data.total : subtotal
 
   return (
     <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
@@ -50,10 +65,21 @@ function OrderSummary({ items, subtotal }) {
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-[#43474f]">Frete</span>
-          <span className="text-[#737780]">Não incluído no total</span>
+          <FreteLinha quote={quote} />
         </div>
+        {quote.status === 'ok' && !quote.data.freteGratis ? (
+          <p className="text-xs text-[#43474f]">
+            Faltam {formatPrice(quote.data.faltaParaFreteGratis)} em produtos para ganhar frete grátis.
+          </p>
+        ) : null}
+        {quote.status === 'unavailable' ? (
+          <p className="text-xs text-[#a33a3a]">{quote.data?.mensagem || 'Entrega indisponível para este CEP.'}</p>
+        ) : null}
+        {quote.status === 'error' ? (
+          <p className="text-xs text-[#a33a3a]">{quote.error}</p>
+        ) : null}
         <div className="flex items-center justify-between pt-2 border-t border-[#e5e8ee]">
-          <span className="text-base font-bold text-[#003366]">Total Geral</span>
+          <span className="text-base font-bold text-[#003366]">{quote.status === 'ok' ? 'Total Geral' : 'Total dos produtos'}</span>
           <span className="text-xl font-bold text-[#003366]">{formatPrice(total)}</span>
         </div>
       </div>
@@ -110,7 +136,7 @@ function CustomerForm({ customer, onChange, fieldErrors }) {
   )
 }
 
-function AddressForm({ address, onChange, fieldErrors }) {
+function AddressForm({ address, onChange, fieldErrors, quote }) {
   const getInputClassName = (field) =>
     `h-11 px-3 rounded-xl border bg-white outline-none ${
       fieldErrors[field] ? 'border-[#d14343] focus:border-[#d14343]' : 'border-[#c3c6d1] focus:border-[#0070ea]'
@@ -125,11 +151,27 @@ function AddressForm({ address, onChange, fieldErrors }) {
           <input
             type="text"
             value={address.cep}
-            onChange={(e) => onChange('cep', e.target.value)}
+            onChange={(e) => onChange('cep', formatCep(e.target.value))}
             className={getInputClassName('cep')}
             placeholder="00000-000"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            maxLength={9}
           />
           {fieldErrors.cep ? <span className="text-xs text-[#d14343]">{fieldErrors.cep}</span> : null}
+          {!fieldErrors.cep && address.cep && !isCepValido(address.cep) ? (
+            <span className="text-xs text-[#737780]">Digite os 8 números do CEP.</span>
+          ) : null}
+          {!fieldErrors.cep && quote?.status === 'ok' ? (
+            <span className="text-xs text-[#1a6b3c]">
+              Entregamos neste CEP{quote.data.municipio ? ` (${quote.data.municipio})` : ''}.
+            </span>
+          ) : null}
+          {!fieldErrors.cep && quote?.status === 'unavailable' ? (
+            <span className="text-xs text-[#d14343]">
+              {quote.data?.mensagem || 'Entrega indisponível para este CEP.'}
+            </span>
+          ) : null}
         </label>
 
         <label className="flex flex-col gap-1.5">
@@ -254,6 +296,8 @@ export default function Checkout() {
   )
 
   const cartIsEmpty = items.length === 0
+  const freteQuote = useFreteQuote(address.cep, items)
+  const freteOk = freteQuote.status === 'ok'
 
   const handleCustomerChange = (field, value) => {
     setCustomer((prev) => ({ ...prev, [field]: value }))
@@ -336,6 +380,23 @@ export default function Checkout() {
 
     setFieldErrors({})
 
+    if (!isCepValido(requiredFieldValues.cep)) {
+      setFieldErrors({ cep: 'Informe um CEP válido com 8 números.' })
+      setErrorMessage('Informe um CEP válido para calcular o frete.')
+      return
+    }
+
+    if (!freteOk) {
+      setErrorMessage(
+        freteQuote.status === 'unavailable'
+          ? freteQuote.data?.mensagem || 'Entrega indisponível para o CEP informado.'
+          : freteQuote.status === 'loading'
+            ? 'Aguarde o cálculo do frete para continuar.'
+            : 'Não foi possível calcular o frete. Revise o CEP e tente novamente.',
+      )
+      return
+    }
+
     const payload = {
       clienteId: Number(cliente.id),
       itens,
@@ -400,7 +461,7 @@ export default function Checkout() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <section className="xl:col-span-2 space-y-6">
             <CustomerForm customer={customer} onChange={handleCustomerChange} fieldErrors={fieldErrors} />
-            <AddressForm address={address} onChange={handleAddressChange} fieldErrors={fieldErrors} />
+            <AddressForm address={address} onChange={handleAddressChange} fieldErrors={fieldErrors} quote={freteQuote} />
 
             <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5">
               <h2 className="text-lg font-bold text-[#003366] mb-4">Observações</h2>
@@ -418,7 +479,7 @@ export default function Checkout() {
           </section>
 
           <aside className="xl:col-span-1 space-y-6">
-            <OrderSummary items={items} subtotal={subtotal} />
+            <OrderSummary items={items} subtotal={subtotal} quote={freteQuote} />
             <PaymentCard />
 
             <div className="bg-white rounded-2xl border border-[#e5e8ee] p-5 space-y-3">
@@ -438,13 +499,20 @@ export default function Checkout() {
               <button
                 type="button"
                 onClick={handleProceed}
-                disabled={cartIsEmpty || isSubmitting}
+                disabled={cartIsEmpty || isSubmitting || !freteOk}
                 className={`w-full h-11 rounded-xl text-white font-semibold transition-colors ${
-                  cartIsEmpty || isSubmitting ? 'bg-[#9aa0a9] cursor-not-allowed' : 'bg-[#0070ea] hover:bg-[#0059bb]'
+                  cartIsEmpty || isSubmitting || !freteOk ? 'bg-[#9aa0a9] cursor-not-allowed' : 'bg-[#0070ea] hover:bg-[#0059bb]'
                 }`}
               >
                 {isSubmitting ? 'Processando...' : 'Ir para Pagamento'}
               </button>
+              {!cartIsEmpty && !freteOk && !isSubmitting ? (
+                <p className="text-xs text-[#737780] text-center">
+                  {freteQuote.status === 'unavailable'
+                    ? 'Não entregamos neste CEP. Informe outro endereço para continuar.'
+                    : 'Informe um CEP atendido para calcular o frete e continuar.'}
+                </p>
+              ) : null}
             </div>
           </aside>
         </div>

@@ -4,6 +4,7 @@ import { assertOrderTransition, assertOrderPayable, assertOrderCancellable } fro
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import { createMercadoPagoPreference } from "./pagamento.service.js";
+import { exigirFrete, precoUnitarioDoProduto } from "./resumoPedido.service.js";
 import { createCheckoutAccessToken, validateCheckoutAccessToken } from "./checkoutAccessToken.service.js";
 import {
   toPedidoAdminDetailDto,
@@ -164,8 +165,8 @@ export async function criarPedido(dados) {
     );
   }
 
-  // Verificar estoque e calcular total
-  let valorTotal = 0;
+  // Verificar estoque e calcular subtotal
+  let subtotalProdutos = 0;
   const itensComPreco = itens.map((item) => {
     const produto = produtos.find((p) => p.id === item.produtoId);
 
@@ -176,8 +177,8 @@ export async function criarPedido(dados) {
       );
     }
 
-    const precoUnitario = Number(produto.precoPromocional || produto.preco);
-    valorTotal = (Math.round(valorTotal * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
+    const precoUnitario = precoUnitarioDoProduto(produto);
+    subtotalProdutos = (Math.round(subtotalProdutos * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
 
     return {
       produtoId: item.produtoId,
@@ -185,6 +186,9 @@ export async function criarPedido(dados) {
       precoUnitario,
     };
   });
+
+  // Frete calculado no servidor (CEP + subtotal); lança erro se o CEP for inválido ou não atendido.
+  const { valorFrete, valorTotal } = exigirFrete({ cep, subtotal: subtotalProdutos });
 
   // Criar pedido e atualizar estoque em transação
   const pedido = await prisma.$transaction(async (tx) => {
@@ -195,6 +199,7 @@ export async function criarPedido(dados) {
       data: {
         clienteId,
         valorTotal,
+        valorFrete,
         stockLedgerVersion: 1,
         ...creationFields(identity),
         observacoes,
@@ -273,7 +278,7 @@ export async function criarPedidoComPagamento(dados) {
 
   logger.info("CRIAR PEDIDO COM PAGAMENTO - INICIO VALIDACAO ESTOQUE");
 
-  let valorTotal = 0;
+  let subtotalProdutos = 0;
   const itensComPreco = itens.map((item) => {
     const produto = produtos.find((p) => p.id === item.produtoId);
 
@@ -288,8 +293,8 @@ export async function criarPedidoComPagamento(dados) {
       );
     }
 
-    const precoUnitario = Number(produto.precoPromocional || produto.preco);
-    valorTotal = (Math.round(valorTotal * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
+    const precoUnitario = precoUnitarioDoProduto(produto);
+    subtotalProdutos = (Math.round(subtotalProdutos * 100) + Math.round(precoUnitario * 100) * item.quantidade) / 100;
 
     return {
       produtoId: item.produtoId,
@@ -299,7 +304,13 @@ export async function criarPedidoComPagamento(dados) {
     };
   });
 
+  // Frete calculado no servidor (CEP + subtotal); lança erro se o CEP for inválido ou não atendido.
+  // O valorTotal do pedido e a soma dos itens enviados ao Mercado Pago (produtos + frete) são idênticos.
+  const { valorFrete, valorTotal } = exigirFrete({ cep, subtotal: subtotalProdutos });
+
   logger.info("CRIAR PEDIDO COM PAGAMENTO - FIM VALIDACAO ESTOQUE", {
+    subtotalProdutos,
+    valorFrete,
     valorTotal,
     itensValidados: itensComPreco.length,
   });
@@ -321,6 +332,7 @@ export async function criarPedidoComPagamento(dados) {
       data: {
         clienteId,
         valorTotal,
+        valorFrete,
         stockLedgerVersion: 1,
         ...creationFields(identity),
         observacoes,
@@ -374,6 +386,7 @@ export async function criarPedidoComPagamento(dados) {
       const preferencia = await createMercadoPagoPreference({
         pedido: pedidoInicial,
         itens: itensComPreco,
+        valorFrete,
         payer: cliente,
       });
 
@@ -521,6 +534,7 @@ export async function listarMeusPedidos(clienteId) {
       id: true,
       createdAt: true,
       valorTotal: true,
+      valorFrete: true,
       status: true,
       paymentStatus: true,
       paymentMethod: true,

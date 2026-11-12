@@ -33,6 +33,7 @@ export function toClienteDetailDto(cliente) {
       id: pedido.id,
       status: pedido.status,
       valorTotal: pedido.valorTotal,
+      valorFrete: pedido.valorFrete,
       paymentStatus: pedido.paymentStatus,
       createdAt: pedido.createdAt,
       itens: (pedido.itens || []).map((item) => ({

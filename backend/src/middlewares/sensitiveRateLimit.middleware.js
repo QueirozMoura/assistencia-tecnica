@@ -39,3 +39,11 @@ export const criarPreferenciaSensitiveLimiter = rateLimit({
   legacyHeaders: false,
   handler: buildHandler("SECURITY_RATE_LIMIT_CRIAR_PREFERENCIA"),
 });
+
+export const freteCotacaoLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: buildHandler("SECURITY_RATE_LIMIT_FRETE_COTACAO"),
+});
