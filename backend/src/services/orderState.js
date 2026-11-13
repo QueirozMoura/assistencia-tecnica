@@ -31,8 +31,14 @@ export function assertOrderPayable(pedido) {
   }
 }
 
-export function paymentOrderTransition(pedido, mapped) {
+export function paymentOrderTransition(pedido, mapped, paymentId = null) {
   if (pedido.status === "CANCELADO") return { ignoredReason: "ORDER_CANCELLED_REQUIRES_RECONCILIATION" };
+  // The first payment that confirmed the order is the order's payment. A different approved payment is extra money: it is
+  // queued for manual reconciliation and must not overwrite paymentId/paymentMethod/paidAt. Only provider-confirmed orders count
+  // (PAID or paidAt) and only when the recorded payment is known; a repeated notification of the SAME payment is not a duplicate.
+  if (mapped.paymentStatus === "PAID" && isPaymentConfirmed(pedido) && pedido.paymentId && paymentId && String(pedido.paymentId) !== String(paymentId)) {
+    return { ignoredReason: "DUPLICATE_APPROVED_PAYMENT" };
+  }
   // An approved payment must not rewind preparation/shipping/delivery.
   const advanced = ["PREPARANDO", "ENVIADO", "ENTREGUE"].includes(pedido.status);
   const paid = pedido.paymentStatus === "PAID" || pedido.paidAt || pedido.status === "PAGO" || advanced;

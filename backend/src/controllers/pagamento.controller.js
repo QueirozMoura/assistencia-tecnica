@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import logger from "../config/logger.js";
 import * as pedidoService from "../services/pedido.service.js";
+import { assertOrderPayable } from "../services/orderState.js";
 import { buildSuspiciousAttemptLog } from "../utils/logSanitizer.js";
 import {
   createMercadoPagoPreference,
@@ -17,49 +18,88 @@ export async function criarPreferencia(req, res, next) {
 
     const checkoutToken = req.body?.checkoutToken || req.query?.token;
 
-    const { pedido } = await pedidoService.validarAcessoPagamentoPedido({
+    // Autorização (cliente dono ou token de checkout) e pré-condição de pagamento (pedido pendente e não pago).
+    await pedidoService.validarAcessoPagamentoPedido({
       pedidoId,
       clienteId: req.cliente?.id ?? null,
       checkoutToken: typeof checkoutToken === "string" ? checkoutToken : null,
     });
 
-    const itens = pedido.itens.map((item) => ({
-      produtoId: item.produtoId,
-      nome: item.produto?.nome || `Produto #${item.produtoId}`,
-      quantidade: item.quantidade,
-      precoUnitario: Number(item.precoUnitario),
-    }));
+    // Um pedido tem no máximo UMA preferência: o webhook confere o pagamento com pedido.preferenceId, então trocar a
+    // preferência faria um pagamento feito pelo link anterior cair em conciliação. A linha do pedido fica travada
+    // (FOR UPDATE) durante a criação: chamadas simultâneas serializam e as seguintes recebem a preferência já criada.
+    // A criação no Mercado Pago leva até 15 s (timeout da requisição), por isso o timeout da transação é maior que o padrão de 5 s.
+    const resultado = await prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`SELECT id FROM "public".pedidos WHERE id = ${pedidoId}::integer FOR UPDATE`;
+        const pedido = await tx.pedido.findUnique({
+          where: { id: pedidoId },
+          include: {
+            cliente: { select: { id: true, nome: true, email: true } },
+            itens: { include: { produto: { select: { id: true, nome: true } } } },
+          },
+        });
+        if (!pedido) {
+          throw Object.assign(new Error("Não foi possível iniciar o pagamento."), { statusCode: 404 });
+        }
+        // Estado relido com a linha travada: pedido pago, cancelado ou fora de PENDENTE nunca recebe preferência nem link.
+        assertOrderPayable(pedido);
 
-    // O frete persistido no pedido entra como linha própria na preferência, para que a soma enviada ao
-    // Mercado Pago seja igual a pedido.valorTotal (conferido em createMercadoPagoPreference e no webhook).
-    // Pedidos anteriores à migração do frete têm valorFrete = 0 (default da coluna) e não geram linha de frete.
-    const valorFrete = Number(pedido.valorFrete ?? 0);
+        if (pedido.preferenceId && pedido.checkoutInitPoint) {
+          return { preferenceId: pedido.preferenceId, initPoint: pedido.checkoutInitPoint, sandboxInitPoint: null, reutilizada: true };
+        }
+        if (pedido.preferenceId) {
+          // Há preferência sem link salvo (criada por uma versão anterior). Criar outra trocaria o vínculo com o webhook.
+          throw Object.assign(new Error("Este pedido já possui uma preferência de pagamento. Não é possível gerar outra."), { statusCode: 409 });
+        }
 
-    const pref = await createMercadoPagoPreference({
-      pedido,
-      itens,
-      valorFrete,
-      payer: pedido.cliente,
-    });
+        const itens = pedido.itens.map((item) => ({
+          produtoId: item.produtoId,
+          nome: item.produto?.nome || `Produto #${item.produtoId}`,
+          quantidade: item.quantidade,
+          precoUnitario: Number(item.precoUnitario),
+        }));
 
-    const saved = await prisma.pedido.updateMany({
-      where: { id: pedidoId, status: "PENDENTE", paymentStatus: pedido.paymentStatus, preferenceId: pedido.preferenceId },
-      data: {
-        preferenceId: pref.preferenceId,
-        externalReference: pref.externalReference,
+        // O frete persistido no pedido entra como linha própria na preferência, para que a soma enviada ao
+        // Mercado Pago seja igual a pedido.valorTotal (conferido em createMercadoPagoPreference e no webhook).
+        // Pedidos anteriores à migração do frete têm valorFrete = 0 (default da coluna) e não geram linha de frete.
+        const valorFrete = Number(pedido.valorFrete ?? 0);
+
+        const pref = await createMercadoPagoPreference({
+          pedido,
+          itens,
+          valorFrete,
+          payer: pedido.cliente,
+        });
+
+        if (!pref.preferenceId || !pref.initPoint) {
+          throw Object.assign(new Error("Resposta incompleta do Mercado Pago ao criar a preferência."), { statusCode: 502 });
+        }
+
+        const saved = await tx.pedido.updateMany({
+          where: { id: pedidoId, status: "PENDENTE", paymentStatus: pedido.paymentStatus, preferenceId: null },
+          data: {
+            preferenceId: pref.preferenceId,
+            externalReference: pref.externalReference,
+            checkoutInitPoint: pref.initPoint,
+          },
+        });
+        if (saved.count !== 1) {
+          throw Object.assign(new Error("Pedido alterado durante criação da preferência. Atualize os dados."), { statusCode: 409 });
+        }
+        return { preferenceId: pref.preferenceId, initPoint: pref.initPoint, sandboxInitPoint: pref.sandboxInitPoint, reutilizada: false };
       },
-    });
+      { maxWait: 5000, timeout: 25000 },
+    );
 
-    if (saved.count !== 1) {
-      throw Object.assign(new Error("Pedido alterado durante criação da preferência. Atualize os dados."), { statusCode: 409 });
-    }
     return res.status(200).json({
       success: true,
       data: {
         pedidoId,
-        preferenceId: pref.preferenceId,
-        init_point: pref.initPoint,
-        sandbox_init_point: pref.sandboxInitPoint,
+        preferenceId: resultado.preferenceId,
+        init_point: resultado.initPoint,
+        sandbox_init_point: resultado.sandboxInitPoint,
+        reutilizada: resultado.reutilizada,
       },
     });
   } catch (error) {

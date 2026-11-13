@@ -34,7 +34,8 @@ export async function replayCheckout(tx, previous) {
   await tx.$queryRaw`SELECT id FROM "public".pedidos WHERE id = ${previous.id}::integer FOR UPDATE`;
   const order = await tx.pedido.findUnique({ where: { id: previous.id } });
   if (!order) throw Object.assign(new Error('Pedido não encontrado.'), { statusCode: 404 });
-  if (order.status !== 'PENDENTE' || order.paymentStatus !== 'PENDING' || !order.checkoutInitPoint || order.paidAt) {
+  // FAILED = a última tentativa de pagamento foi recusada; o pedido segue PENDENTE e o cliente pode tentar de novo.
+  if (order.status !== 'PENDENTE' || !['PENDING', 'FAILED'].includes(order.paymentStatus) || !order.checkoutInitPoint || order.paidAt) {
     throw Object.assign(new Error('Pedido já processado. Consulte seus pedidos antes de iniciar outra compra.'), { statusCode: 409 });
   }
   const access = await createCheckoutAccessToken({ pedidoId: order.id, tx });

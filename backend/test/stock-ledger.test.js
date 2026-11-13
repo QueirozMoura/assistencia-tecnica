@@ -72,3 +72,15 @@ test('checkout replay uses saved preference without provider call or another res
 test('SQL fixture splitter preserves dollar blocks, comments and literal semicolons', () => {
   assert.equal(splitSql("BEGIN; -- ;comment\nSELECT 'a;b'; DO $$ BEGIN PERFORM 1; END $$; COMMIT;").length, 2);
 });
+test('checkout replay also serves the saved preference when the last payment attempt was refused (FAILED), so the customer can retry', async () => {
+  const order = { id: 1, status: 'PENDENTE', paymentStatus: 'FAILED', checkoutInitPoint: 'https://example.invalid/fixture' };
+  const tx = { $queryRaw: async () => [{ id: 1 }], pedido: { findUnique: async () => order },
+    checkoutAccessToken: { updateMany: async () => ({ count: 0 }), create: async () => ({ id: 1 }) } };
+  const result = await replayCheckout(tx, order);
+  assert.equal(result.pedidoId, 1); assert.equal(result.init_point, order.checkoutInitPoint);
+});
+test('checkout replay still refuses an order whose payment is confirmed, even if still marked PENDENTE', async () => {
+  const order = { id: 1, status: 'PENDENTE', paymentStatus: 'PAID', checkoutInitPoint: 'https://example.invalid/fixture' };
+  const tx = { $queryRaw: async () => [{ id: 1 }], pedido: { findUnique: async () => order } };
+  await assert.rejects(() => replayCheckout(tx, order), { statusCode: 409 });
+});

@@ -7,11 +7,12 @@ Object.assign(process.env, {
   MERCADO_PAGO_MODE: "test", MERCADO_PAGO_TEST_SELLER_ID: "123", MERCADO_PAGO_ACCESS_TOKEN: "synthetic-only",
 });
 const prisma = (await import("../src/config/prisma.js")).default;
+const logger = (await import("../src/config/logger.js")).default;
 const { atualizarStatusPedido, validarAcessoPagamentoPedido } = await import("../src/services/pedido.service.js");
 const { processMercadoPagoWebhook } = await import("../src/services/pagamento.service.js");
 const { assertOrderTransition } = await import("../src/services/orderState.js");
 
-let pendencias, history, order, stock, increments, events, nextPayment, beforeCompare, queue, debitEvidence, returned, failReturn;
+let pendencias, history, order, stock, increments, events, nextPayment, beforeCompare, queue, debitEvidence, returned, failReturn, notifications;
 const originals = [];
 const originalFetch = globalThis.fetch;
 const copy = value => structuredClone(value);
@@ -23,10 +24,15 @@ beforeEach(() => {
   order = { id: 1, clienteId: 1, status: "PENDENTE", paymentStatus: "PENDING", paidAt: null, valorTotal: 10, preferenceId: "fixture-preference", itens: [{ produtoId: 1, quantidade: 2 }], cliente: { id: 1, email: "fixture@example.invalid" } };
   debitEvidence = true; returned = false; failReturn = false; pendencias = new Map(); history = [];
   stock = 3; increments = 0; events = new Map(); beforeCompare = null; queue = Promise.resolve();
+  // O transporte mock de e-mail registra uma linha por aviso ao administrador de pagamento aprovado: serve para contar envios.
+  notifications = 0;
+  replace(logger, "info", (...args) => { if (String(args[0]).includes("[email:mock] Notificacao administrativa")) notifications++; return logger; });
   nextPayment = { id: 1, collector_id: 123, live_mode: false, external_reference: "pedido_1", preference_id: "fixture-preference", status: "pending", transaction_amount: 10 };
   globalThis.fetch = async url => {
     if (url === "https://api.mercadopago.com/users/me") return { ok: true, json: async () => ({ id: 123, tags: ["test_user"] }) };
-    if (url === "https://api.mercadopago.com/v1/payments/1") return { ok: true, status: 200, json: async () => copy(nextPayment) };
+    // Qualquer ID de pagamento devolve o estado atual simulado; o ID da resposta é o consultado (cada tentativa tem o seu).
+    const paymentUrl = /^https:\/\/api\.mercadopago\.com\/v1\/payments\/(\d+)$/.exec(url);
+    if (paymentUrl) return { ok: true, status: 200, json: async () => ({ ...copy(nextPayment), id: Number(paymentUrl[1]) }) };
     throw new Error("Unexpected external request blocked");
   };
   const pedido = {
@@ -80,7 +86,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => { while (originals.length) originals.pop()(); globalThis.fetch = originalFetch; });
-const webhook = (id = "fixture-event") => processMercadoPagoWebhook({ id, type: "payment", data: { id: 1 }, live_mode: false });
+const webhook = (id = "fixture-event", paymentId = 1) => processMercadoPagoWebhook({ id, type: "payment", data: { id: paymentId }, live_mode: false });
 
 test("first cancellation returns inventory once and repeated cancellation is idempotent", async () => {
   await atualizarStatusPedido(1, "CANCELADO");
@@ -193,12 +199,14 @@ test("historical order without proof cancels without manufacturing a stock retur
   await atualizarStatusPedido(1, "CANCELADO");
   assert.equal(order.status, "CANCELADO"); assert.equal(stock, 3); assert.equal(increments, 0);
 });
-test("rejected payment releases proven reserve exactly once across repeated and late events", async () => {
+test("rejected payment never releases stock: repeated rejections keep the order reserved and a later approval pays it", async () => {
   nextPayment.status = "rejected";
   await webhook("rejected-1"); await webhook("rejected-2");
-  nextPayment.status = "approved"; await webhook("late-approved");
-  assert.equal(order.status, "CANCELADO"); assert.equal(order.paymentStatus, "FAILED");
-  assert.equal(stock, 5); assert.equal(increments, 1);
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "FAILED");
+  assert.equal(stock, 3); assert.equal(increments, 0);
+  nextPayment.status = "approved"; await webhook("later-approved");
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID");
+  assert.equal(stock, 3); assert.equal(increments, 0);
 });
 test("historical rejected payment without debit evidence never increments stock", async () => {
   debitEvidence = false; nextPayment.status = "rejected";
@@ -209,11 +217,11 @@ test("return failure rolls back administrative state and inventory", async () =>
   await assert.rejects(() => atualizarStatusPedido(1, "CANCELADO"), { statusCode: 409 });
   assert.equal(order.status, "PENDENTE"); assert.equal(stock, 3); assert.equal(increments, 0);
 });
-test("return failure rolls back webhook state, dedupe marker and inventory", async () => {
+test("a rejected payment never touches the stock ledger, so a ledger failure cannot affect the webhook", async () => {
   failReturn = true; nextPayment.status = "rejected";
-  await assert.rejects(() => webhook(), { statusCode: 409 });
-  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "PENDING");
-  assert.equal(stock, 3); assert.equal(events.size, 0);
+  assert.equal((await webhook()).updated, true);
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "FAILED");
+  assert.equal(stock, 3); assert.equal(increments, 0); assert.equal(events.size, 1);
 });
 
 // --- Approved business rule: payment-vs-cancellation race (two valid outcomes only) ---
@@ -421,4 +429,179 @@ test("webhook com frete: valor pago com frete a mais ou a menos (centavos) fora 
     assert.equal((await webhook(`frete-fora-${i}`)).reason, "PAYMENT_AMOUNT_MISMATCH", `valor ${amount}`);
   }
   assert.equal(order.status, "PENDENTE");
+});
+
+// ---------------------------------------------------------------- P1.1: recusa/cancelamento de UMA tentativa não cancela o pedido
+// Cada tentativa de pagamento tem o seu ID. Uma recusa registra a tentativa (paymentStatus FAILED) e mantém o pedido PENDENTE,
+// com o estoque reservado, para que uma nova tentativa aprovada ainda seja aceita. Só dinheiro aprovado confirma o pedido.
+let seq = 0;
+const notify = (paymentId, status) => { nextPayment.status = status; return webhook(`p11-${++seq}`, paymentId); };
+
+for (const status of ["rejected", "cancelled", "cancelled_by_user"]) {
+  test(`P1.1 provider status ${status} records the failed attempt but keeps the order PENDENTE, reserved and payable`, async () => {
+    assert.equal((await notify(7, status)).updated, true);
+    assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "FAILED"); assert.equal(order.paymentId, "7"); assert.equal(order.paidAt, null);
+    assert.equal(increments, 0); assert.equal(stock, 3, "the reservation is kept for the next attempt");
+    assert.equal(all().length, 0, "a refused attempt is not money: nothing is queued");
+    assert.ok((await validarAcessoPagamentoPedido({ pedidoId: 1, clienteId: 1 })).pedido, "the order still accepts a new payment attempt");
+  });
+}
+test("P1.1 rejected then approved (new attempt, new payment id) confirms the order once, without reconciliation or stock movement", async () => {
+  await notify(7, "rejected");
+  assert.equal(order.status, "PENDENTE");
+  assert.equal((await notify(8, "approved")).updated, true);
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.ok(order.paidAt); assert.equal(order.paymentId, "8");
+  assert.equal(all().length, 0); assert.equal(increments, 0); assert.equal(stock, 3);
+});
+test("P1.1 rejected, then a new attempt in process, then approved still ends PAGO", async () => {
+  await notify(7, "rejected"); await notify(8, "in_process");
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "PENDING");
+  await notify(8, "approved");
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.equal(order.paymentId, "8");
+  assert.equal(all().length, 0); assert.equal(increments, 0); assert.equal(stock, 3);
+});
+for (const late of ["rejected", "cancelled"]) {
+  test(`P1.1 a late ${late} notification of an earlier attempt cannot revert an order already paid`, async () => {
+    await notify(8, "approved"); const paidAt = order.paidAt;
+    assert.equal((await notify(7, late)).reason, "PAYMENT_STATE_REGRESSION");
+    assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.equal(order.paymentId, "8"); assert.equal(order.paidAt.getTime(), paidAt.getTime());
+    assert.equal(all().length, 0, "an old refused attempt is not a financial event"); assert.equal(increments, 0); assert.equal(stock, 3);
+  });
+}
+test("P1.1 duplicated rejected notifications (same event id and different ids) change nothing twice", async () => {
+  nextPayment.status = "rejected";
+  await webhook("same-rejected", 7);
+  assert.equal((await webhook("same-rejected", 7)).reason, "WEBHOOK_ALREADY_PROCESSED");
+  await Promise.all([notify(7, "rejected"), notify(7, "rejected")]);
+  assert.equal(order.status, "PENDENTE"); assert.equal(order.paymentStatus, "FAILED"); assert.equal(order.paymentId, "7");
+  assert.equal(increments, 0); assert.equal(stock, 3); assert.equal(all().length, 0);
+});
+test("P1.1 duplicated approved notifications keep the first paidAt and never touch stock or the reconciliation queue", async () => {
+  nextPayment.status = "approved";
+  await webhook("same-approved", 8); const paidAt = order.paidAt;
+  assert.equal((await webhook("same-approved", 8)).reason, "WEBHOOK_ALREADY_PROCESSED");
+  await Promise.all([webhook("other-approved-1", 8), webhook("other-approved-2", 8)]);
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.equal(order.paidAt.getTime(), paidAt.getTime());
+  assert.equal(increments, 0); assert.equal(stock, 3); assert.equal(all().length, 0);
+});
+test("P1.1 a cancelled payment does not cancel the order; a later approval pays it", async () => {
+  await notify(7, "cancelled");
+  assert.equal(order.status, "PENDENTE"); assert.equal(increments, 0); assert.equal(stock, 3);
+  await notify(8, "approved");
+  assert.equal(order.status, "PAGO"); assert.equal(all().length, 0);
+});
+test("P1.1 an effectively cancelled order keeps its handling: stock returns once and a later approval goes to reconciliation", async () => {
+  await notify(7, "rejected");
+  await atualizarStatusPedido(1, "CANCELADO");
+  assert.equal(order.status, "CANCELADO"); assert.equal(stock, 5); assert.equal(increments, 1);
+  const late = await notify(8, "approved");
+  assert.equal(late.reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION");
+  assert.equal(all().length, 1); assert.equal(all()[0].tipo, "PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO"); assert.equal(all()[0].verificacao, "CONFIRMADO_PELO_PROVEDOR");
+  assert.equal(order.status, "CANCELADO"); assert.equal(order.paidAt, null); assert.equal(stock, 5); assert.equal(increments, 1, "never reserved or released again");
+  await notify(8, "approved"); // same approval notified again
+  assert.equal(all().length, 1); assert.equal(all()[0].ocorrencias, 2); assert.equal(increments, 1);
+});
+test("P1.1 a refused attempt on an order cancelled in the meantime is ignored and not queued as money", async () => {
+  await atualizarStatusPedido(1, "CANCELADO");
+  assert.equal((await notify(7, "rejected")).reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION");
+  assert.equal(all().length, 0); assert.equal(stock, 5); assert.equal(increments, 1);
+});
+
+// ---------------------------------------------------------------- P1.2 fase 1: segunda aprovação (outro paymentId) em pedido já pago
+// O primeiro pagamento que confirma o pedido é o pagamento do pedido. Uma segunda aprovação com OUTRO paymentId é dinheiro a mais:
+// vai para a conciliação manual (nunca reembolso automático) e não sobrescreve paymentId, paymentMethod, paidAt, status nem estoque.
+const approvedWith = (paymentId, method) => { nextPayment.payment_method_id = method; return notify(paymentId, "approved"); };
+
+test("P1.2 the same payment approved again under different notification ids is the same charge, not a duplicate", async () => {
+  await approvedWith(8, "visa");
+  const paidAt = order.paidAt; const sent = notifications;
+  assert.ok(sent >= 1, "the first approval notifies the administrator");
+  await approvedWith(8, "visa"); await approvedWith(8, "visa");
+  assert.equal(all().length, 0, "nothing queued for a repeated notification of the same payment");
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentId, "8"); assert.equal(order.paidAt.getTime(), paidAt.getTime());
+  assert.equal(notifications, sent, "no second administrator notification"); assert.equal(increments, 0); assert.equal(stock, 3);
+});
+test("P1.2 a second approved payment with a different paymentId is queued and never overwrites the original payment", async () => {
+  await approvedWith(8, "visa");
+  const original = copy(order); const sent = notifications;
+  const result = await approvedWith(9, "pix");
+  assert.equal(result.ignored, true); assert.equal(result.reason, "DUPLICATE_APPROVED_PAYMENT"); assert.ok(result.conciliacaoId);
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID");
+  assert.equal(order.paymentId, "8"); assert.equal(order.paymentMethod, "visa"); assert.equal(order.paidAt.getTime(), original.paidAt.getTime());
+  assert.equal(all().length, 1);
+  const [item] = all();
+  assert.equal(item.tipo, "PAGAMENTO_DUPLICADO"); assert.equal(item.verificacao, "CONFIRMADO_PELO_PROVEDOR"); assert.equal(item.chave, "pid:9");
+  assert.equal(item.pedidoId, 1); assert.equal(item.paymentId, "9"); assert.equal(item.statusProvedor, "approved");
+  assert.equal(item.valorProvedor, 10); assert.equal(item.valorPedido, 10); assert.equal(item.statusPedido, "PAGO");
+  assert.deepEqual(history.map(h => h.acao), ["REGISTRADA"]);
+  assert.equal(notifications, sent, "no duplicate administrator notification"); assert.equal(increments, 0); assert.equal(stock, 3, "stock is never released or reserved again");
+});
+test("P1.2 the duplicate is idempotent by paymentId across different notification ids; another duplicate payment is a separate item", async () => {
+  await approvedWith(8, "visa");
+  await approvedWith(9, "pix"); await approvedWith(9, "pix"); await approvedWith(9, "pix");
+  assert.equal(all().length, 1); assert.equal(all()[0].ocorrencias, 3);
+  assert.deepEqual(history.map(h => h.acao), ["REGISTRADA", "REOCORRENCIA", "REOCORRENCIA"]);
+  await approvedWith(10, "master");
+  assert.deepEqual(all().map(item => item.chave).sort(), ["pid:10", "pid:9"]);
+  assert.equal(order.paymentId, "8"); assert.equal(increments, 0); assert.equal(stock, 3);
+});
+test("P1.2 out-of-order approvals: whichever approval confirmed the order first is kept, the other is queued", async () => {
+  await approvedWith(9, "pix");
+  await approvedWith(8, "visa");
+  assert.equal(order.paymentId, "9"); assert.equal(order.paymentMethod, "pix");
+  assert.deepEqual(all().map(item => item.chave), ["pid:8"]);
+});
+test("P1.2 a second approval that races past the first one is refused by the state check and queued when the provider retries", async () => {
+  // A outra transação confirma o pedido com o pagamento 8 entre a leitura e o UPDATE condicional desta aprovação (9).
+  const committedByTheOtherTransaction = { status: "PAGO", paymentStatus: "PAID", paidAt: new Date(), paymentId: "8", paymentMethod: "visa" };
+  beforeCompare = () => { Object.assign(order, committedByTheOtherTransaction); };
+  await assert.rejects(() => approvedWith(9, "pix"), { statusCode: 409 });
+  assert.equal(events.size, 0); assert.equal(all().length, 0, "the refused attempt leaves nothing behind");
+  // O harness desfaz com a transação que falhou o commit concorrente simulado; no banco real ele é durável. Reaplica.
+  Object.assign(order, committedByTheOtherTransaction);
+  assert.equal((await approvedWith(9, "pix")).reason, "DUPLICATE_APPROVED_PAYMENT");
+  assert.deepEqual(all().map(item => item.chave), ["pid:9"]); assert.equal(order.paymentId, "8");
+});
+test("P1.2 two approvals in flight at the same time end with exactly one payment on the order and the other queued", async () => {
+  nextPayment.status = "approved";
+  await Promise.all([webhook("race-a", 8).catch(error => error), webhook("race-b", 9).catch(error => error)]);
+  assert.equal(order.status, "PAGO"); assert.equal(order.paymentStatus, "PAID"); assert.ok(["8", "9"].includes(order.paymentId));
+  const other = order.paymentId === "8" ? "9" : "8";
+  assert.deepEqual(all().map(item => item.chave), [`pid:${other}`]);
+  assert.equal(increments, 0); assert.equal(stock, 3);
+});
+for (const advanced of ["PREPARANDO", "ENVIADO", "ENTREGUE"]) {
+  test(`P1.2 a second approved payment on an order already ${advanced} is queued and does not touch the order`, async () => {
+    Object.assign(order, { status: advanced, paymentStatus: "PAID", paidAt: new Date(), paymentId: "8", paymentMethod: "visa" });
+    assert.equal((await approvedWith(9, "pix")).reason, "DUPLICATE_APPROVED_PAYMENT");
+    assert.equal(order.status, advanced); assert.equal(order.paymentId, "8"); assert.equal(order.paymentMethod, "visa");
+    assert.deepEqual(all().map(item => item.chave), ["pid:9"]); assert.equal(increments, 0);
+  });
+}
+test("P1.2 an order paid without a recorded paymentId (manual or historical) cannot be told apart, so a real approval is applied as before", async () => {
+  Object.assign(order, { status: "PAGO", paymentStatus: null, paidAt: null, paymentId: null });
+  assert.equal((await approvedWith(8, "visa")).updated, true);
+  assert.equal(order.paymentId, "8"); assert.equal(all().length, 0);
+  Object.assign(order, { status: "PENDENTE", paymentStatus: "PAID", paidAt: new Date(), paymentId: null });
+  assert.equal((await approvedWith(9, "pix")).updated, true); assert.equal(all().length, 0);
+});
+test("P1.2 an approval on an effectively cancelled order keeps its own reconciliation type, even when an older attempt is on the order", async () => {
+  await notify(7, "rejected");
+  await atualizarStatusPedido(1, "CANCELADO");
+  const result = await approvedWith(9, "pix");
+  assert.equal(result.reason, "ORDER_CANCELLED_REQUIRES_RECONCILIATION");
+  assert.deepEqual(all().map(item => [item.tipo, item.chave]), [["PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO", "pid:9"]]);
+  assert.equal(order.status, "CANCELADO"); assert.equal(order.paidAt, null); assert.equal(stock, 5); assert.equal(increments, 1);
+});
+test("P1.2 a second approval with a different amount stays a value divergence, not a duplicate", async () => {
+  await approvedWith(8, "visa");
+  nextPayment.transaction_amount = 99;
+  assert.equal((await approvedWith(9, "pix")).reason, "PAYMENT_AMOUNT_MISMATCH");
+  assert.deepEqual(all().map(item => [item.tipo, item.verificacao]), [["DIVERGENCIA_VALOR", "NAO_VERIFICADO"]]);
+  assert.equal(order.paymentId, "8"); assert.equal(order.status, "PAGO");
+});
+test("P1.2 non-approved notifications of another attempt on a paid order are still ignored without queueing", async () => {
+  await approvedWith(8, "visa");
+  for (const status of ["rejected", "cancelled", "in_process", "pending"]) assert.equal((await notify(9, status)).reason, "PAYMENT_STATE_REGRESSION");
+  assert.equal(all().length, 0); assert.equal(order.paymentId, "8"); assert.equal(order.status, "PAGO");
 });

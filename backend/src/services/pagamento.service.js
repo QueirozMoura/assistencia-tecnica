@@ -62,6 +62,11 @@ export function validateMercadoPagoWebhookSignature({
   return { valid, reason: valid ? "OK" : "INVALID_SIGNATURE" };
 }
 
+// Tipos de pagamento (payment_type_id) excluídos do Checkout Pro. "ticket" = boleto (método bolbradesco): confirmado na
+// documentação oficial ("Exclude payment methods") e em GET /v1/payment_methods. "atm" NÃO entra: não consta na lista da conta
+// e o identificador não foi confirmado. Pix é "bank_transfer" e não pode ser excluído aqui.
+export const TIPOS_PAGAMENTO_EXCLUIDOS = Object.freeze(["ticket"]);
+
 /**
  * Cria preferência de pagamento no Mercado Pago.
  * Integração aditiva para Etapa 2 sem alterar o fluxo legado de pedidos.
@@ -111,9 +116,11 @@ export async function createMercadoPagoPreference({
       pending: pendingUrl || "https://example.com/pagamento/pendente",
     },
     notification_url: notificationUrl || undefined,
+    // Boleto (payment_type_id "ticket") fora: Pix (bank_transfer), cartão de crédito/débito e saldo continuam disponíveis.
+    payment_methods: { excluded_payment_types: TIPOS_PAGAMENTO_EXCLUIDOS.map((id) => ({ id })) },
   };
 
-  const ensureValidHttpUrl = (value, fieldName) => {
+  const ensureValidHttpUrl =(value, fieldName) => {
     if (!value) return;
     try {
       const parsed = new URL(value);
@@ -299,12 +306,17 @@ function mapMercadoPagoStatusToInternal(status) {
     return { pedidoStatus: "PAGO", paymentStatus: "PAID" };
   }
 
+  // Recusa ou cancelamento de UMA tentativa de pagamento não cancela o pedido: a tentativa é registrada
+  // (paymentStatus FAILED), mas o pedido continua PENDENTE e com o estoque reservado, pois o mesmo link de
+  // pagamento aceita nova tentativa e uma aprovação posterior ainda precisa encontrar o pedido aberto.
+  // Cancelar aqui reabriria o risco de cobrança sem pedido (aprovação em pedido CANCELADO só vai para
+  // conciliação manual). O cancelamento do pedido é decisão administrativa (ou da futura expiração).
   if (
     normalizedStatus === "rejected" ||
     normalizedStatus === "cancelled" ||
     normalizedStatus === "cancelled_by_user"
   ) {
-    return { pedidoStatus: "CANCELADO", paymentStatus: "FAILED" };
+    return { pedidoStatus: "PENDENTE", paymentStatus: "FAILED" };
   }
 
   return { pedidoStatus: "PENDENTE", paymentStatus: "PENDING" };
@@ -546,12 +558,13 @@ export async function processMercadoPagoWebhook(payload, metadata = {}) {
     const txResult = await prisma.$transaction(async (tx) => {
       const current = await tx.pedido.findUnique({ where: { id: pedidoId } });
       if (!current) return { ignoredReason: "PEDIDO_NOT_FOUND" };
-      const transition = paymentOrderTransition(current, mapped);
+      const transition = paymentOrderTransition(current, mapped, paymentId);
       if (transition.ignoredReason) {
         // Recorded in THIS transaction: the queue entry commits (or rolls back) with the decision to leave the order untouched.
         const providerStatus = String(payment?.status || "").toLowerCase();
         let tipo = null;
         if (transition.ignoredReason === "ORDER_CANCELLED_REQUIRES_RECONCILIATION" && approvedByProvider(payment)) tipo = TIPOS.PAGAMENTO_CONFIRMADO_PEDIDO_CANCELADO;
+        else if (transition.ignoredReason === "DUPLICATE_APPROVED_PAYMENT" && approvedByProvider(payment)) tipo = TIPOS.PAGAMENTO_DUPLICADO;
         else if (transition.ignoredReason === "PAYMENT_STATE_REGRESSION" && ["refunded", "charged_back"].includes(providerStatus)) tipo = TIPOS.ESTORNO_OU_CHARGEBACK;
         if (tipo) {
           const registro = await registrarPendencia(tx, evidence(payment, { tipo, pedidoId, statusPedido: current.status,
