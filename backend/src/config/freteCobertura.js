@@ -32,6 +32,17 @@
  * Intervalos usados abaixo = os que coincidem em todas as fontes (limite inicial incluindo
  * o CEP "-000" do início de cada faixa).
  *
+ * VERIFICAÇÃO INDEPENDENTE (Etapa 4.4, 11/11/2026): 12.287 CEPs reais obtidos do ViaCEP (base dos Correios) para
+ * os 5 municípios atendidos e 25 municípios vizinhos (Carapicuíba, Barueri, Cotia, Itapecerica da Serra, Vargem Grande
+ * Paulista, Mauá, São Caetano do Sul, São Bernardo do Campo, Ferraz de Vasconcelos, Guarulhos etc.), confrontados com
+ * estas faixas: 0 CEPs de município atendido fora da faixa, 0 CEPs de outro município dentro da faixa, 0 divergências de
+ * nome. Bordas observadas: capital 01001-900 a 08490-552; Osasco 06010-040 a 06298-190 (Carapicuíba começa em 06310);
+ * Taboão da Serra 06753-005 a 06795-006 (Vargem Grande Paulista termina em 06742); Embu das Artes 06803-000 a 06846-830
+ * (Itapecerica começa em 06850); Santo André 09010-010 a 09291-280 (Mauá começa em 09310). O bloco 05900-05999 da capital
+ * não tem nenhum CEP no ViaCEP (0 de 500 sondados; no bloco de controle 05800-05810 houve resposta): é seguro mantê-lo,
+ * pois não contém endereços reais. A amostra não é exaustiva e o ViaCEP não é a fonte oficial: a conferência final
+ * continua sendo a "Busca CEP > Faixa de CEP" dos Correios (formulário que não pode ser automatizado).
+ *
  * PENDÊNCIAS / CUIDADOS (não resolvidos, deixados de fora de propósito):
  *  1. Conferir as faixas na busca oficial dos Correios ("Busca CEP > Faixa de CEP"), pois
  *     as fontes consultadas são secundárias e a consulta oficial é um formulário que não pôde

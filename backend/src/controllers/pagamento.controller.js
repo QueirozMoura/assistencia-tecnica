@@ -30,9 +30,15 @@ export async function criarPreferencia(req, res, next) {
       precoUnitario: Number(item.precoUnitario),
     }));
 
+    // O frete persistido no pedido entra como linha própria na preferência, para que a soma enviada ao
+    // Mercado Pago seja igual a pedido.valorTotal (conferido em createMercadoPagoPreference e no webhook).
+    // Pedidos anteriores à migração do frete têm valorFrete = 0 (default da coluna) e não geram linha de frete.
+    const valorFrete = Number(pedido.valorFrete ?? 0);
+
     const pref = await createMercadoPagoPreference({
       pedido,
       itens,
+      valorFrete,
       payer: pedido.cliente,
     });
 
